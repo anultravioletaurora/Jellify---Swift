@@ -6,12 +6,15 @@
 //
 
 import SwiftUI
+import MediaPlayer
+import StoreKit
 
 @main
 struct FinTuneApp: App {
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+                ContentView()
         }
     }
 }

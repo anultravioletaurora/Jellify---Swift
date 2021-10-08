@@ -8,14 +8,31 @@
 import SwiftUI
 
 struct ContentView: View {
+        
     var body: some View {
-        Text("Hello, world!")
-            .padding()
+        
+        
+        
+        /**
+        If the user is not yet auth'd, then we will prompt them to login
+        */
+        if true {
+            LoginView()
+        }
+        
+        /**
+         Else render the app, since *hacker noise* they're in
+         */
+        else {
+            TabBarView()
+        }
     }
 }
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        ContentView()
+        Group {
+            ContentView()
+        }
     }
 }
