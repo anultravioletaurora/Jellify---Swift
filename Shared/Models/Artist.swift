@@ -31,4 +31,10 @@ struct Artist : Identifiable {
      Whether the artist has been favorited by the user
      */
     var favorite: Bool
+    
+    enum CodingKeys: String, CodingKey {
+        case id = "Id"
+
+        case name = "Name"
+    }
 }

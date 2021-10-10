@@ -10,7 +10,7 @@ import SwiftUI
 struct LoginView: View {
     
     @State
-    var serverUrl: String = ""
+    var serverUrl: String = "https://"
     
     @State
     var username: String = ""
@@ -18,40 +18,65 @@ struct LoginView: View {
     @State
     var password: String = ""
     
+    @State
+    var loggingIn: Bool = false
+    
+    var authenticationService = AuthenticationService.shared
+    
     var body: some View {
         
         NavigationView {
             VStack {
                 
-                Image("profile")
+                // Splash Image
+                Image("AppIcon")
                     .resizable()
                     .frame(width: 200, height: 200)
                     .padding()
                 
+                // Server URL Input
+                    
                 HStack {
                     Image(systemName: "server.rack")
                     TextField("serverUrl", text: $serverUrl, prompt: Text("Enter Jellyfin Server URL"))
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
-                        ._tightPadding()
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
                         .keyboardType(.alphabet)
+                        ._tightPadding()
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+
                 }
-                
+                                    
+                // Username Input
                 HStack {
                     Image(systemName: "person.fill")
                     TextField("username", text: $username, prompt: Text("Enter Username"))
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         ._tightPadding()
                 }
                 
+                // Password Input
                 HStack {
                     Image(systemName: "key.fill")
                     SecureField("password", text: $password, prompt: Text("Enter Password"))
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
                         .textFieldStyle(RoundedBorderTextFieldStyle())
                         ._tightPadding()
                 }
                 
+                // Submit Button
                 Button(action: {
-                    print("I'm in!")
+                    authenticationService.authenticate(server: serverUrl, username: username, password: password, completion: {result in
+                        
+                        if result {
+                            print("We did it!!")
+                        } else {
+                            print("BOOOOOOO")
+                        }
+                    })
                 }) {
                     
                         Text("Let me in!")
@@ -59,20 +84,15 @@ struct LoginView: View {
                         .padding()
                         .frame(width: nil, height: 50, alignment: .center)
                         .foregroundColor(.white)
-                        .background(Color.accentColor)
+                        .background(Color.accentColor.opacity(loggingIn ? 0.3 : 1))
                         .cornerRadius(15)
                 }
+                .disabled(loggingIn)
                 .frame(maxWidth: .infinity)
                 .buttonStyle(DefaultButtonStyle())
             }
             .padding()
             .navigationTitle(Text("Welcome to FinTune"))
         }
-    }
-}
-
-struct LoginView_Previews: PreviewProvider {
-    static var previews: some View {
-        LoginView()
     }
 }

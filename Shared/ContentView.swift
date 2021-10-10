@@ -9,6 +9,9 @@ import SwiftUI
 
 struct ContentView: View {
         
+    @ObservedObject
+    var authenticationService = AuthenticationService.shared
+    
     var body: some View {
         
         
@@ -16,15 +19,16 @@ struct ContentView: View {
         /**
         If the user is not yet auth'd, then we will prompt them to login
         */
-        if true {
+        if !authenticationService.authenticated() {
             LoginView()
+                .transition(.slide)
         }
         
         /**
          Else render the app, since *hacker noise* they're in
          */
         else {
-            TabBarView()
+            TabBarView().transition(.slide)
         }
     }
 }

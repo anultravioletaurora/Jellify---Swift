@@ -8,19 +8,18 @@
 import SwiftUI
 
 struct SettingsView: View {
+    
+    @ObservedObject
+    var authenticationService = AuthenticationService.shared
+    
     var body: some View {
         NavigationView {
-            VStack(alignment: .leading, spacing: 10) {
-                ForEach(1...10, id: \.self) {
-                    Text("Item \($0)")
-                }
-            }
+            Button(action: {
+                
+                authenticationService.logOut()
+            }, label: {
+                Text("Log out")
+            })
             .navigationTitle("Settings")
         }    }
-}
-
-struct SettingsView_Previews: PreviewProvider {
-    static var previews: some View {
-        SettingsView()
-    }
 }

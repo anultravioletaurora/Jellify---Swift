@@ -9,6 +9,8 @@ import SwiftUI
 
 struct ArtistsView: View {
     
+    var artistService = ArtistService.shared
+    
     @State
     var artists : [Artist] = [
         Artist(name: "Coldplay", albums: [
@@ -57,6 +59,10 @@ struct ArtistsView: View {
         }
         
         return songCount
+    }
+    
+    init() {
+        
     }
     
     var body: some View {

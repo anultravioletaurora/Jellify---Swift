@@ -14,6 +14,22 @@
 		04D4B5EF2710BF0D0089CFC3 /* AlbumDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B5EE2710BF0D0089CFC3 /* AlbumDetailView.swift */; };
 		04D4B5F32710E9D30089CFC3 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B5F22710E9D30089CFC3 /* LoginView.swift */; };
 		04D4B5F42710E9D30089CFC3 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B5F22710E9D30089CFC3 /* LoginView.swift */; };
+		04D4B5F62711E34F0089CFC3 /* AuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B5F52711E34F0089CFC3 /* AuthenticationService.swift */; };
+		04D4B5F72711E34F0089CFC3 /* AuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B5F52711E34F0089CFC3 /* AuthenticationService.swift */; };
+		04D4B5F92712246D0089CFC3 /* Login.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B5F82712246D0089CFC3 /* Login.swift */; };
+		04D4B5FA2712246D0089CFC3 /* Login.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B5F82712246D0089CFC3 /* Login.swift */; };
+		04D4B5FC271232B90089CFC3 /* UserResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B5FB271232B90089CFC3 /* UserResponse.swift */; };
+		04D4B5FD271232B90089CFC3 /* UserResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B5FB271232B90089CFC3 /* UserResponse.swift */; };
+		04D4B5FF2713472E0089CFC3 /* ArtistService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B5FE2713472E0089CFC3 /* ArtistService.swift */; };
+		04D4B6002713472E0089CFC3 /* ArtistService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B5FE2713472E0089CFC3 /* ArtistService.swift */; };
+		04D4B60327135DD50089CFC3 /* LoginResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B60227135DD50089CFC3 /* LoginResult.swift */; };
+		04D4B60427135DD50089CFC3 /* LoginResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B60227135DD50089CFC3 /* LoginResult.swift */; };
+		04D4B60627135DE50089CFC3 /* UserResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B60527135DE50089CFC3 /* UserResult.swift */; };
+		04D4B60727135DE50089CFC3 /* UserResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B60527135DE50089CFC3 /* UserResult.swift */; };
+		04D4B60927135DEA0089CFC3 /* SessionInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B60827135DEA0089CFC3 /* SessionInfo.swift */; };
+		04D4B60A27135DEA0089CFC3 /* SessionInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B60827135DEA0089CFC3 /* SessionInfo.swift */; };
+		04D4B60D27135FA50089CFC3 /* ArtistResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B60C27135FA50089CFC3 /* ArtistResult.swift */; };
+		04D4B60E27135FA50089CFC3 /* ArtistResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B60C27135FA50089CFC3 /* ArtistResult.swift */; };
 		04E1071A270CD307002CACB0 /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E10719270CD307002CACB0 /* Tests_iOS.swift */; };
 		04E1071C270CD307002CACB0 /* Tests_iOSLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E1071B270CD307002CACB0 /* Tests_iOSLaunchTests.swift */; };
 		04E10726270CD307002CACB0 /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E10725270CD307002CACB0 /* Tests_macOS.swift */; };
@@ -72,6 +88,14 @@
 		0480A231270DE67D0066578E /* Album.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
 		04D4B5EE2710BF0D0089CFC3 /* AlbumDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumDetailView.swift; sourceTree = "<group>"; };
 		04D4B5F22710E9D30089CFC3 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
+		04D4B5F52711E34F0089CFC3 /* AuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationService.swift; sourceTree = "<group>"; };
+		04D4B5F82712246D0089CFC3 /* Login.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Login.swift; sourceTree = "<group>"; };
+		04D4B5FB271232B90089CFC3 /* UserResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserResponse.swift; sourceTree = "<group>"; };
+		04D4B5FE2713472E0089CFC3 /* ArtistService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistService.swift; sourceTree = "<group>"; };
+		04D4B60227135DD50089CFC3 /* LoginResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginResult.swift; sourceTree = "<group>"; };
+		04D4B60527135DE50089CFC3 /* UserResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserResult.swift; sourceTree = "<group>"; };
+		04D4B60827135DEA0089CFC3 /* SessionInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionInfo.swift; sourceTree = "<group>"; };
+		04D4B60C27135FA50089CFC3 /* ArtistResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistResult.swift; sourceTree = "<group>"; };
 		04E10701270CD304002CACB0 /* FinTuneApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinTuneApp.swift; sourceTree = "<group>"; };
 		04E10702270CD304002CACB0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		04E10703270CD307002CACB0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -138,6 +162,25 @@
 			path = Login;
 			sourceTree = "<group>";
 		};
+		04D4B60127135DCB0089CFC3 /* Results */ = {
+			isa = PBXGroup;
+			children = (
+				04D4B60B27135F890089CFC3 /* Authentication */,
+				04D4B60C27135FA50089CFC3 /* ArtistResult.swift */,
+			);
+			path = Results;
+			sourceTree = "<group>";
+		};
+		04D4B60B27135F890089CFC3 /* Authentication */ = {
+			isa = PBXGroup;
+			children = (
+				04D4B60227135DD50089CFC3 /* LoginResult.swift */,
+				04D4B60527135DE50089CFC3 /* UserResult.swift */,
+				04D4B60827135DEA0089CFC3 /* SessionInfo.swift */,
+			);
+			path = Authentication;
+			sourceTree = "<group>";
+		};
 		04E106FB270CD304002CACB0 = {
 			isa = PBXGroup;
 			children = (
@@ -152,6 +195,7 @@
 		04E10700270CD304002CACB0 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				04D4B60127135DCB0089CFC3 /* Results */,
 				04E1075A270CDE79002CACB0 /* Models */,
 				04E10756270CD807002CACB0 /* Services */,
 				04E1073D270CD63F002CACB0 /* Views */,
@@ -219,6 +263,8 @@
 			isa = PBXGroup;
 			children = (
 				04E10757270CD81B002CACB0 /* JellyfinService.swift */,
+				04D4B5F52711E34F0089CFC3 /* AuthenticationService.swift */,
+				04D4B5FE2713472E0089CFC3 /* ArtistService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -229,6 +275,8 @@
 				04E10762270CE487002CACB0 /* Song.swift */,
 				0480A22E270DE3B10066578E /* Artist.swift */,
 				0480A231270DE67D0066578E /* Album.swift */,
+				04D4B5F82712246D0089CFC3 /* Login.swift */,
+				04D4B5FB271232B90089CFC3 /* UserResponse.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -422,9 +470,13 @@
 			files = (
 				04E10754270CD6FA002CACB0 /* SettingsView.swift in Sources */,
 				04E10751270CD6F3002CACB0 /* PlaylistsView.swift in Sources */,
+				04D4B5FF2713472E0089CFC3 /* ArtistService.swift in Sources */,
 				04E2DE23270E4A48007ABE38 /* BlurView.swift in Sources */,
+				04D4B5F62711E34F0089CFC3 /* AuthenticationService.swift in Sources */,
 				04E1072B270CD307002CACB0 /* ContentView.swift in Sources */,
+				04D4B60327135DD50089CFC3 /* LoginResult.swift in Sources */,
 				04E10763270CE487002CACB0 /* Song.swift in Sources */,
+				04D4B60627135DE50089CFC3 /* UserResult.swift in Sources */,
 				04E10748270CD6B8002CACB0 /* SongsView.swift in Sources */,
 				04E1074E270CD6ED002CACB0 /* ArtistsView.swift in Sources */,
 				04E2DE19270E264B007ABE38 /* ArtistDetailView.swift in Sources */,
@@ -432,11 +484,15 @@
 				04E10758270CD81B002CACB0 /* JellyfinService.swift in Sources */,
 				04D4B5F32710E9D30089CFC3 /* LoginView.swift in Sources */,
 				04E2DE1C270E48D9007ABE38 /* TabBarView.swift in Sources */,
+				04D4B5F92712246D0089CFC3 /* Login.swift in Sources */,
 				0480A232270DE67D0066578E /* Album.swift in Sources */,
+				04D4B5FC271232B90089CFC3 /* UserResponse.swift in Sources */,
 				0480A22F270DE3B10066578E /* Artist.swift in Sources */,
+				04D4B60927135DEA0089CFC3 /* SessionInfo.swift in Sources */,
 				04E2DE2B270FE282007ABE38 /* NowPlayingBar.swift in Sources */,
 				04E10729270CD307002CACB0 /* FinTuneApp.swift in Sources */,
 				04D4B5EF2710BF0D0089CFC3 /* AlbumDetailView.swift in Sources */,
+				04D4B60D27135FA50089CFC3 /* ArtistResult.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -452,13 +508,21 @@
 				04E10749270CD6B8002CACB0 /* SongsView.swift in Sources */,
 				04E1074F270CD6ED002CACB0 /* ArtistsView.swift in Sources */,
 				04E2DE1A270E264B007ABE38 /* ArtistDetailView.swift in Sources */,
+				04D4B60A27135DEA0089CFC3 /* SessionInfo.swift in Sources */,
 				04E1074C270CD6E6002CACB0 /* AlbumsView.swift in Sources */,
 				04E10759270CD81B002CACB0 /* JellyfinService.swift in Sources */,
 				04E2DE1D270E48D9007ABE38 /* TabBarView.swift in Sources */,
+				04D4B60727135DE50089CFC3 /* UserResult.swift in Sources */,
 				0480A233270DE67D0066578E /* Album.swift in Sources */,
 				0480A230270DE3B20066578E /* Artist.swift in Sources */,
+				04D4B5FD271232B90089CFC3 /* UserResponse.swift in Sources */,
+				04D4B5F72711E34F0089CFC3 /* AuthenticationService.swift in Sources */,
+				04D4B60427135DD50089CFC3 /* LoginResult.swift in Sources */,
 				04E2DE2C270FE282007ABE38 /* NowPlayingBar.swift in Sources */,
+				04D4B60E27135FA50089CFC3 /* ArtistResult.swift in Sources */,
+				04D4B5FA2712246D0089CFC3 /* Login.swift in Sources */,
 				04D4B5F42710E9D30089CFC3 /* LoginView.swift in Sources */,
+				04D4B6002713472E0089CFC3 /* ArtistService.swift in Sources */,
 				04E1072A270CD307002CACB0 /* FinTuneApp.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
