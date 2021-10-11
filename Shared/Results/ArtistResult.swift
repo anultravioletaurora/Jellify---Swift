@@ -7,12 +7,13 @@
 
 import Foundation
 
-struct ArtistResult: Codable {
-    let name, serverID, id, dateCreated, sortName: String
-    let overview: String?
-    let genreItems: [GenreItem]
+struct ArtistResult: Codable, Identifiable {
+    let name, serverID, id: String
+    let dateCreated, overview, sortName: String?
+    let genreItems: [GenreItem]?
     let imageTags: ImageTags
     let backdropImageTags: [String]
+    var userData: UserData
 
     enum CodingKeys: String, CodingKey {
         case name = "Name"
@@ -24,9 +25,9 @@ struct ArtistResult: Codable {
         case genreItems = "GenreItems"
         case imageTags = "ImageTags"
         case backdropImageTags = "BackdropImageTags"
+        case userData = "UserData"
     }
 }
-
 struct GenreItem: Codable {
     let name, id: String
 
@@ -46,24 +47,20 @@ struct ImageTags: Codable, Hashable {
     }
 }
 
-struct AlbumResult: Codable {
-    let name, serverID, id, dateCreated, albumArtist: String
-    let genres: [String]
+struct AlbumResult: Codable, Hashable, Identifiable {
+    let name, serverID, id, albumArtist: String
     let runTimeTicks: Int64
     let productionYear: Int?
-    let genreItems, artistItems, albumArtists: [GenericItem]
+    let albumArtists: [GenericItem]
     let imageTags: ImageTags
+    var userData: UserData?
 
     enum CodingKeys: String, CodingKey {
         case name = "Name"
         case serverID = "ServerId"
         case id = "Id"
-        case dateCreated = "DateCreated"
-        case genres = "Genres"
         case runTimeTicks = "RunTimeTicks"
         case productionYear = "ProductionYear"
-        case genreItems = "GenreItems"
-        case artistItems = "ArtistItems"
         case albumArtist = "AlbumArtist"
         case albumArtists = "AlbumArtists"
         case imageTags = "ImageTags"
@@ -82,12 +79,17 @@ struct Id: Codable, Hashable {
     }
 }
 
-struct GenericItem: Codable, Hashable {
+struct GenericItem: Codable, Hashable, Identifiable {
     let name, id: String
-
+    
     enum CodingKeys: String, CodingKey {
         case name = "Name"
         case id = "Id"
+    }
+    
+    init() {
+        name = ""
+        id = UUID().uuidString
     }
 }
 
@@ -103,15 +105,15 @@ struct PlaylistItem: Codable, Hashable{
     }
 }
 
-public struct SongResult: Codable, Hashable {
+public struct SongResult: Codable, Hashable, Identifiable {
     
-    let name, serverID, id, albumId, album: String
+    public let name, serverID, id, albumId, album: String
     let playlistItemId: String?
     let runTimeTicks: Int
     let productionYear, indexNumber, parentIndexNumber: Int?
     let artists: [String]
     let artistItems: [GenericItem]
-//    var userData: UserData?
+    var userData: UserData?
     
     enum CodingKeys: String, CodingKey {
         case name = "Name"

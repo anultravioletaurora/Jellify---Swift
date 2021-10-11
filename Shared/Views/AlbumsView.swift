@@ -56,9 +56,3 @@ struct AlbumsView: View {
         }
     }
 }
-
-struct AlbumsView_Previews: PreviewProvider {
-    static var previews: some View {
-        AlbumsView()
-    }
-}

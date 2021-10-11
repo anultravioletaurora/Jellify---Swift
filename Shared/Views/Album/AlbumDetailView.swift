@@ -10,7 +10,12 @@ import SwiftUI
 struct AlbumDetailView: View {
     
     @Binding
-    var album: Album
+    var album: AlbumResult
+    
+    @State
+    var songs: [SongResult] = []
+    
+    var songService: SongService = SongService.shared
     
     var body: some View {
         
@@ -24,26 +29,26 @@ struct AlbumDetailView: View {
 //                .clipShape(Circle())
 //                .padding()
             
-            // Favorite Artist Button
-            Button(action: {
-                // TODO: Make API call to favorite artist
-                print("Artist favorited")
-                album.favorite.toggle()
-            }) {
-                HStack {
-
-                    if album.favorite {
-                        Image(systemName: "heart.fill")
-                        Text("Favorited")
-                    } else {
-                        Image(systemName: "heart")
-                        Text("Favorite")
-                    }
-                }
-                .tint(.accentColor)
-            }
-            .frame(maxWidth: .infinity)
-            .buttonStyle(.bordered)
+            // Favorite Album Button
+//            Button(action: {
+//                // TODO: Make API call to favorite artist
+//                print("Album favorited")
+//                album.userData!.isFavorite.toggle()
+//            }) {
+//                HStack {
+//
+//                    if album.userData != nil && album.userData!.isFavorite {
+//                        Image(systemName: "heart.fill")
+//                        Text("Favorited")
+//                    } else {
+//                        Image(systemName: "heart")
+//                        Text("Favorite")
+//                    }
+//                }
+//                .tint(.accentColor)
+//            }
+//            .frame(maxWidth: .infinity)
+//            .buttonStyle(.bordered)
                 
             // Play Artist Button
             Button(action: {
@@ -72,6 +77,36 @@ struct AlbumDetailView: View {
             .frame(maxWidth: .infinity)
             .buttonStyle(.bordered)
         }
-            .navigationTitle(album.name)
+        
+        List(songs) { song in
+            
+            HStack(alignment: .center, spacing: 15, content: {
+                
+                Text(song.indexNumber != nil ? String(song.indexNumber!) : "")
+                    .padding(.trailing, 5)
+
+                VStack(alignment: .leading, spacing: 10) {
+                    Text(song.name)
+                }
+
+                Spacer()
+            })
+                .onTapGesture(perform: {
+                    print("Playing \(song.name)")
+                })
+        }
+        .listStyle(PlainListStyle())
+        .onAppear(perform: {
+            
+            songService.retrieveSongs(albumId: album.id, complete: { songs in
+                self.songs = songs.items
+            })
+        })
+        .navigationTitle(album.name)
     }
+    
+//    func getSongDuration(runTimeTicks: Int) {
+//        TimeSpan duration = new TimeSpan(runTimeTicks)
+//        double minutes = duration;
+//    }
 }

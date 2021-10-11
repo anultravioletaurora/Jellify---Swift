@@ -9,46 +9,10 @@ import SwiftUI
 
 struct ArtistsView: View {
     
-    var artistService = ArtistService.shared
+    let artistService = ArtistService.shared
     
-    @State
-    var artists : [Artist] = [
-        Artist(name: "Coldplay", albums: [
-            Album(name: "Viva la Vida", year: "2008", favorite: true,
-                  songs: [Song(index: 1, name: "Viva la Vida")]
-                 )
-        ],
-               favorite: true
-               ),
-        Artist(name: "Coldplay 2", albums: [
-            Album(name: "Viva la Vida", year: "2008", favorite: false,
-                  songs: [Song(index: 1, name: "Viva la Vida")]
-                 )
-        ],
-               favorite: false
-               ),
-        Artist(name: "Coldplay 3", albums: [
-            Album(name: "Viva la Vida", year: "2008", favorite: false,
-                  songs: [Song(index: 1, name: "Viva la Vida")]
-                 )
-        ],
-               favorite: false
-               ),
-        Artist(name: "Coldplay 4", albums: [
-            Album(name: "Viva la Vida", year: "2008", favorite: false,
-                  songs: [Song(index: 1, name: "Viva la Vida")]
-                 )
-        ],
-               favorite: false
-               ),
-        Artist(name: "Coldplay 5", albums: [
-            Album(name: "Viva la Vida", year: "2008", favorite: false,
-                  songs: [Song(index: 1, name: "Viva la Vida")]
-                 )
-        ],
-               favorite: false
-               )
-    ]
+    @Binding
+    var artists : [ArtistResult]
     
     func getSongCount(artist : Artist) -> Int{
         
@@ -61,17 +25,21 @@ struct ArtistsView: View {
         return songCount
     }
     
-    init() {
-        
-    }
-    
+//    func viewDidLoad() {
+//        artistService.retrieveArtist(complete: { result in
+//            storeArtists(items: result.items)
+//        })
+//    }
+//
     var body: some View {
         NavigationView {
+
             List($artists) { $artist in
+                
                 NavigationLink(destination: ArtistDetailView(artist: $artist)) {
                     HStack {
                         
-                        Image("profile")
+                        Image(systemName: "music.quarternote.3")
                             .resizable()
                             .frame(width: 48, height: 48, alignment: .leading)
                             .clipShape(Circle())
@@ -80,22 +48,22 @@ struct ArtistsView: View {
                             Text(artist.name)
                                 .font(.title3)
 
-                            HStack {
-                                let albumCount = artist.albums.count
-                                
-                                let albumText : String = albumCount == 1 ? "album" : "albums"
-                                
-                                
-                                let songCount : Int = getSongCount(artist: artist)
-                                
-                                let songText : String = songCount == 1 ? "song" : "songs"
-                            
-                                Text("\(albumCount) \(albumText), \(songCount) \(songText)")
-                                    .font(.subheadline)
-                                    .fontWeight(.light)
-
-                                
-                            }
+//                            HStack {
+//                                let albumCount = artist.albums.count
+//
+//                                let albumText : String = albumCount == 1 ? "album" : "albums"
+//
+//
+//                                let songCount : Int = getSongCount(artist: artist)
+//
+//                                let songText : String = songCount == 1 ? "song" : "songs"
+//
+//                                Text("\(albumCount) \(albumText), \(songCount) \(songText)")
+//                                    .font(.subheadline)
+//                                    .fontWeight(.light)
+//
+//
+//                            }
                         }
                     }
                 }

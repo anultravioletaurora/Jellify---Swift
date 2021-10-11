@@ -8,7 +8,7 @@
 import Foundation
 import UIKit
 
-class JellyfinService {
+class JellyfinService: ObservableObject {
     
     let urlSession = URLSession.shared
     
@@ -16,11 +16,21 @@ class JellyfinService {
     
     let decoder = JSONDecoder()
     
-    let server = UserDefaults.standard.string(forKey: "Server")
+    static var server = UserDefaults.standard.string(forKey: "Server")
+    
+    static var accessToken = UserDefaults.standard.string(forKey: "AccessToken")
+    
+    static var userId = UserDefaults.standard.string(forKey: "UserId")
+    
+    static var libraryId = UserDefaults.standard.string(forKey: "LibraryId")
+    
+    func getUserId() -> String {
+        return UserDefaults.standard.string(forKey: "UserId") ?? ""
+    }
         
-    func get(url: String, params: Dictionary<String, String>) {
+    func get(url: String, params: Dictionary<String, String>, completion: @escaping (Data) -> Void) {
         
-        var url = URLComponents(string: server! + url)!
+        var url = URLComponents(string: JellyfinService.server! + url)!
         
         url.queryItems = params.map { (key, value) in
             URLQueryItem(name: key, value: value)
@@ -28,13 +38,19 @@ class JellyfinService {
         
         var request = URLRequest(url: url.url!)
         request.httpMethod = HttpMethod.get.rawValue
-
+        
+        print("Setting token header: \(getUserId())")
+        
+        request.setValue(UserDefaults.standard.string(forKey: "AccessToken"), forHTTPHeaderField: "X-Emby-Token")
         
         let dataTask = urlSession.dataTask(with: request, completionHandler: { data, response, error in
                         
             // Check if the request succeeded
-            if error == nil {
-                                                                                    
+            if error == nil && data != nil {
+                                        
+                print("Get successful, data is : \(response!)")
+                
+                completion(data!)
 //                let ArtistResponse : ArtistResponse = try! self.decoder.decode([ArtistResponse].self, from: data!)
             }
             
@@ -51,7 +67,7 @@ class JellyfinService {
     
     func post(url: String, params: Data?) {
         
-        var request : URLRequest = URLRequest(url: URL(string: "\(String(describing: server))\(url))")!)
+        var request : URLRequest = URLRequest(url: URL(string: "\(String(describing: JellyfinService.server))\(url))")!)
         
         request.httpMethod = HttpMethod.post.rawValue
         

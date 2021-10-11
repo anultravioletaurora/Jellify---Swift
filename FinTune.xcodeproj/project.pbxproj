@@ -11,6 +11,20 @@
 		0480A230270DE3B20066578E /* Artist.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0480A22E270DE3B10066578E /* Artist.swift */; };
 		0480A232270DE67D0066578E /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0480A231270DE67D0066578E /* Album.swift */; };
 		0480A233270DE67D0066578E /* Album.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0480A231270DE67D0066578E /* Album.swift */; };
+		04CBCDB6271371C8003E9BE9 /* ResultSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CBCDB5271371C8003E9BE9 /* ResultSet.swift */; };
+		04CBCDB7271371C8003E9BE9 /* ResultSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CBCDB5271371C8003E9BE9 /* ResultSet.swift */; };
+		04CBCDB927139AA1003E9BE9 /* UserData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CBCDB827139AA1003E9BE9 /* UserData.swift */; };
+		04CBCDBA27139AA1003E9BE9 /* UserData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CBCDB827139AA1003E9BE9 /* UserData.swift */; };
+		04CBCDBC27139DE1003E9BE9 /* AlbumService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CBCDBB27139DE1003E9BE9 /* AlbumService.swift */; };
+		04CBCDBD27139DE1003E9BE9 /* AlbumService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CBCDBB27139DE1003E9BE9 /* AlbumService.swift */; };
+		04CBCDC22713C915003E9BE9 /* LibrarySelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CBCDC12713C915003E9BE9 /* LibrarySelectionView.swift */; };
+		04CBCDC32713C915003E9BE9 /* LibrarySelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CBCDC12713C915003E9BE9 /* LibrarySelectionView.swift */; };
+		04CBCDC52713C945003E9BE9 /* LibrarySelectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CBCDC42713C945003E9BE9 /* LibrarySelectionService.swift */; };
+		04CBCDC62713C945003E9BE9 /* LibrarySelectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CBCDC42713C945003E9BE9 /* LibrarySelectionService.swift */; };
+		04CBCDC82713D1F0003E9BE9 /* LibraryResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CBCDC72713D1F0003E9BE9 /* LibraryResult.swift */; };
+		04CBCDC92713D1F0003E9BE9 /* LibraryResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CBCDC72713D1F0003E9BE9 /* LibraryResult.swift */; };
+		04CBCDCB2714BEBA003E9BE9 /* SongService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CBCDCA2714BEBA003E9BE9 /* SongService.swift */; };
+		04CBCDCC2714BEBA003E9BE9 /* SongService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04CBCDCA2714BEBA003E9BE9 /* SongService.swift */; };
 		04D4B5EF2710BF0D0089CFC3 /* AlbumDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B5EE2710BF0D0089CFC3 /* AlbumDetailView.swift */; };
 		04D4B5F32710E9D30089CFC3 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B5F22710E9D30089CFC3 /* LoginView.swift */; };
 		04D4B5F42710E9D30089CFC3 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B5F22710E9D30089CFC3 /* LoginView.swift */; };
@@ -86,6 +100,13 @@
 /* Begin PBXFileReference section */
 		0480A22E270DE3B10066578E /* Artist.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Artist.swift; sourceTree = "<group>"; };
 		0480A231270DE67D0066578E /* Album.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Album.swift; sourceTree = "<group>"; };
+		04CBCDB5271371C8003E9BE9 /* ResultSet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ResultSet.swift; sourceTree = "<group>"; };
+		04CBCDB827139AA1003E9BE9 /* UserData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserData.swift; sourceTree = "<group>"; };
+		04CBCDBB27139DE1003E9BE9 /* AlbumService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumService.swift; sourceTree = "<group>"; };
+		04CBCDC12713C915003E9BE9 /* LibrarySelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySelectionView.swift; sourceTree = "<group>"; };
+		04CBCDC42713C945003E9BE9 /* LibrarySelectionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySelectionService.swift; sourceTree = "<group>"; };
+		04CBCDC72713D1F0003E9BE9 /* LibraryResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryResult.swift; sourceTree = "<group>"; };
+		04CBCDCA2714BEBA003E9BE9 /* SongService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongService.swift; sourceTree = "<group>"; };
 		04D4B5EE2710BF0D0089CFC3 /* AlbumDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumDetailView.swift; sourceTree = "<group>"; };
 		04D4B5F22710E9D30089CFC3 /* LoginView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginView.swift; sourceTree = "<group>"; };
 		04D4B5F52711E34F0089CFC3 /* AuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationService.swift; sourceTree = "<group>"; };
@@ -158,6 +179,7 @@
 			isa = PBXGroup;
 			children = (
 				04D4B5F22710E9D30089CFC3 /* LoginView.swift */,
+				04CBCDC12713C915003E9BE9 /* LibrarySelectionView.swift */,
 			);
 			path = Login;
 			sourceTree = "<group>";
@@ -167,6 +189,9 @@
 			children = (
 				04D4B60B27135F890089CFC3 /* Authentication */,
 				04D4B60C27135FA50089CFC3 /* ArtistResult.swift */,
+				04CBCDB5271371C8003E9BE9 /* ResultSet.swift */,
+				04CBCDB827139AA1003E9BE9 /* UserData.swift */,
+				04CBCDC72713D1F0003E9BE9 /* LibraryResult.swift */,
 			);
 			path = Results;
 			sourceTree = "<group>";
@@ -265,6 +290,9 @@
 				04E10757270CD81B002CACB0 /* JellyfinService.swift */,
 				04D4B5F52711E34F0089CFC3 /* AuthenticationService.swift */,
 				04D4B5FE2713472E0089CFC3 /* ArtistService.swift */,
+				04CBCDBB27139DE1003E9BE9 /* AlbumService.swift */,
+				04CBCDC42713C945003E9BE9 /* LibrarySelectionService.swift */,
+				04CBCDCA2714BEBA003E9BE9 /* SongService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -471,12 +499,16 @@
 				04E10754270CD6FA002CACB0 /* SettingsView.swift in Sources */,
 				04E10751270CD6F3002CACB0 /* PlaylistsView.swift in Sources */,
 				04D4B5FF2713472E0089CFC3 /* ArtistService.swift in Sources */,
+				04CBCDBC27139DE1003E9BE9 /* AlbumService.swift in Sources */,
 				04E2DE23270E4A48007ABE38 /* BlurView.swift in Sources */,
 				04D4B5F62711E34F0089CFC3 /* AuthenticationService.swift in Sources */,
+				04CBCDC52713C945003E9BE9 /* LibrarySelectionService.swift in Sources */,
 				04E1072B270CD307002CACB0 /* ContentView.swift in Sources */,
 				04D4B60327135DD50089CFC3 /* LoginResult.swift in Sources */,
 				04E10763270CE487002CACB0 /* Song.swift in Sources */,
+				04CBCDC82713D1F0003E9BE9 /* LibraryResult.swift in Sources */,
 				04D4B60627135DE50089CFC3 /* UserResult.swift in Sources */,
+				04CBCDB6271371C8003E9BE9 /* ResultSet.swift in Sources */,
 				04E10748270CD6B8002CACB0 /* SongsView.swift in Sources */,
 				04E1074E270CD6ED002CACB0 /* ArtistsView.swift in Sources */,
 				04E2DE19270E264B007ABE38 /* ArtistDetailView.swift in Sources */,
@@ -484,10 +516,13 @@
 				04E10758270CD81B002CACB0 /* JellyfinService.swift in Sources */,
 				04D4B5F32710E9D30089CFC3 /* LoginView.swift in Sources */,
 				04E2DE1C270E48D9007ABE38 /* TabBarView.swift in Sources */,
+				04CBCDCB2714BEBA003E9BE9 /* SongService.swift in Sources */,
 				04D4B5F92712246D0089CFC3 /* Login.swift in Sources */,
 				0480A232270DE67D0066578E /* Album.swift in Sources */,
 				04D4B5FC271232B90089CFC3 /* UserResponse.swift in Sources */,
 				0480A22F270DE3B10066578E /* Artist.swift in Sources */,
+				04CBCDB927139AA1003E9BE9 /* UserData.swift in Sources */,
+				04CBCDC22713C915003E9BE9 /* LibrarySelectionView.swift in Sources */,
 				04D4B60927135DEA0089CFC3 /* SessionInfo.swift in Sources */,
 				04E2DE2B270FE282007ABE38 /* NowPlayingBar.swift in Sources */,
 				04E10729270CD307002CACB0 /* FinTuneApp.swift in Sources */,
@@ -500,6 +535,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04CBCDBA27139AA1003E9BE9 /* UserData.swift in Sources */,
 				04E10755270CD6FA002CACB0 /* SettingsView.swift in Sources */,
 				04E10752270CD6F3002CACB0 /* PlaylistsView.swift in Sources */,
 				04E2DE24270E4A48007ABE38 /* BlurView.swift in Sources */,
@@ -510,17 +546,23 @@
 				04E2DE1A270E264B007ABE38 /* ArtistDetailView.swift in Sources */,
 				04D4B60A27135DEA0089CFC3 /* SessionInfo.swift in Sources */,
 				04E1074C270CD6E6002CACB0 /* AlbumsView.swift in Sources */,
+				04CBCDC32713C915003E9BE9 /* LibrarySelectionView.swift in Sources */,
 				04E10759270CD81B002CACB0 /* JellyfinService.swift in Sources */,
 				04E2DE1D270E48D9007ABE38 /* TabBarView.swift in Sources */,
+				04CBCDC92713D1F0003E9BE9 /* LibraryResult.swift in Sources */,
 				04D4B60727135DE50089CFC3 /* UserResult.swift in Sources */,
 				0480A233270DE67D0066578E /* Album.swift in Sources */,
 				0480A230270DE3B20066578E /* Artist.swift in Sources */,
+				04CBCDCC2714BEBA003E9BE9 /* SongService.swift in Sources */,
 				04D4B5FD271232B90089CFC3 /* UserResponse.swift in Sources */,
+				04CBCDB7271371C8003E9BE9 /* ResultSet.swift in Sources */,
 				04D4B5F72711E34F0089CFC3 /* AuthenticationService.swift in Sources */,
 				04D4B60427135DD50089CFC3 /* LoginResult.swift in Sources */,
 				04E2DE2C270FE282007ABE38 /* NowPlayingBar.swift in Sources */,
 				04D4B60E27135FA50089CFC3 /* ArtistResult.swift in Sources */,
 				04D4B5FA2712246D0089CFC3 /* Login.swift in Sources */,
+				04CBCDBD27139DE1003E9BE9 /* AlbumService.swift in Sources */,
+				04CBCDC62713C945003E9BE9 /* LibrarySelectionService.swift in Sources */,
 				04D4B5F42710E9D30089CFC3 /* LoginView.swift in Sources */,
 				04D4B6002713472E0089CFC3 /* ArtistService.swift in Sources */,
 				04E1072A270CD307002CACB0 /* FinTuneApp.swift in Sources */,
@@ -679,6 +721,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WAH9CZ8BPG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
@@ -708,6 +751,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = WAH9CZ8BPG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;

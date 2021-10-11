@@ -9,9 +9,14 @@ import SwiftUI
 
 struct ArtistDetailView: View {
     
-    @Binding
-    var artist : Artist
+    let albumService : AlbumService = AlbumService.shared
+    
+    @State
+    var albums : [AlbumResult] = []
         
+    @Binding
+    var artist : ArtistResult
+                
     var body: some View {
                     
         HStack(alignment: .center, spacing: 5) {
@@ -27,11 +32,10 @@ struct ArtistDetailView: View {
             Button(action: {
                 // TODO: Make API call to favorite artist
                 print("Artist favorited")
-                artist.favorite.toggle()
+                artist.userData.isFavorite.toggle()
             }) {
                 HStack {
-
-                    if artist.favorite {
+                    if artist.userData.isFavorite {
                         Image(systemName: "heart.fill")
                         Text("Favorited")
                     } else {
@@ -74,25 +78,28 @@ struct ArtistDetailView: View {
         .frame(maxWidth: .infinity)
         .fixedSize(horizontal: true, vertical: true)
             
-        List($artist.albums) { $album in
-            
+        List($albums) { $album in
+
             HStack {
-                
+
                 NavigationLink(destination: AlbumDetailView(album: $album)) {
-                    
-                    // Album Image
-                    Image("profile")
-                        .resizable()
-                        .frame(width: 64, height: 64, alignment: .leading)
-                        .cornerRadius(5)
-                    
-                    VStack(alignment: .leading) {
+
+                    HStack {
                         
-                        Text(album.name)
-                            .font(.title3)
-                        
-                        Text(album.year)
-                            .font(.subheadline)
+                        // Album Image
+//                        Image("profile")
+//                            .resizable()
+//                            .frame(width: 64, height: 64, alignment: .leading)
+//                            .cornerRadius(5)
+
+                        VStack(alignment: .leading) {
+
+                            Text(album.name)
+                                .font(.title3)
+
+                            Text(album.productionYear != nil ? String(album.productionYear!) : "")
+                                .font(.subheadline)
+                        }
                     }
                 }
             }
@@ -107,5 +114,11 @@ struct ArtistDetailView: View {
         }
         .listStyle(PlainListStyle())
         .navigationTitle(artist.name)
+        .onAppear(perform: {
+            // Fetch Albums
+            albumService.retrieveAlbums(artistId: artist.id, complete: { result in
+                self.albums = result.items
+            })
+        })
     }
 }

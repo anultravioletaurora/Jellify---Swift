@@ -8,13 +8,18 @@
 import Foundation
 import UIKit
 
-class AuthenticationService : JellyfinService, ObservableObject {
+class AuthenticationService : JellyfinService {
     
     static let shared = AuthenticationService()
     
     @Published
-    var accessToken = UserDefaults.standard.string(forKey: "AccessToken")
-        
+    var authenticated : Bool = false
+    
+    override init() {
+        super.init()
+        self.authenticated = AuthenticationService.accessToken != nil
+    }
+            
     func authenticate(server: String, username: String, password: String, completion: @escaping (Bool) -> Void) {
 
         login(username: username, password: password, server: server){ result in
@@ -23,12 +28,13 @@ class AuthenticationService : JellyfinService, ObservableObject {
                     
                     UserDefaults.standard.set(username, forKey: "Username")
                     UserDefaults.standard.set(server, forKey: "Server")
+                    self.authenticated = true
                     completion(true)
                     
                     print("Authenticated successfully")
 
                 case false:
-                    
+                    self.authenticated = false
                     completion(false)
                     
                     print("Authentication failed")
@@ -36,10 +42,6 @@ class AuthenticationService : JellyfinService, ObservableObject {
                 }
             }
         }
-    
-    func authenticated() -> Bool {
-        return self.accessToken != nil
-    }
     
     private func getAppCurrentVersionNumber() -> String {
         let nsObject: AnyObject? = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as AnyObject?
@@ -49,45 +51,75 @@ class AuthenticationService : JellyfinService, ObservableObject {
     private func login(username: String, password: String, server: String, completion: @escaping (_ result: Bool) -> Void){
 
         print("Attempting to login user \(username)")
+        print("Device name: \(UIDevice.current.name)")
+        print("Device model: \(UIDevice.current.model)")
+        print("App Version: \(getAppCurrentVersionNumber())")
         
         let login = Login(username: username, password: password)
             
         let jsonData = try? self.encoder.encode(login)
         
-        var request : URLRequest = URLRequest(url: URL(string: "\(server)/emby/Users/AuthenticateByName")!)
+        var request : URLRequest = URLRequest(url: URL(string: "\(server)/Users/AuthenticateByName")!)
         
         request.httpMethod = HttpMethod.post.rawValue
         request.httpBody = jsonData
         
-        request.setValue("MediaBrowser Client=\"jFin\", Device=\"\(UIDevice.current.name)\", DeviceId=\"\(UIDevice.current.model)\", Version=\"\(getAppCurrentVersionNumber())\"", forHTTPHeaderField: "X-Emby-Authorization")
+        let deviceName : String = UIDevice.current.name
+        print("Device Name: \(deviceName)")
+        
+        let deviceName2 : String = "Jack's iPhone"
+        print("Device Name 2: \(deviceName2)")
+        
+        print("Device Names equal: \(deviceName == deviceName2)")
+        
+        request.setValue("MediaBrowser Client=\"FinTune\", Device=\"\(deviceName2)\", DeviceId=\"\(UIDevice.current.model)\", Version=\"\(getAppCurrentVersionNumber())\"", forHTTPHeaderField: "X-Emby-Authorization")
         
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
         
+        print("REQUEST BODY")
+        print(jsonData)
+        
+        print("REQUEST HEADERS")
+        for (key,value) in request.allHTTPHeaderFields ?? [:] {
+              print("\(key): \(value)")
+           }
+
         let dataTask = urlSession.dataTask(with: request, completionHandler: { data, response, error in
                         
-            // Check if the request succeeded
-            if error == nil {
-                                
-                print("User \(username) authenticated")
+            if let httpResponse = response as? HTTPURLResponse {
                 
-                if let jsonResult = try! JSONSerialization.jsonObject(with: data!, options: []) as? NSDictionary {
-                            print(jsonResult)
-                        }
-                
-                let loginResult : LoginResult = try! self.decoder.decode(LoginResult.self, from: data!)
-                
-                debugPrint("Decoded Login Result: \(loginResult)")
-                                
-                self.setAccessToken(accessToken: loginResult.accessToken)
-                completion(true)
-            }
+                print("HTTP Response: \(httpResponse)")
             
-            // Else the request failed *sad trombone*
-            else {
+            // Check if the request succeeded
+                if error == nil && httpResponse.statusCode < 300{
+                                    
+                    print("User \(username) authenticated")
+                    
+                    print("DATA IS EMPTY: \(data == nil)")
+                    
+                    let received = String(data: data!, encoding: String.Encoding.utf8)
+
+                    print(received)
+                    
+                    let jsonData = try? JSONSerialization.jsonObject(with: data!, options: .allowFragments) as! [String: Any]
+
+                    print(jsonData)
+                    
+                    let loginResult : LoginResult = try! self.decoder.decode(LoginResult.self, from: data!)
+                    
+                    debugPrint("Decoded Login Result: \(loginResult)")
+                                    
+                    self.setAccessDetails(loginResult: loginResult)
+                    completion(true)
+                }
                 
-                print("Big sadge")
-                completion(false)
+                // Else the request failed *sad trombone*
+                else {
+                    
+                    print("Big sadge")
+                    completion(false)
+                }
             }
         })
         
@@ -96,11 +128,18 @@ class AuthenticationService : JellyfinService, ObservableObject {
     
     func logOut() {
         UserDefaults.standard.removeObject(forKey: "AccessToken")
-        self.accessToken = nil
+        UserDefaults.standard.removeObject(forKey: "UserId")
+        UserDefaults.standard.removeObject(forKey: "LibraryId")
+        
+        authenticated = false
     }
     
-    private func setAccessToken(accessToken : String) -> Void {
-        UserDefaults.standard.set(accessToken, forKey: "AccessToken")
-        self.accessToken = accessToken
+    private func setAccessDetails(loginResult : LoginResult) -> Void {
+        
+        JellyfinService.accessToken = loginResult.accessToken
+        UserDefaults.standard.set(loginResult.accessToken, forKey: "AccessToken")
+        
+        JellyfinService.userId = loginResult.user.id
+        UserDefaults.standard.set(loginResult.user.id, forKey: "UserId")        
     }
 }

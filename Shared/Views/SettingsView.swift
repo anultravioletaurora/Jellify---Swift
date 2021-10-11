@@ -14,12 +14,28 @@ struct SettingsView: View {
     
     var body: some View {
         NavigationView {
-            Button(action: {
+            
+            VStack {
                 
-                authenticationService.logOut()
-            }, label: {
-                Text("Log out")
-            })
+                HStack {
+                    Text("User ID: \(UserDefaults.standard.string(forKey: "UserId") ?? "")")
+                }
+                
+                HStack {
+                    Text("Access Token: \(UserDefaults.standard.string(forKey: "AccessToken") ?? "")")
+                }
+
+                HStack {
+                    Text("Music Library ID: \(UserDefaults.standard.string(forKey: "LibraryId") ?? "")")
+                }
+                
+                Button(action: {
+                    
+                    authenticationService.logOut()
+                }, label: {
+                    Text("Log out")
+                })
+            }
             .navigationTitle("Settings")
         }    }
 }

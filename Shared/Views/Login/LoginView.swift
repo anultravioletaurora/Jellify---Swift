@@ -60,7 +60,7 @@ struct LoginView: View {
                 // Password Input
                 HStack {
                     Image(systemName: "key.fill")
-                    SecureField("password", text: $password, prompt: Text("Enter Password"))
+                    TextField("password", text: $password, prompt: Text("Enter Password"))
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
                         .textFieldStyle(RoundedBorderTextFieldStyle())

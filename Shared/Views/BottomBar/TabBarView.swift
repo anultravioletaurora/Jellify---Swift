@@ -8,54 +8,51 @@
 import SwiftUI
 
 struct TabBarView: View {
+        
+    @Binding
+    var artists : [ArtistResult]
     
-    @State
-    var showMediaPlayer = false
-    
-    @Namespace
-    var animation
-    
+    var artistService = ArtistService.shared
+        
     var body: some View {
-        
-        ZStack(alignment: Alignment(horizontal: .center, vertical: .bottom), content: {
-        
+                
             TabView {
                 
                 // Artists Tab
-                NowPlayingBar(content: ArtistsView(), showMediaPlayer: $showMediaPlayer, animation: animation)
+                ArtistsView(artists: $artists)
                     .tabItem {
                         Image(systemName: "music.mic")
                         Text("Artists")
                     }
                 
                 // Albums Tab
-                NowPlayingBar(content: AlbumsView(), showMediaPlayer: $showMediaPlayer, animation: animation)
+                AlbumsView()
                     .tabItem {
                         Image(systemName: "square.stack.fill")
                         Text("Albums")
                     }
                 
                 // Songs Tab
-                NowPlayingBar(content: SongsView(), showMediaPlayer: $showMediaPlayer, animation: animation)
+                SongsView()
                     .tabItem {
                         Image(systemName: "music.note")
                         Text("Songs")
                     }
                 
                 // Playlists Tab
-                NowPlayingBar(content: PlaylistsView(), showMediaPlayer: $showMediaPlayer, animation: animation)
+                PlaylistsView()
                     .tabItem {
                         Image(systemName: "music.note.list")
                         Text("Playlists")
                     }
                 
                 // Settings View
-                NowPlayingBar(content: SettingsView(), showMediaPlayer: $showMediaPlayer, animation: animation)
+                SettingsView()
                     .tabItem {
                         Image(systemName: "gear")
                         Text("Settings")
                     }
             }
-        })
+        
     }
 }
