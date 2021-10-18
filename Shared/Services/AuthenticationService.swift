@@ -11,13 +11,13 @@ import UIKit
 class AuthenticationService : JellyfinService {
     
     static let shared = AuthenticationService()
-    
+        
     @Published
     var authenticated : Bool = false
     
     override init() {
         super.init()
-        self.authenticated = AuthenticationService.accessToken != nil
+        self.authenticated = !self.accessToken.isEmpty
     }
             
     func authenticate(server: String, username: String, password: String, completion: @escaping (Bool) -> Void) {
@@ -99,18 +99,22 @@ class AuthenticationService : JellyfinService {
                     print("DATA IS EMPTY: \(data == nil)")
                     
                     let received = String(data: data!, encoding: String.Encoding.utf8)
-
-                    print(received)
                     
                     let jsonData = try? JSONSerialization.jsonObject(with: data!, options: .allowFragments) as! [String: Any]
-
-                    print(jsonData)
                     
                     let loginResult : LoginResult = try! self.decoder.decode(LoginResult.self, from: data!)
                     
                     debugPrint("Decoded Login Result: \(loginResult)")
-                                    
-                    self.setAccessDetails(loginResult: loginResult)
+                    
+                    let user = User(context: JellyfinService.context)
+                    
+                    user.userId = loginResult.user.id
+                    user.authToken = loginResult.accessToken
+                    user.serverId = loginResult.serverID
+                    user.server = server
+                    
+                    try! JellyfinService.context.save()
+
                     completion(true)
                 }
                 
@@ -127,19 +131,30 @@ class AuthenticationService : JellyfinService {
     }
     
     func logOut() {
-        UserDefaults.standard.removeObject(forKey: "AccessToken")
-        UserDefaults.standard.removeObject(forKey: "UserId")
-        UserDefaults.standard.removeObject(forKey: "LibraryId")
-        
-        authenticated = false
-    }
-    
-    private func setAccessDetails(loginResult : LoginResult) -> Void {
-        
-        JellyfinService.accessToken = loginResult.accessToken
-        UserDefaults.standard.set(loginResult.accessToken, forKey: "AccessToken")
-        
-        JellyfinService.userId = loginResult.user.id
-        UserDefaults.standard.set(loginResult.user.id, forKey: "UserId")        
+
+        JellyfinService.context.perform {
+
+            UserDefaults.standard.set(false, forKey: "Authenticated")
+            DispatchQueue.main.async {
+                Player.shared.isPlaying = false
+                Player.shared.songs.removeAll()
+            }
+            self.deleteAllOfEntity(entityName: "User")
+            self.deleteAllOfEntity(entityName: "Album")
+            self.deleteAllOfEntity(entityName: "Song")
+            self.deleteAllOfEntity(entityName: "Artist")
+            self.deleteAllOfEntity(entityName: "Playlist")
+            self.deleteAllOfEntity(entityName: "Genre")
+            self._server = ""
+            self._userId = ""
+            self._accessToken = ""
+            self._playlistId = ""
+            self._libraryId = ""
+
+            DispatchQueue.main.async {
+                self.authenticated = false
+            }
+            
+        }
     }
 }

@@ -7,13 +7,13 @@
 
 import Foundation
 
-struct ArtistResult: Codable, Identifiable {
-    let name, serverID, id: String
+class ArtistResult: Codable, Identifiable {
+    var name, serverID, id: String
     let dateCreated, overview, sortName: String?
     let genreItems: [GenreItem]?
     let imageTags: ImageTags
     let backdropImageTags: [String]
-    var userData: UserData
+    var userData: UserDataResult
 
     enum CodingKeys: String, CodingKey {
         case name = "Name"
@@ -93,23 +93,47 @@ struct GenericItem: Codable, Hashable, Identifiable {
     }
 }
 
-struct PlaylistItem: Codable, Hashable{
-    let name, id, sortName: String
-    let overview: String?
+struct PlaylistResult: Codable, Hashable{
+    let name, id: String
     
     enum CodingKeys: String, CodingKey {
         case name = "Name"
         case id = "Id"
-        case overview = "Overview"
-        case sortName = "SortName"
+    }
+}
+
+
+struct PlaylistItem: Codable, Hashable, Identifiable {
+    public var name, serverID, id, albumId, album: String
+    let playlistItemId: String?
+    let runTimeTicks: Double
+    let productionYear, indexNumber, parentIndexNumber: Int?
+    let artists: [String]
+    let artistItems: [GenericItem]
+    var userData: UserData?
+    
+    enum CodingKeys: String, CodingKey {
+        case name = "Name"
+        case serverID = "ServerId"
+        case id = "Id"
+        case runTimeTicks = "RunTimeTicks"
+        case productionYear = "ProductionYear"
+        case indexNumber = "IndexNumber"
+        case parentIndexNumber = "ParentIndexNumber"
+        case artists = "Artists"
+        case artistItems = "ArtistItems"
+        case albumId = "AlbumId"
+//        case userData = "UserData"
+        case album = "Album"
+        case playlistItemId = "PlaylistItemId"
     }
 }
 
 public struct SongResult: Codable, Hashable, Identifiable {
     
-    public let name, serverID, id, albumId, album: String
+    public var name, serverID, id, albumId, album: String
     let playlistItemId: String?
-    let runTimeTicks: Int
+    let runTimeTicks: Double
     let productionYear, indexNumber, parentIndexNumber: Int?
     let artists: [String]
     let artistItems: [GenericItem]

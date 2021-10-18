@@ -16,32 +16,42 @@ struct LibrarySelectionView: View {
     
     @State
     var libraries : [LibraryResult] = []
+    
+    @State
+    var loading : Bool = true
         
     var body: some View {
         NavigationView {
             
-            VStack {
-                Picker("Select Music Library", selection: $selectedLibrary, content: {
-                    ForEach(libraries) { library in
-                        Text(library.name)
-                    }
-                })
-                    .pickerStyle(.wheel)
-            
-                Button(action: {
-                    librarySelectionService.saveLibrary(selectedLibrary: selectedLibrary)
-                }, label: {
-                    Text("Start Listening")
-                })
+            if loading {
+                ProgressView("Loading Libraries")
+            } else {
+                VStack {
+                    Picker("Select Music Library", selection: $selectedLibrary, content: {
+                        ForEach(libraries) { library in
+                            Text(library.name)
+                        }
+                    })
+                        .pickerStyle(.wheel)
+                
+                    Button(action: {
+                        librarySelectionService.saveLibrary(selectedLibrary: selectedLibrary)
+                    }, label: {
+                        Text("Start Listening")
+                    })
+                }
+                .navigationTitle("Select Your Library")
             }
-            .navigationTitle("Select Your Library")
-            .onAppear(perform: {
-                librarySelectionService.retrieveLibraries(complete: { libraries in
-                    self.libraries = libraries.items
-                    selectedLibrary = libraries.items[0]
-                })
-            })
 
         }
+        .onAppear(perform: {
+            librarySelectionService.retrieveLibraries(complete: { libraries in
+                self.libraries = libraries.items
+                selectedLibrary = libraries.items[0]
+            })
+            
+            self.loading = false
+        })
+
     }
 }

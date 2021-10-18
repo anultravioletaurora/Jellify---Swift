@@ -10,6 +10,9 @@ import simd
 
 struct AlbumsView: View {
     
+    @Environment(\.managedObjectContext)
+    var managedObjectContext
+
     @State
     var search: String = ""
     

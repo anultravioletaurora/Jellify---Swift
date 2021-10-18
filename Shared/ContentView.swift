@@ -8,22 +8,22 @@
 import SwiftUI
 
 struct ContentView: View {
-        
+    
+    @Environment(\.managedObjectContext)
+    var managedObjectContext
+    
     @ObservedObject
     var authenticationService = AuthenticationService.shared
     
     @ObservedObject
-    var artistService = ArtistService.shared
-    
-    @ObservedObject
     var librarySelectionService = LibrarySelectionService.shared
     
-    @State
-    var artists : [ArtistResult] = []
-    
-    @State
-    var albums : [AlbumResult] = []
-    
+    init() {
+        
+        // Because of reasons I don't know, this is needed so that the tab bar doesn't
+        // become transparent when returning to a previous navigation view with a list
+        UITabBar.appearance().scrollEdgeAppearance = UITabBarAppearance.init(idiom: .unspecified)
+    }
 
     var body: some View {
         
@@ -45,12 +45,10 @@ struct ContentView: View {
          Else render the app, since *hacker noise* they're in
          */
         else {
-            TabBarView(artists: $artists)
-                .onAppear(perform: {
-                    artistService.retrieveArtists(complete: { result in
-                        self.artists = result.items
-                    })
-                })
+            
+            ZStack(alignment: Alignment(horizontal: .center, vertical: .bottom), content: {
+                TabBarView()
+            })
         }
     }
 }

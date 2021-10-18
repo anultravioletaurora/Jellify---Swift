@@ -1,0 +1,21 @@
+{
+  "images" : [
+    {
+      "filename" : "220px-Viva_la_Vida_or_Death_and_All_His_Friends.jpg",
+      "idiom" : "universal",
+      "scale" : "1x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "2x"
+    },
+    {
+      "idiom" : "universal",
+      "scale" : "3x"
+    }
+  ],
+  "info" : {
+    "author" : "xcode",
+    "version" : 1
+  }
+}

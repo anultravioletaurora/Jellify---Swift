@@ -1,47 +1,44 @@
 //
-//  SongService.swift
+//  PlaylistService.swift
 //  FinTune
 //
-//  Created by Jack Caulfield on 10/11/21.
+//  Created by Jack Caulfield on 10/12/21.
 //
 
 import Foundation
 
-class SongService: JellyfinService {
+class PlaylistService : JellyfinService {
     
-    static let shared = SongService()
+    static let shared = PlaylistService()
     
-    func getSongUrl(songId: String) -> URL {
-        
-        print("Building stream URL: \(JellyfinService.users.first!.server!)/Audio/\(songId)/stream.aac")
-        
-        return URL(string: "\(self.server)/Audio/\(songId)/stream.aac")!
-    }
-    
-    func retrieveSongs(parentId: String?, complete: @escaping (ResultSet<SongResult>) -> Void) {
-        print("Retrieving songs, access token is: \(self.accessToken)")
+    func retrievePlaylists(complete: @escaping (ResultSet<PlaylistResult>) -> Void) {
+        print("Retrieving playlists, access token is: \(self.accessToken)")
         
         self.get(url: "/Users/\(self.userId)/Items", params: [
-            "parentId": parentId ?? ""
+            "parentId": self.playlistId
         ], completion: { data in
                                
             let json = try? JSONSerialization.jsonObject(with: data, options: [])
             
             print(json as Any)
             
-            let songResult = try! self.decoder.decode(ResultSet<SongResult>.self, from: data)
+            let playlistResult = try! self.decoder.decode(ResultSet<PlaylistResult>.self, from: data)
                                         
-            complete(songResult)
+            complete(playlistResult)
         })
     }
-    
+
     func retrieveSongsFromPlaylist(playlistId: String, complete: @escaping (ResultSet<SongResult>) -> Void) {
         
         print("Retrieving songs from playlist, ID is \(playlistId)")
         
         self.get(url: "/Playlists/\(playlistId)/Items", params: [
-            "userId": self.userId
+            "UserId": self.userId
         ], completion: { data in
+            let json = try? JSONSerialization.jsonObject(with: data, options: [])
+            
+            print(json as Any)
+
             let songResult = try! self.decoder.decode(ResultSet<SongResult>.self, from: data)
                                         
             complete(songResult)

@@ -6,17 +6,20 @@
 //
 
 import Foundation
+import SwiftUI
 
 class LibrarySelectionService: JellyfinService {
     
     static let shared = LibrarySelectionService()
-    
+                    
     @Published
     var selected : Bool = false
     
     override init() {
+
         super.init()
-        selected = LibrarySelectionService.libraryId != nil
+        
+        selected = !self.libraryId.isEmpty
     }
     
     func isSelected() -> Bool {
@@ -24,25 +27,32 @@ class LibrarySelectionService: JellyfinService {
     }
     
     func retrieveLibraries(complete: @escaping (ResultSet<LibraryResult>) -> Void) {
-        print("Retrieving libraries, access token is: \(LibrarySelectionService.accessToken!)")
         
-        self.get(url: "/Users/\(getUserId())/Items", params: [:], completion: { data in
+        print(JellyfinService.users)
+        
+        print("Retrieving libraries, access token is: \(self.accessToken)")
+        
+        self.get(url: "/Users/\(self.userId)/Items", params: [:], completion: { data in
                                
-            let json = try? JSONSerialization.jsonObject(with: data, options: [])
-            
-            print(json)
-            
+//            let json = try? JSONSerialization.jsonObject(with: data, options: [])
+                        
             let libraryResult = try! self.decoder.decode(ResultSet<LibraryResult>.self, from: data)
             
             let musicLibraries = libraryResult.items.filter({ library in
                 library.collectionType == "music"
             })
             
+            let playlistLibrary = libraryResult.items.filter({ library in
+                library.collectionType == "playlists"
+            })
+            
             if (musicLibraries.count == 1) {
                 
-                JellyfinService.libraryId = musicLibraries[0].id
-                UserDefaults.standard.set(musicLibraries[0].id, forKey: "LibraryId")
-                self.selected = true
+                self.user!.musicLibraryId = musicLibraries[0].id
+            }
+            
+            if playlistLibrary.count >= 1 {
+                self.user!.playlistLibraryId = playlistLibrary[0].id
             }
             
             complete(libraryResult)
@@ -51,8 +61,10 @@ class LibrarySelectionService: JellyfinService {
     
     func saveLibrary(selectedLibrary: LibraryResult) {
         
-        JellyfinService.libraryId = selectedLibrary.id
-        UserDefaults.standard.set(selectedLibrary.id, forKey: "LibraryId")
+        self.user!.musicLibraryId = selectedLibrary.id
+        
+        try! JellyfinService.context.save()
+
         selected = true
     }
 }
