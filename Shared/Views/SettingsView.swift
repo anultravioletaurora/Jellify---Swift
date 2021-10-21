@@ -30,11 +30,19 @@ struct SettingsView: View {
                 }
                 
                 Button(action: {
+                    authenticationService.deleteAllEntities()
+                }, label: {
+                    Text("Clear Data")
+                })
+                    .buttonStyle(PlainButtonStyle())
+                
+                Button(action: {
                     
                     authenticationService.logOut()
                 }, label: {
                     Text("Log out")
                 })
+                    .buttonStyle(PlainButtonStyle())
             }
             .navigationTitle("Settings")
         }    }

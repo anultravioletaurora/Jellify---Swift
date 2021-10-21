@@ -142,17 +142,7 @@ struct ArtistsView: View {
                 
                 loading = true
 
-                artistService.retrieveArtists(complete: { result in
-                    
-                    for artistResult in result.items {
-                        let artist = Artist(context: managedObjectContext)
-                        
-                        artist.jellyfinId = artistResult.id
-                        artist.name = artistResult.name
-                        artist.dateCreated = artistResult.dateCreated
-                        artist.overview = artistResult.overview
-                    }
-                })
+                artistService.retrieveArtists()
                 
                 loading = false
             } else {

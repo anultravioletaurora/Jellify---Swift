@@ -12,12 +12,32 @@ struct AlbumsView: View {
     
     @Environment(\.managedObjectContext)
     var managedObjectContext
+    
+    var albumService = AlbumService.shared
+    
+    var fetchRequest: FetchRequest<Album>
+    
+    var albums: FetchedResults<Album>{
+        fetchRequest.wrappedValue
+    }
+
+    @State
+    var albumResults : [AlbumResult] = []
 
     @State
     var search: String = ""
     
+    let height = UIScreen.main.bounds.height / 5
+    
     var columns = Array(repeating: GridItem(.flexible(), spacing: 20), count: 2)
         
+    init() {
+        self.fetchRequest = FetchRequest(
+            entity: Album.entity(),
+            sortDescriptors: [NSSortDescriptor(key: "name", ascending: true)]
+        )
+    }
+    
     var body: some View {
         
         NavigationView {
@@ -39,15 +59,17 @@ struct AlbumsView: View {
                     .cornerRadius(15)
                     
                     // Grid View of Albums
-                    LazyVGrid(columns: columns, spacing: 20){
-                        ForEach(1...10, id: \.self) { index in
+                    LazyVGrid(columns: columns){
+                        ForEach(albums) { album in
                             
-                            Image("profile")
-                                .resizable()
-                                .frame(width: UIScreen.main.bounds.width - 100, height: 180, alignment: .center)
-                                .aspectRatio(contentMode: .fill)
+                            HStack {
+                                Image("profile")
+                                    .resizable()
+                                    .frame(width: height, height: height, alignment: .center)
+                                    .cornerRadius(15)
                                 
-                                .cornerRadius(15)
+                                Text(album.name ?? "Unknown Album")
+                            }
                             
                         }
                     }
@@ -57,5 +79,8 @@ struct AlbumsView: View {
                 .padding(.bottom, 60)
             }.navigationTitle("Albums")
         }
+        .onAppear(perform: {
+            
+        })
     }
 }

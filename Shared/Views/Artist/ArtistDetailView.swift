@@ -46,7 +46,7 @@ struct ArtistDetailView: View {
                    
         VStack {
             
-            HStack {
+//            HStack {
                 // Favorite Artist Button
 //                Button(action: {
 //                    // TODO: Make API call to favorite artist
@@ -72,34 +72,34 @@ struct ArtistDetailView: View {
 //                .buttonStyle(.bordered)
                     
                 // Play Artist Button
-                Button(action: {
-                    print("Playing artist")
-                }) {
-                    Spacer()
-                    HStack {
-                        Image(systemName: "play.fill")
-                        Text("Play")
-                    }
-                    .tint(.accentColor)
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
-                .buttonStyle(.bordered)
-                
-                Button(action: {
-                    print("Shuffling artist")
-                }) {
-                    Spacer()
-                    HStack {
-                        Image(systemName: "shuffle")
-                        Text("Shuffle")
-                    }
-                    .tint(.accentColor)
-                    Spacer()
-                }
-                .frame(maxWidth: .infinity)
-                .buttonStyle(.bordered)
-            }
+//                Button(action: {
+//                    print("Playing artist")
+//                }) {
+//                    Spacer()
+//                    HStack {
+//                        Image(systemName: "play.fill")
+//                        Text("Play")
+//                    }
+//                    .tint(.accentColor)
+//                    Spacer()
+//                }
+//                .frame(maxWidth: .infinity)
+//                .buttonStyle(.bordered)
+//
+//                Button(action: {
+//                    print("Shuffling artist")
+//                }) {
+//                    Spacer()
+//                    HStack {
+//                        Image(systemName: "shuffle")
+//                        Text("Shuffle")
+//                    }
+//                    .tint(.accentColor)
+//                    Spacer()
+//                }
+//                .frame(maxWidth: .infinity)
+//                .buttonStyle(.bordered)
+//            }
 
             
             List (albums) { album in
@@ -142,7 +142,7 @@ struct ArtistDetailView: View {
                     .contentShape(Rectangle())
                 }
             }
-            .padding(.bottom, 65)
+            .padding(.bottom, 69)
             .listStyle(PlainListStyle())
 //        .searchable(text: $search, prompt: "Search \(artist.name ?? "Unknown Artist") albums")
 //        .onChange(of: search, perform: { newSearch in
@@ -158,35 +158,7 @@ struct ArtistDetailView: View {
             if self.albums.isEmpty {
             
                 print("No core data albums, fetching them from server")
-                albumService.retrieveAlbums(artistId: artist.jellyfinId!, complete: { result in
-                    self.albumResults = result.items
-                    
-                    for albumResult in result.items {
-                        let album = Album(context: managedObjectContext)
-                        
-                        album.jellyfinId = albumResult.id
-                        album.name = albumResult.name
-                        album.productionYear = Int16(albumResult.productionYear ?? 0)
-                        
-                        album.addToAlbumArtists(artist)
-                        
-                        print("Fetching songs from service")
-                        songService.retrieveSongs(parentId: album.jellyfinId!, complete: { songResult in
-                                        
-                            for songResult in songResult.items {
-                                let song = Song(context: managedObjectContext)
-                                
-                                song.jellyfinId = songResult.id
-                                song.name = songResult.name
-                                song.indexNumber = Int16(songResult.indexNumber!)
-                                
-                                song.album = album
-                                song.addToArtists(album.albumArtists!)
-                            }
-                        })
-
-                    }
-                })
+                albumService.retrieveAlbums(artist: artist)
                                 
                 print("Albums retrieved")
             }

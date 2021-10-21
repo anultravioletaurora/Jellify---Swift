@@ -28,6 +28,16 @@ struct AlbumDetailView: View {
         
     var songService: SongService = SongService.shared
     
+    var artistService: ArtistService = ArtistService.shared
+    
+    var playlistService: PlaylistService = PlaylistService.shared
+    
+    @State
+    var showPlaylistSheet: Bool = false
+    
+    @State
+    var selectedSong: Song?
+        
     @State
     var player : AVPlayer = AVPlayer()
     
@@ -86,40 +96,26 @@ struct AlbumDetailView: View {
 //        }
 //        .padding(.horizontal)
                     
-
-            List(songs) { song in
-                    
-                    Button(action: {
-                        print("Playing \(song.name ?? "Unknown Song")")
+        VStack(alignment: .center) {
                         
-                        Player.shared.loadSongs(Array(songs), songId: song.jellyfinId!)
-                        Player.shared.isPlaying = true
+            List {
                                         
-                        print("Playing!")
-                    }, label: {
-                        HStack(alignment: .center, content: {
-                            
-                            VStack(alignment: .center, spacing: 10, content: {
-                                Text(String(song.indexNumber))
-                                    .font(.subheadline)
-                                    .padding(.trailing, 5)
-                            }).padding(.trailing, 5)
-                                                    
-                            VStack(alignment: .leading, spacing: 10) {
-                                Text(song.name ?? "Unknown Song")
-                                    .padding(.leading, 5)
-                            }
-                            
-                            Spacer()
-                        })
-                    })
-                    .padding(.horizontal, 10)
-                    .padding(.vertical, 5)
-                    .buttonStyle(PlainButtonStyle())
-
+                AlbumArtwork(album: album)
+                    .listRowSeparator(.hidden)
+                
+                ForEach(songs) { song in
+                    SongButton(song: song, selectedSong: $selectedSong, songs: Array(songs), showPlaylistSheet: $showPlaylistSheet)
             }
+            .sheet(isPresented: $showPlaylistSheet, content: {
+                PlaylistSelectionSheet(song: $selectedSong)
+            })
+
+        }
+            .padding(.bottom, 60)
+
             .listStyle(PlainListStyle())
-            .navigationTitle(album.name ?? "Unknown Album")
+        .navigationTitle(album.name ?? "Unknown Album")
+    }
     }
     
     func getRuntime(runTimeTicks: Int) -> String{
@@ -138,5 +134,140 @@ struct AlbumDetailView: View {
 //        let formattedString = String(format: "%02ld%02ld", difference.hour!, difference.minute!)
         
         return runtimeString.joined(separator: " ")
+    }
+    
+    struct SongButton: View {
+        
+        var song: Song
+        
+        @Binding
+        var selectedSong: Song?
+        
+        var songs: [Song]
+        
+        @Binding
+        var showPlaylistSheet: Bool
+        
+        var body: some View{
+            Button(action: {
+                print("Playing \(song.name ?? "Unknown Song")")
+                
+                Player.shared.loadSongs(Array(songs), songId: song.jellyfinId!)
+                Player.shared.isPlaying = true
+                                
+                print("Playing!")
+            }, label: {
+                HStack(alignment: .center, content: {
+                    
+                    VStack(alignment: .center, spacing: 10, content: {
+                        Text(String(song.indexNumber))
+                            .font(.subheadline)
+                            .padding(.trailing, 5)
+                    }).padding(.trailing, 5)
+                                            
+                    VStack(alignment: .leading, spacing: 10) {
+                        Text(song.name ?? "Unknown Song")
+                            .padding(.leading, 5)
+                    }
+                    
+                    Spacer()
+                })
+            })
+            .padding(.horizontal, 10)
+            .padding(.vertical, 5)
+            .buttonStyle(PlainButtonStyle())
+            .swipeActions {
+                Button(action: {
+                    print("Artist Swiped")
+                }) {
+                    Image(systemName: "heart")
+                }
+                .tint(.purple)
+                
+                Button(action: {
+                    print("Add to playlist sheet activated")
+                    selectedSong = song
+                    
+                    print("Showing playlist sheet for: \(selectedSong!.name)")
+                    
+                    showPlaylistSheet.toggle()
+                    
+                    print(showPlaylistSheet ? "Showing Playlist Sheet" : "Hiding Playlist Sheet")
+                }) {
+                    Image(systemName: "music.note.list")
+                }
+                .tint(.blue)
+            }
+        }
+    }
+    
+    struct AlbumArtwork: View {
+        
+        var album: Album
+        
+        var artistService: ArtistService = ArtistService.shared
+        
+        var height = UIScreen.main.bounds.height / 4
+        
+        var body: some View {
+            
+            HStack {
+                
+                Spacer()
+                
+                // Album Image
+                CacheAsyncImage(
+                    url: URL(string:artistService.getAlbumArt(id: album.jellyfinId!, maxSize: 1000))!
+                ) { phase in
+                    switch phase {
+                    case .success(let image):
+                        image
+                            .resizable()
+                            .frame(width: height, height: height)
+                            .cornerRadius(2)
+                        
+                    case .empty:
+                        ProgressView()
+                            .frame(width: height, height: height)
+                        
+                    @unknown default:
+                    Image(systemName: "opticaldisc")
+                            .resizable()
+                        .frame(width: height, height: height)
+
+                    }
+                }
+                
+                Spacer()
+            }
+        }
+    }
+    
+    struct PlaylistSelectionSheet: View {
+        
+        @Binding
+        var song: Song?
+        
+        var playlistService: PlaylistService = PlaylistService.shared
+        
+        @FetchRequest(
+            entity: Playlist.entity(),
+            sortDescriptors: [NSSortDescriptor(key: "name", ascending: true)])
+        var playlists: FetchedResults<Playlist>
+        
+        var body: some View {
+            
+            List(playlists) { playlist in
+                Button(action: {
+                    print("Adding \(song!.name) to playlist \(playlist.name)")
+                    playlistService.addToPlaylist(playlist: playlist, song: self.song!)
+                    
+                    // TODO: Refresh playlists
+                    
+                }, label: {
+                    Text(playlist.name!)
+                })
+            }
+        }
     }
 }

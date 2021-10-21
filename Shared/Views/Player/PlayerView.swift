@@ -19,6 +19,9 @@ struct PlayerView: View {
     @State
     var showMediaPlayer: Bool = false
     
+    @Environment(\.colorScheme)
+    var colorScheme: ColorScheme
+    
     @State
     var seekPos = 0.0
     
@@ -321,8 +324,7 @@ struct PlayerView: View {
                                     Text(player.currentSong?.song.album?.name ?? "")
                                         .font(.body)
                                         .transition(.opacity)
-
-
+                            
                                     Text(getWrappedArtists(artists: (player.currentSong?.song.artists)))
                                         .font(.body)
                                         .transition(.opacity)
@@ -386,7 +388,7 @@ struct PlayerView: View {
                                             .frame(width: height * 3, height: height * 3)
                                             .cornerRadius(10)
                                             .blur(radius: 20, opaque: true)
-                                            .brightness(-0.5).ignoresSafeArea()
+                                            .brightness(colorScheme == .dark ? -0.5 : 0.5).ignoresSafeArea()
                                     }
                                     
                                 case .empty:

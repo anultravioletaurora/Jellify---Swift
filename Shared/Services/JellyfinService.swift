@@ -10,6 +10,7 @@ import UIKit
 import CoreData
 import SwiftUI
 import JellyfinAPI
+import Combine
 
 class JellyfinService: ObservableObject {
         
@@ -18,6 +19,8 @@ class JellyfinService: ObservableObject {
     let encoder = JSONEncoder()
     
     let decoder = JSONDecoder()
+    
+    var cancellables = Set<AnyCancellable>()
     
     static let sharedParent = JellyfinService()
         
@@ -178,11 +181,13 @@ class JellyfinService: ObservableObject {
         #endif
         
         var header = "MediaBrowser "
-        header.append("Client=\"Jellyfin \(platform)\", ")
+        header.append("Client=\"FinTune\", ")
         header.append("Device=\"\(deviceName)\", ")
-        header.append("DeviceId=\"\(platform)_\(UIDevice.current.identifierForVendor!)_\(String(Date().timeIntervalSince1970))\", ")
+        header.append("DeviceId=\"\(UIDevice.current.identifierForVendor!)\", ")
         header.append("Version=\"\(appVersion ?? "0.0.1")\", ")
-        header.append("Token=\"\(accessToken)\"")
+        header.append("Token=\"\(user!.authToken!)\"")
+        
+        print("Setting Auth Header: \(header)")
 
         JellyfinAPI.customHeaders["X-Emby-Authorization"] = header
     }
@@ -242,6 +247,16 @@ class JellyfinService: ObservableObject {
     private func getAppCurrentVersionNumber() -> String {
         let nsObject: AnyObject? = Bundle.main.infoDictionary!["CFBundleShortVersionString"] as AnyObject?
         return nsObject as! String
+    }
+    
+    public func deleteAllEntities() -> Void {
+        
+        
+        deleteAllOfEntity(entityName: "Artist")
+        deleteAllOfEntity(entityName: "Album")
+        deleteAllOfEntity(entityName: "Song")
+        deleteAllOfEntity(entityName: "PlaylistSong")
+        deleteAllOfEntity(entityName: "Playlist")
     }
     
     public func deleteAllOfEntity(entityName: String)-> Void{
