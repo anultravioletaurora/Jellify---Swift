@@ -26,6 +26,9 @@ struct ArtistsView: View {
     @State
     var loading : Bool = true
     
+    @FocusState
+    var isSearchFocused : Bool
+    
     init() {
                 
         self.fetchRequest = FetchRequest(
@@ -66,74 +69,22 @@ struct ArtistsView: View {
                     
                     // Artists List
                 List(artists) { artist in
-
-                    NavigationLink(destination: ArtistDetailView(artist)) {
-                        HStack {
-                                                
-                            
-                            CacheAsyncImage(
-                                url: URL(string:artistService.getAlbumArt(id: artist.jellyfinId!, maxSize: 250))!
-                            ) { phase in
-                                switch phase {
-                                case .success(let image):
-                                    image
-                                        .resizable()
-                                        .frame(width: 60, height: 60)
-                                        .cornerRadius(10)
-                                                                        
-                                case .empty:
-                                    ProgressView()
-                                        .frame(width: 60, height: 60)
-                                    
-                                @unknown default:
-                                Image(systemName: "music.mic")
-                                        .resizable()
-                                    .frame(width: 60, height: 60)
-
-                                }
-                            }
-
-                            VStack(alignment: .leading) {
-                                Text(artist.name ?? "Unknown Artist")
-                                    .font(.body)
-
-    //                            HStack {
-    //                                let albumCount = artist.albums.count
-    //
-    //                                let albumText : String = albumCount == 1 ? "album" : "albums"
-    //
-    //
-    //                                let songCount : Int = getSongCount(artist: artist)
-    //
-    //                                let songText : String = songCount == 1 ? "song" : "songs"
-    //
-    //                                Text("\(albumCount) \(albumText), \(songCount) \(songText)")
-    //                                    .font(.subheadline)
-    //                                    .fontWeight(.light)
-    //
-    //
-    //                            }
-                            }
-                        }
-                    }
-                    .swipeActions {
-                        Button(action: {
-                            print("Artist Swiped")
-                        }) {
-                            Image(systemName: "heart")
-                        }
-                        .tint(.purple)
-                    }
-
+                    ArtistRow(artist: artist)
                 }
-                .padding(.bottom, 65)
                 .searchable(text: $search, prompt: "Search artists")
+                .disableAutocorrection(true)
                 .onChange(of: search, perform: { newSearch in
-                                                            
-                    artists.nsPredicate = newSearch.isEmpty ? nil : NSPredicate(format: "%K contains[c] %@", #keyPath(Artist.name), newSearch)
+                                                        
+                    artists.nsPredicate = newSearch.isEmpty ? nil : NSPredicate(format: "%K contains[c] %@", #keyPath(Artist.name), newSearch.trimmingCharacters(in: .whitespaces))
                 })
                 .listStyle(PlainListStyle())
                 .navigationTitle("Artists")
+                .refreshable {
+                    
+                    if !loading {
+                        self.forceFetchArtists()
+                    }
+                }
             }
         }
         .onAppear(perform: {
@@ -142,12 +93,25 @@ struct ArtistsView: View {
                 
                 loading = true
 
-                artistService.retrieveArtists()
-                
-                loading = false
+                artistService.retrieveArtists(complete: {
+                    loading = false
+                })
             } else {
                 loading = false
             }
         })
+    }
+    
+    func forceFetchArtists() -> Void {
+        
+        loading = true
+        
+        artistService.deleteAllEntities()
+        
+        artistService.retrieveArtists(complete: {
+            loading = false
+        })
+        
+        loading = false
     }
 }

@@ -29,6 +29,9 @@ struct AlbumsView: View {
     
     let height = UIScreen.main.bounds.height / 5
     
+    @State
+    var loading : Bool = false
+    
     var columns = Array(repeating: GridItem(.flexible(), spacing: 20), count: 2)
         
     init() {
@@ -41,46 +44,30 @@ struct AlbumsView: View {
     var body: some View {
         
         NavigationView {
-            ScrollView {
-                VStack(spacing: 18) {
+            
+            List(albums) { album in
+                HStack {
+                    AlbumThumbnail(album: album)
                     
-                    // Search
-                    HStack(spacing: 15) {
-                        
-                        Image(systemName: "magnifyingglass")
-                            .foregroundColor(.primary)
-                        
-                        TextField("Search", text: $search)
-                        
-                    }
-                    .padding(.vertical, 10)
-                    .padding(.horizontal)
-                    .background(Color.primary.opacity(0.06))
-                    .cornerRadius(15)
-                    
-                    // Grid View of Albums
-                    LazyVGrid(columns: columns){
-                        ForEach(albums) { album in
-                            
-                            HStack {
-                                Image("profile")
-                                    .resizable()
-                                    .frame(width: height, height: height, alignment: .center)
-                                    .cornerRadius(15)
-                                
-                                Text(album.name ?? "Unknown Album")
-                            }
-                            
-                        }
-                    }
-                    
+                    Text(album.name ?? "Unknown Album")
                 }
-                .padding()
-                .padding(.bottom, 60)
-            }.navigationTitle("Albums")
+            }
+            .padding()
+            .padding(.bottom, 60)
+            .navigationTitle("Albums")
         }
         .onAppear(perform: {
-            
+            if self.albums.isEmpty {
+                
+                loading = true
+
+                albumService.retrieveAlbums(artist: nil, complete: {
+                    loading = false
+                })
+            } else {
+                loading = false
+            }
+
         })
     }
 }

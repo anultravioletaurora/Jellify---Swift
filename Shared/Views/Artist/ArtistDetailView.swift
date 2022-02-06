@@ -29,6 +29,9 @@ struct ArtistDetailView: View {
     
     @State
     var search : String = ""
+    
+    @State
+    var loading : Bool = true
         
     var artist : Artist
                 
@@ -46,102 +49,74 @@ struct ArtistDetailView: View {
                    
         VStack {
             
-//            HStack {
-                // Favorite Artist Button
-//                Button(action: {
-//                    // TODO: Make API call to favorite artist
-//                    print("Artist favorited")
-//        //            artist.userData.isFavorite.toggle()
-//                }) {
-//                    
-//                    Spacer()
-//                    HStack {
-//                        if true {
-//                            Image(systemName: "heart.fill")
-//                            Text("Favorited")
-//                        } else {
-//                            Image(systemName: "heart")
-//                            Text("Favorite")
-//                        }
-//                    }
-//                    .tint(.accentColor)
-//                    
-//                    Spacer()
-//                }
-//                .frame(maxWidth: .infinity)
-//                .buttonStyle(.bordered)
-                    
-                // Play Artist Button
-//                Button(action: {
-//                    print("Playing artist")
-//                }) {
-//                    Spacer()
-//                    HStack {
-//                        Image(systemName: "play.fill")
-//                        Text("Play")
-//                    }
-//                    .tint(.accentColor)
-//                    Spacer()
-//                }
-//                .frame(maxWidth: .infinity)
-//                .buttonStyle(.bordered)
-//
-//                Button(action: {
-//                    print("Shuffling artist")
-//                }) {
-//                    Spacer()
-//                    HStack {
-//                        Image(systemName: "shuffle")
-//                        Text("Shuffle")
-//                    }
-//                    .tint(.accentColor)
-//                    Spacer()
-//                }
-//                .frame(maxWidth: .infinity)
-//                .buttonStyle(.bordered)
-//            }
+            if loading {
+                ProgressView()
+            } else {
 
-            
-            List (albums) { album in
-                NavigationLink(destination: AlbumDetailView(album: album, artist: artist)) {
+                List {
+                    Section(content: {
+                        ForEach(albums, id: \.jellyfinId) { album in
+                            AlbumRow(album: album, artist: artist)
+                        }
                         
-                    HStack {
-                        // Album Image
-                        CacheAsyncImage(
-                            url: URL(string:artistService.getAlbumArt(id: album.jellyfinId!, maxSize: 1000))!
-                        ) { phase in
-                            switch phase {
-                            case .success(let image):
-                                image
-                                    .resizable()
-                                    .frame(width: 60, height: 60)
-                                    .cornerRadius(2)
+                    }, header: {
+                        VStack {
+                            ArtistImage(artist: artist)
                                 
-                            case .empty:
-                                ProgressView()
-                                    .frame(width: 60, height: 60)
-                                
-                            @unknown default:
-                            Image(systemName: "opticaldisc")
-                                    .resizable()
-                                .frame(width: 60, height: 60)
+                            HStack {
+                                // Favorite Artist Button
+                                Button(action: {
+                                    // TODO: Make API call to favorite artist
+                                    print("Artist favorited")
+                        //            artist.userData.isFavorite.toggle()
+                                }) {
+                                    HStack {
+                                        if false {
+                                            Image(systemName: "heart.fill")
+                                            Text("Favorited")
+                                        } else {
+                                            Image(systemName: "heart")
+                                            Text("Favorite")
+                                        }
+                                    }
+                                    .tint(.accentColor)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .buttonStyle(.bordered)
+                                    
+                                // Play Artist Button
+                                Button(action: {
+                                    print("Playing artist")
+                                }) {
+                                    Spacer()
+                                    HStack {
+                                        Image(systemName: "play.fill")
+                                        Text("Play")
+                                    }
+                                    .tint(.accentColor)
+                                    Spacer()
+                                }
+                                .frame(maxWidth: .infinity)
+                                .buttonStyle(.bordered)
 
+                                Button(action: {
+                                    print("Shuffling artist")
+                                }) {
+                                    HStack {
+                                        Image(systemName: "shuffle")
+                                        Text("Shuffle")
+                                    }
+                                    .tint(.accentColor)
+                                }
+                                .frame(maxWidth: .infinity)
+                                .buttonStyle(.bordered)
                             }
                         }
 
-                        VStack(alignment: .leading) {
-
-                            Text(album.name ?? "Unknown Album")
-                                .font(.body)
-
-                            Text(String(album.productionYear))
-                                .font(.body)
-                                .opacity(0.6)
-                        }
-                    }
-                    .contentShape(Rectangle())
+                    }, footer: {
+                        
+                    })
                 }
-            }
             .padding(.bottom, 69)
             .listStyle(PlainListStyle())
 //        .searchable(text: $search, prompt: "Search \(artist.name ?? "Unknown Artist") albums")
@@ -149,8 +124,9 @@ struct ArtistDetailView: View {
 //            albums.nsPredicate = newSearch.isEmpty ? nil : NSPredicate(format: "%K contains[c] %@", #keyPath(Album.name), newSearch)
 //
 //        })
-        .navigationTitle(artist.name ?? "Unknown Artist")
+            }
         }
+        .navigationTitle(artist.name ?? "Unknown Artist")
         .onAppear(perform: {
                        
             print(self.albums)
@@ -158,9 +134,13 @@ struct ArtistDetailView: View {
             if self.albums.isEmpty {
             
                 print("No core data albums, fetching them from server")
-                albumService.retrieveAlbums(artist: artist)
+                albumService.retrieveAlbums(artist: artist, complete: {
+                    loading = false
+                })
                                 
                 print("Albums retrieved")
+            } else {
+                loading = false
             }
                         
         })

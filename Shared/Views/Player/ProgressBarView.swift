@@ -20,6 +20,9 @@ struct ProgressBarView: View {
     @State private var durationOffset: CGFloat = -7.5
     @State private var canAnimate: Bool = false
     @State private var appeared: Bool = false
+    
+    @Environment(\.colorScheme)
+    var colorScheme: ColorScheme
  
     var body: some View {
             GeometryReader { geometry in
@@ -30,21 +33,21 @@ struct ProgressBarView: View {
                             .opacity(0.0)
                         Rectangle().fill(Color.clear).background(
                             Rectangle().frame(width: geometry.size.width - seekSize, height: 3)
-                                .foregroundColor(Globals.colorLow)
+                                .foregroundColor(Color.primary).opacity(0.5)
                                 .cornerRadius(1.5)
                         ).padding(.horizontal, seekSize / 2)
                         Rectangle().fill(Color.clear).frame(width: max(min(prog, progNoAnim), 0)).background(
                             Rectangle().frame(height: 3)
-                                .foregroundColor(Globals.colorMed)
+                                .foregroundColor(Color.accentColor)
                                 .cornerRadius(1.5)
                         ).padding(.horizontal, seekSize / 2)
                         .animation(Animation.linear(duration: Globals.playTimeInterval), value: canAnimate ? prog : nil)
                         Circle().fill(Color.black.opacity(0.0001))
                             .overlay(
                             Circle()
-                                .fill(Globals.colorMed)
-                                .frame(width: player.seeking ? seekSize : 7, height: player.seeking ? seekSize : 7)
-                                .animation(.default, value: player.seeking)
+                                .fill(Color.accentColor)
+                                .frame(width: player.seeking ? seekSize : 10, height: player.seeking ? seekSize : 10)
+                                .animation(.easeOut(duration: 0.3), value: player.seeking)
                             )
                         .frame(width: seekSize, height: seekSize)
                         .offset(x:min(min(prog, progNoAnim), geometry.size.width), y: 0)
@@ -113,7 +116,7 @@ struct ProgressBarView: View {
                                     durationOffset = -7.5
                             }
                     })
-                    .foregroundColor(Globals.colorMed).opacity(0.6)
+                    .foregroundColor(Color.primary)
                     .padding(.horizontal, seekSize / 2)
                     .font(.system(size: 13))
                     

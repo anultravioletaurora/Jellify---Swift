@@ -1,6 +1,6 @@
 //
 //  Player.swift
-//  jFin
+//  FinTune
 //
 //  Created by Jack Caulfield on 10/12/21.
 //
@@ -19,7 +19,6 @@ public class Globals{
     public static let colorFull: Color = Color(Color.RGBColorSpace.displayP3, white: (1), opacity: 1)
 }
 
-// TODO: DUMB DUMB, INSTANTIATE ONE INSTANCE OF JELLYFINSERVICE INSTEAD OF 90
 open class AVPlayerItemId: AVPlayerItem, Identifiable{
     public let id = UUID().uuidString
     public var initialOrder: Int
@@ -370,7 +369,7 @@ class Player: ObservableObject {
     }
     
     public func previous() {
-        if timeElasped < "0:02"{
+        if timeElasped < "0:03"{
             changeSong(newIndex: -1)
         }else{
             seek(progress: 0.0)
@@ -478,14 +477,18 @@ class Player: ObservableObject {
                 artistNameArray.append((artist as! Artist).name ?? "")
             })
             
-                    let info: [String: Any] =
-            [MPMediaItemPropertyArtist: artistNameArray.joined(separator: ", "),
-                         MPMediaItemPropertyAlbumTitle: currentItem.song.album ?? "Unknown Album",
-              MPMediaItemPropertyTitle: currentItem.song.name ?? "Unknown Track",
+                    let info: [String: Any] = [
+                        MPMediaItemPropertyArtist: artistNameArray.joined(separator: ", "),
+                        MPMediaItemPropertyAlbumTitle: currentItem.song.album ?? "Unknown Album",
+                        MPMediaItemPropertyTitle: currentItem.song.name ?? "Unknown Track",
+                        MPMediaItemPropertyArtwork: MPMediaItemArtwork(boundsSize: CGSize(width: 500, height: 500), requestHandler: { (size: CGSize) -> UIImage in
+                            return self.getAlbumUiImage(url: self.currentSong?.song.album?.artwork) ?? self.placeholderImage
+                        })
+
 //                         MPMediaItemPropertyArtwork: MPMediaItemArtwork(boundsSize: CGSize(width: 500, height: 500),
-//                                                                        requestHandler: { (size: CGSize) -> UIImage in
-//                                                                            return (self?.currentSongImage)!
-//                         })
+//                            requestHandler: { (size: CGSize) -> UIImage in
+//                return UIImage(self.currentSong?.song.album?.artwork) ?? self.placeholderImage
+//                     })
             ]
             MPNowPlayingInfoCenter.default().playbackState = self.isPlaying ?? false ? MPNowPlayingPlaybackState.playing : .paused
                     MPNowPlayingInfoCenter.default().nowPlayingInfo = info
@@ -495,6 +498,18 @@ class Player: ObservableObject {
         else {
             self.isPlaying = false
     }
+    }
+    
+    private func getAlbumUiImage(url: URL?) -> UIImage? {
+        var image: UIImage?
+
+        if url != nil {
+            if let imageData: NSData = NSData(contentsOf: url!) {
+                image = UIImage(data: imageData as Data)
+            }
+        }
+
+        return image
     }
     
     private func setupPlayTimer() {
@@ -606,7 +621,10 @@ class Player: ObservableObject {
 //        let formattedString = String(format: "%02ld%02ld", difference.hour!, difference.minute!)
         
         return runtimeString.joined(separator: " ")
-    }}
+    }
+}
+                                                           
+                                                           
 
 extension Array where Element: Equatable
 {

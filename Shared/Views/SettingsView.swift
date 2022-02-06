@@ -15,18 +15,31 @@ struct SettingsView: View {
     var body: some View {
         NavigationView {
             
-            VStack {
+            List {
                 
                 HStack {
-                    Text("User ID: \(UserDefaults.standard.string(forKey: "UserId") ?? "")")
+                    
+                    Text("User ID")
+                    
+                    Text(authenticationService.userId)
                 }
                 
                 HStack {
-                    Text("Access Token: \(UserDefaults.standard.string(forKey: "AccessToken") ?? "")")
+                    Text("Access Token")
+                    
+                    Text(authenticationService.accessToken)
                 }
 
                 HStack {
-                    Text("Music Library ID: \(UserDefaults.standard.string(forKey: "LibraryId") ?? "")")
+                    Text("Music Library")
+                    
+                    Text(authenticationService.libraryId)
+                }
+                
+                HStack {
+                    Text("Playlist Library")
+                    
+                    Text(authenticationService.playlistId)
                 }
                 
                 Button(action: {
@@ -45,5 +58,6 @@ struct SettingsView: View {
                     .buttonStyle(PlainButtonStyle())
             }
             .navigationTitle("Settings")
-        }    }
+        }
+                    }
 }

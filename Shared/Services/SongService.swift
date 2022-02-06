@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import JellyfinAPI
 
 class SongService: JellyfinService {
     
@@ -18,21 +19,35 @@ class SongService: JellyfinService {
         return URL(string: "\(self.server)/Audio/\(songId)/stream.aac")!
     }
     
-    func retrieveSongs(parentId: String?, complete: @escaping (ResultSet<SongResult>) -> Void) {
-        print("Retrieving songs, access token is: \(self.accessToken)")
+    func retrieveSongs(parentId: String?, complete: @escaping ([BaseItemDto]) -> Void) {
         
-        self.get(url: "/Users/\(self.userId)/Items", params: [
-            "parentId": parentId ?? ""
-        ], completion: { data in
-                               
-            let json = try? JSONSerialization.jsonObject(with: data, options: [])
-            
-            print(json as Any)
-            
-            let songResult = try! self.decoder.decode(ResultSet<SongResult>.self, from: data)
-                                        
-            complete(songResult)
-        })
+        ItemsAPI.getItems(userId: self.userId, parentId: parentId, apiResponseQueue: JellyfinAPI.apiResponseQueue)
+            .subscribe(on: processingQueue)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { complete in
+                switch complete {
+                case.finished:
+                    break
+                case .failure(let error):
+                    print("Error retrieving songs: \(error)")
+                }
+            }, receiveValue: { songResults in
+                complete(songResults.items!)
+            })
+            .store(in: &self.cancellables)
+        
+//        self.get(url: "/Users/\(self.userId)/Items", params: [
+//            "parentId": parentId ?? ""
+//        ], completion: { data in
+//
+//            let json = try? JSONSerialization.jsonObject(with: data, options: [])
+//
+//            print(json as Any)
+//
+//            let songResult = try! self.decoder.decode(ResultSet<SongResult>.self, from: data)
+//
+//            complete(songResult)
+//        })
     }
     
     func retrieveSongsFromPlaylist(playlistId: String, complete: @escaping (ResultSet<SongResult>) -> Void) {

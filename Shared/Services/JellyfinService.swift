@@ -22,6 +22,8 @@ class JellyfinService: ObservableObject {
     
     var cancellables = Set<AnyCancellable>()
     
+    let processingQueue = DispatchQueue(label: "FinTuneProcessingQueue")
+    
     static let sharedParent = JellyfinService()
         
     @FetchRequest(
@@ -131,7 +133,7 @@ class JellyfinService: ObservableObject {
     
     public var _libraryId: String = ""
     public var libraryId:String {
-        if _libraryId != ""{
+        if _libraryId != "" {
             return _libraryId
         }
         let userRequest: NSFetchRequest<User> = User.fetchRequest()
@@ -167,6 +169,16 @@ class JellyfinService: ObservableObject {
         }
     }
     
+    public func saveContext() {
+        DispatchQueue.main.async {
+            do {
+                try JellyfinService.context.save()
+            } catch {
+                print("Error saving context: \(error)")
+            }
+        }
+    }
+    
     public func setAuthHeader(with accessToken: String) {
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
         var deviceName = UIDevice.current.name
@@ -191,8 +203,6 @@ class JellyfinService: ObservableObject {
 
         JellyfinAPI.customHeaders["X-Emby-Authorization"] = header
     }
-
-
         
     func get(url: String, params: Dictionary<String, String>, completion: @escaping (Data) -> Void) {
         
@@ -251,12 +261,17 @@ class JellyfinService: ObservableObject {
     
     public func deleteAllEntities() -> Void {
         
-        
-        deleteAllOfEntity(entityName: "Artist")
-        deleteAllOfEntity(entityName: "Album")
-        deleteAllOfEntity(entityName: "Song")
         deleteAllOfEntity(entityName: "PlaylistSong")
+        deleteAllOfEntity(entityName: "Song")
+        deleteAllOfEntity(entityName: "Album")
         deleteAllOfEntity(entityName: "Playlist")
+        deleteAllOfEntity(entityName: "Artist")
+        
+        do {
+            try JellyfinService.context.save()
+        } catch {
+            print(error)
+        }
     }
     
     public func deleteAllOfEntity(entityName: String)-> Void{

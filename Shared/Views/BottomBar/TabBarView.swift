@@ -9,8 +9,6 @@ import SwiftUI
 
 struct TabBarView: View {
     
-    @State var uiTabarController: UITabBarController?
-
     @State private var isShowingSheet = false
     
     @State
@@ -69,7 +67,7 @@ struct TabBarView: View {
         .edgesIgnoringSafeArea(.top)
 
         .overlay(
-            PlayerView(animation: animation)
+            PlayerView()
 
 //                .offset(y: showMediaPlayer ? 0 : UIScreen.main.bounds.height / 3 + 19)
         )

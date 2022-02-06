@@ -9,9 +9,12 @@ import SwiftUI
 
 struct PlaylistDetailView: View {
     
+    @ObservedObject
     var playlist : Playlist
     
     let playlistService = PlaylistService.shared
+    
+    let artistService = ArtistService.shared
 
     var fetchRequest: FetchRequest<PlaylistSong>
     
@@ -47,19 +50,17 @@ struct PlaylistDetailView: View {
                 }, label: {
                     HStack(alignment: .center, content: {
                         
-                        VStack(alignment: .center, spacing: 10, content: {
-                            Text(String(playlistSong.indexNumber))
-                                .font(.subheadline)
-                                .padding(.trailing, 5)
-                        })
-                            .frame(width: 30, height: 30)
-                                                
+                        AlbumThumbnail(album: playlistSong.song!.album!)
+                                                           
                         VStack(alignment: .leading, spacing: 10) {
                             Text(playlistSong.song?.name! ?? "Unknown Song")
                             
                             HStack {
-                                Text(playlistSong.song?.album?.name! ?? "Unknown Album")
+//                                Text(playlistSong.song?.album?.name! ?? "Unknown Album")
+//                                    .font(.subheadline)
                                 Text(getArtistNameArray(playlistSong: playlistSong))
+                                    .font(.subheadline)
+                                    .foregroundColor(.gray)
                             }
                         }
                         .padding(.leading, 5)
@@ -67,13 +68,14 @@ struct PlaylistDetailView: View {
                         Spacer()
                     })
                 })
-                .swipeActions(content: {
+                .swipeActions(allowsFullSwipe: true, content: {
                     Button(action: {
                         print("Playlist Item Swiped to delete")
                         
                         playlistService.deleteFromPlaylist(playlist: playlist, playlistSong: playlistSong)
                     }) {
                         Image(systemName: "trash")
+                            .background(.red)
                     }
                     .tint(.red)
 

@@ -34,7 +34,7 @@ struct AlbumDetailView: View {
     
     @State
     var showPlaylistSheet: Bool = false
-    
+        
     @State
     var selectedSong: Song?
         
@@ -107,7 +107,7 @@ struct AlbumDetailView: View {
                     SongButton(song: song, selectedSong: $selectedSong, songs: Array(songs), showPlaylistSheet: $showPlaylistSheet)
             }
             .sheet(isPresented: $showPlaylistSheet, content: {
-                PlaylistSelectionSheet(song: $selectedSong)
+                PlaylistSelectionSheet(song: $selectedSong, showPlaylistSheet: $showPlaylistSheet)
             })
 
         }
@@ -216,27 +216,7 @@ struct AlbumDetailView: View {
                 Spacer()
                 
                 // Album Image
-                CacheAsyncImage(
-                    url: URL(string:artistService.getAlbumArt(id: album.jellyfinId!, maxSize: 1000))!
-                ) { phase in
-                    switch phase {
-                    case .success(let image):
-                        image
-                            .resizable()
-                            .frame(width: height, height: height)
-                            .cornerRadius(2)
-                        
-                    case .empty:
-                        ProgressView()
-                            .frame(width: height, height: height)
-                        
-                    @unknown default:
-                    Image(systemName: "opticaldisc")
-                            .resizable()
-                        .frame(width: height, height: height)
-
-                    }
-                }
+                AlbumImage(album: album)
                 
                 Spacer()
             }
@@ -248,6 +228,15 @@ struct AlbumDetailView: View {
         @Binding
         var song: Song?
         
+        @State
+        var playlistName: String = ""
+        
+        @Binding
+        var showPlaylistSheet: Bool
+        
+        @State
+        var showNewPlaylistAlert: Bool = false
+        
         var playlistService: PlaylistService = PlaylistService.shared
         
         @FetchRequest(
@@ -257,17 +246,40 @@ struct AlbumDetailView: View {
         
         var body: some View {
             
-            List(playlists) { playlist in
-                Button(action: {
-                    print("Adding \(song!.name) to playlist \(playlist.name)")
-                    playlistService.addToPlaylist(playlist: playlist, song: self.song!)
+            VStack {
+            
+                HStack {
+                    Spacer()
                     
-                    // TODO: Refresh playlists
-                    
-                }, label: {
-                    Text(playlist.name!)
-                })
+                    Button(action: {
+                        
+                    }, label: {
+                        Text("New Playlist")
+                    })
+                }
+                .padding(.trailing, 15)
+                .padding(.top, 15)
+                
+                List(playlists) { playlist in
+                    Button(action: {
+                        playlistService.addToPlaylist(playlist: playlist, song: self.song!, complete: {
+                            showPlaylistSheet = false
+                        })
+                    }, label: {
+                        Text(playlist.name!)
+                    })
+                }
             }
+        }
+    }
+    
+    struct CreatePlaylistForm: View {
+        
+        @Binding
+        var playlistName: String
+        
+        var body: some View {
+            TextField("Playlist Name", text: $playlistName)
         }
     }
 }

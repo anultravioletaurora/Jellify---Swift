@@ -13,9 +13,11 @@ class AlbumService : JellyfinService {
     
     static let shared = AlbumService()
     
+//    let artistService = ArtistService.shared
+    
     let songService = SongService.shared
         
-    func retrieveAlbums(artist: Artist?) {
+    func retrieveAlbums(artist: Artist?, complete: @escaping () -> Void) {
 //
         ItemsAPI.getItemsByUserId(userId: self.userId, maxOfficialRating: nil, hasThemeSong: nil, hasThemeVideo: nil, hasSubtitles: nil, hasSpecialFeature: nil, hasTrailer: nil, adjacentTo: nil, parentIndexNumber: nil, hasParentalRating: nil, isHd: nil, is4K: nil, locationTypes: nil, excludeLocationTypes: nil, isMissing: nil, isUnaired: nil, minCommunityRating: nil, minCriticRating: nil, minPremiereDate: nil, minDateLastSaved: nil, minDateLastSavedForUser: nil, maxPremiereDate: nil, hasOverview: nil, hasImdbId: nil, hasTmdbId: nil, hasTvdbId: nil, excludeItemIds: nil, startIndex: nil, limit: nil, recursive: true, searchTerm: nil, sortOrder: nil, parentId: nil, fields: nil, excludeItemTypes: nil, includeItemTypes: ["MusicAlbum"], filters: nil, isFavorite: nil, mediaTypes: nil, imageTypes: nil, sortBy: nil, isPlayed: nil, genres: nil, officialRatings: nil, tags: nil, years: nil, enableUserData: true, imageTypeLimit: nil, enableImageTypes: nil, person: nil, personIds: nil, personTypes: nil, studios: nil, artists: nil, excludeArtistIds: nil, artistIds: [artist?.jellyfinId ?? ""], albumArtistIds: nil, contributingArtistIds: nil, albums: nil, albumIds: nil, ids: nil, videoTypes: nil, minOfficialRating: nil, isLocked: nil, isPlaceHolder: nil, hasOfficialRating: nil, collapseBoxSetItems: nil, minWidth: nil, minHeight: nil, maxWidth: nil, maxHeight: nil, is3D: nil, seriesStatus: nil, nameStartsWithOrGreater: nil, nameStartsWith: nil, nameLessThan: nil, studioIds: nil, genreIds: nil, enableTotalRecordCount: nil, enableImages: nil, apiResponseQueue: JellyfinAPI.apiResponseQueue)
             .sink(receiveCompletion: { completion in
@@ -23,9 +25,7 @@ class AlbumService : JellyfinService {
             }, receiveValue: { response in
                 if response.items != nil {
                     response.items!.map({ albumResult -> Void in
-                        
-                        print(albumResult)
-                        
+                                                
                         let album = Album(context: JellyfinService.context)
                         
                         album.jellyfinId = albumResult.id!
@@ -35,11 +35,9 @@ class AlbumService : JellyfinService {
                         if (artist != nil) {
                             album.addToAlbumArtists(artist!)
                         }
-                        
-                        print("Fetching songs from service")
-                        self.songService.retrieveSongs(parentId: album.jellyfinId!, complete: { songResult in
+                        self.songService.retrieveSongs(parentId: album.jellyfinId!, complete: { songResults in
                                         
-                            for songResult in songResult.items {
+                            for songResult in songResults {
                                 let song = Song(context: JellyfinService.context)
                                 
                                 song.jellyfinId = songResult.id
@@ -47,31 +45,36 @@ class AlbumService : JellyfinService {
                                 song.indexNumber = Int16(songResult.indexNumber!)
                                 
                                 song.album = album
-                                song.addToArtists(album.albumArtists!)
+                                
+                                if (album.albumArtists != nil) {
+                                    song.addToArtists(album.albumArtists!)
+                                }
+
+                                ImageAPI.getItemImage(itemId: albumResult.id!, imageType: .primary)
+                                    .sink(receiveCompletion: { completion in
+                                        print("Album art retrieval \(completion)")
+                                    }, receiveValue: { response in
+                                        album.artwork = response
+                                        
+                                        ImageAPI.getItemImage(itemId: albumResult.id!, imageType: .primary, width: 250, height: 250, apiResponseQueue: JellyfinAPI.apiResponseQueue)
+                                            .sink(receiveCompletion: { completion in
+                                                print("Album art thumbnail retrieval \(completion)")
+                                            }, receiveValue: { response in
+                                                album.thumbnail = response
+                                            })
+                                            .store(in: &self.cancellables)
+                                    })
+                                    .store(in: &self.cancellables)
                             }
                         })
-
+                        
+                        if response.items!.last == albumResult {
+                            complete()
+                        }
                     })
                 }
             })
             .store(in: &self.cancellables)
-        
-//        self.get(url: "/Users/\(self.userId)/Items", params: [
-////            "parentId": self.libraryId,
-//            "artistIds": artistId!,
-//            "includeItemTypes": "MusicAlbum",
-//            "recursive": "true"
-//
-//        ], completion: { data in
-//
-//            let json = try? JSONSerialization.jsonObject(with: data, options: [])
-//
-//            print(json!)
-//
-//            let albumResult = try! self.decoder.decode(ResultSet<AlbumResult>.self, from: data)
-//
-//            complete(albumResult)
-//        })
     }
     
     func retrieveAlbum(albumId: String, complete: @escaping (Album) -> Void) {
@@ -80,18 +83,12 @@ class AlbumService : JellyfinService {
         
         let fetchRequest = Album.fetchRequest()
 
-        fetchRequest.predicate = NSPredicate(format: "jellyfinId = %@", albumId)
+        fetchRequest.predicate = NSPredicate(format: "jellyfinId == %@", albumId)
         
         var albumStoreResult : [Album] = []
-        
-        do {
-            albumStoreResult = try JellyfinService.context.fetch(fetchRequest)
             
-        } catch let error as NSError {
-            // TODO: handle the error
-            print(error)
-        }
-        
+        albumStoreResult = try! JellyfinService.context.fetch(fetchRequest)
+            
         if !albumStoreResult.isEmpty {
             
             print("Album found in Core Data \(albumId)")
@@ -117,6 +114,32 @@ class AlbumService : JellyfinService {
                         album.jellyfinId = albumDto!.id
                         album.name = albumDto!.name
                         album.productionYear = Int16(albumDto!.productionYear ?? 0)
+                        
+                        // Retrieve Album Thumbnail and Image
+                        ImageAPI.getItemImage(itemId: albumDto!.id!, imageType: .primary)
+                            .sink(receiveCompletion: { completion in
+                                print("Album art retrieval \(completion)")
+                            }, receiveValue: { response in
+                                
+                                print("Handling album art response \(album.name)")
+                                album.artwork = response
+                                
+                                ImageAPI.getItemImage(itemId: albumDto!.id!, imageType: .primary, width: 250, height: 250, apiResponseQueue: JellyfinAPI.apiResponseQueue)
+                                    .sink(receiveCompletion: { completion in
+                                        print("Album art thumbnail retrieval \(completion)")
+                                    }, receiveValue: { response in
+                                        album.thumbnail = response
+                                    })
+                                    .store(in: &self.cancellables)
+                                
+                            })
+                            .store(in: &self.cancellables)
+                        
+//                        self.artistService.retrieveArtist(artistId: albumDto!.albumArtist!, complete: { artist in
+//                            
+//                            album.addToAlbumArtists(artist)
+//                            complete(album)
+//                        })
                         
                         complete(album)
                     }
