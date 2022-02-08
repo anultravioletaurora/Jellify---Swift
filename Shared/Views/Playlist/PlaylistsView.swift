@@ -13,11 +13,11 @@ struct PlaylistsView: View {
     @Environment(\.managedObjectContext)
     var managedObjectContext
     
-    @FetchRequest(
-        entity: Playlist.entity(),
-        sortDescriptors: [NSSortDescriptor(key: "name", ascending: true)]
-    )
-    var playlists: FetchedResults<Playlist>
+    var playlists: FetchedResults<Playlist>{
+        fetchRequest.wrappedValue
+    }
+    
+    var fetchRequest: FetchRequest<Playlist>
     
     let playlistService = PlaylistService.shared
     
@@ -35,22 +35,19 @@ struct PlaylistsView: View {
     
     @State
     var loading : Bool = true
-        
+            
     init() {
+        self.fetchRequest = FetchRequest(
+            entity: Playlist.entity(),
+            sortDescriptors: [NSSortDescriptor(key: #keyPath(Playlist.name), ascending: true, selector: #selector(NSString.caseInsensitiveCompare))]
+        )
 
     }
     
     var body: some View {
         NavigationView {
             
-            if loading {
-                ProgressView()
-            } else {
-                
-                if playlists.isEmpty {
-                    
-                } else {
-                    
+
                     List(playlists) { playlist in
                         
                         NavigationLink(destination: {
@@ -68,16 +65,17 @@ struct PlaylistsView: View {
                     .listStyle(PlainListStyle())
                     .padding(.bottom, 60)
                     .navigationTitle("Playlists")
-                    .refreshable {
-                        self.forceFetchPlaylists()
-                    }
-                }
-            }
+//                    .refreshable {
+//                        self.forceFetchPlaylists()
+//                    }
+                    .overlay(
+                        PlayerView()
+                    )
         }
-        .onAppear(perform: {
-            
-            self.fetchPlaylists()
-            })
+//        .onAppear(perform: {
+//            
+//            self.fetchPlaylists()
+//            })
     }
     
     func deletePlaylists() {

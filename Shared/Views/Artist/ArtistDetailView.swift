@@ -40,8 +40,8 @@ struct ArtistDetailView: View {
         self.artist = artist
         self.fetchRequest = FetchRequest(
             entity: Album.entity(),
-            sortDescriptors: [NSSortDescriptor(key: "productionYear", ascending: true)],
-            predicate: NSPredicate(format: "ANY albumArtists == %@", artist)
+            sortDescriptors: [NSSortDescriptor(key: "productionYear", ascending: false)],
+            predicate: NSPredicate(format: "albumArtist == %@", artist.jellyfinId!)
         )
     }
     
@@ -49,101 +49,35 @@ struct ArtistDetailView: View {
                    
         VStack {
             
-            if loading {
-                ProgressView()
-            } else {
-
-                List {
-                    Section(content: {
-                        ForEach(albums, id: \.jellyfinId) { album in
-                            AlbumRow(album: album, artist: artist)
-                        }
-                        
-                    }, header: {
-                        VStack {
-                            ArtistImage(artist: artist)
-                                
-                            HStack {
-                                // Favorite Artist Button
-                                Button(action: {
-                                    // TODO: Make API call to favorite artist
-                                    print("Artist favorited")
-                        //            artist.userData.isFavorite.toggle()
-                                }) {
-                                    HStack {
-                                        if false {
-                                            Image(systemName: "heart.fill")
-                                            Text("Favorited")
-                                        } else {
-                                            Image(systemName: "heart")
-                                            Text("Favorite")
-                                        }
-                                    }
-                                    .tint(.accentColor)
-                                }
-                                .frame(maxWidth: .infinity)
-                                .buttonStyle(.bordered)
-                                    
-                                // Play Artist Button
-                                Button(action: {
-                                    print("Playing artist")
-                                }) {
-                                    Spacer()
-                                    HStack {
-                                        Image(systemName: "play.fill")
-                                        Text("Play")
-                                    }
-                                    .tint(.accentColor)
-                                    Spacer()
-                                }
-                                .frame(maxWidth: .infinity)
-                                .buttonStyle(.bordered)
-
-                                Button(action: {
-                                    print("Shuffling artist")
-                                }) {
-                                    HStack {
-                                        Image(systemName: "shuffle")
-                                        Text("Shuffle")
-                                    }
-                                    .tint(.accentColor)
-                                }
-                                .frame(maxWidth: .infinity)
-                                .buttonStyle(.bordered)
-                            }
-                        }
-
-                    }, footer: {
-                        
-                    })
+                List(albums) { album in
+                    AlbumRow(album: album, artist: artist)
+                        .padding(.bottom, albums.last! == album ? 65 : 0)
                 }
-            .padding(.bottom, 69)
             .listStyle(PlainListStyle())
 //        .searchable(text: $search, prompt: "Search \(artist.name ?? "Unknown Artist") albums")
 //        .onChange(of: search, perform: { newSearch in
 //            albums.nsPredicate = newSearch.isEmpty ? nil : NSPredicate(format: "%K contains[c] %@", #keyPath(Album.name), newSearch)
 //
 //        })
-            }
         }
         .navigationTitle(artist.name ?? "Unknown Artist")
-        .onAppear(perform: {
-                       
-            print(self.albums)
-            
-            if self.albums.isEmpty {
-            
-                print("No core data albums, fetching them from server")
-                albumService.retrieveAlbums(artist: artist, complete: {
-                    loading = false
-                })
-                                
-                print("Albums retrieved")
-            } else {
-                loading = false
-            }
-                        
-        })
+//        .onAppear(perform: {
+//                       
+//            print(self.albums)
+//            
+//            if self.albums.isEmpty {
+//            
+//                print("No core data albums, fetching them from server")
+//                albumService.retrieveAlbums(artist: artist, complete: {
+//                    loading = false
+//                })
+//                                
+//                print("Albums retrieved")
+//            } else {
+//                loading = false
+//            }
+//                        
+//        })
 
 //        ScrollView {
 //            HStack(alignment: .center, spacing: 5) {

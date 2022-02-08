@@ -22,10 +22,7 @@ struct ArtistsView: View {
         
     @State
     var search : String = ""
-    
-    @State
-    var loading : Bool = true
-    
+        
     @FocusState
     var isSearchFocused : Bool
     
@@ -58,60 +55,40 @@ struct ArtistsView: View {
 //
     var body: some View {
         NavigationView {
-        
-            // Display spinner if we're loading
-            if loading {
-                ProgressView("Loading Artists")
-            }
-            
-            // Else display artists
-            else {
-                    
-                    // Artists List
-                List(artists) { artist in
-                    ArtistRow(artist: artist)
-                }
-                .searchable(text: $search, prompt: "Search artists")
-                .disableAutocorrection(true)
-                .onChange(of: search, perform: { newSearch in
-                                                        
-                    artists.nsPredicate = newSearch.isEmpty ? nil : NSPredicate(format: "%K contains[c] %@", #keyPath(Artist.name), newSearch.trimmingCharacters(in: .whitespaces))
-                })
-                .listStyle(PlainListStyle())
-                .navigationTitle("Artists")
-                .refreshable {
-                    
-                    if !loading {
-                        self.forceFetchArtists()
-                    }
-                }
-            }
-        }
-        .onAppear(perform: {
-            
-            if self.artists.isEmpty {
-                
-                loading = true
 
-                artistService.retrieveArtists(complete: {
-                    loading = false
-                })
-            } else {
-                loading = false
+                                
+            // Artists List
+            List(artists) { artist in
+                ArtistRow(artist: artist)
+                    .padding(.bottom, artists.last! == artist ? 65 : 0)
             }
-        })
+            .searchable(text: $search, prompt: "Search artists")
+            .disableAutocorrection(true)
+            .onChange(of: search, perform: { newSearch in
+                                                    
+                artists.nsPredicate = newSearch.isEmpty ? nil : NSPredicate(format: "%K contains[c] %@", #keyPath(Artist.name), newSearch.trimmingCharacters(in: .whitespaces))
+            })
+            .listStyle(PlainListStyle())
+            .navigationTitle("Artists")
+//                .refreshable {
+//                    
+//                    if !loading {
+//                        self.forceFetchArtists()
+//                    }
+//                }
+        }
     }
     
-    func forceFetchArtists() -> Void {
-        
-        loading = true
-        
-        artistService.deleteAllEntities()
-        
-        artistService.retrieveArtists(complete: {
-            loading = false
-        })
-        
-        loading = false
-    }
+//    func forceFetchArtists() -> Void {
+//        
+//        loading = true
+//        
+//        artistService.deleteAllEntities()
+//        
+//        artistService.retrieveArtists(complete: {
+//            loading = false
+//        })
+//        
+//        loading = false
+//    }
 }

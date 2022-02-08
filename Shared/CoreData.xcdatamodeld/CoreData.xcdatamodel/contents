@@ -45,7 +45,7 @@
         <attribute name="jellyfinId" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="runTime" optional="YES" attributeType="String"/>
-        <relationship name="album" maxCount="1" deletionRule="Nullify" destinationEntity="Album" inverseName="songs" inverseEntity="Album"/>
+        <relationship name="album" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Album" inverseName="songs" inverseEntity="Album"/>
         <relationship name="artists" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Artist" inverseName="songs" inverseEntity="Artist"/>
         <relationship name="playlists" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PlaylistSong" inverseName="song" inverseEntity="PlaylistSong"/>
     </entity>
@@ -68,7 +68,7 @@
         <element name="Genre" positionX="0" positionY="126" width="128" height="88"/>
         <element name="Playlist" positionX="0" positionY="126" width="128" height="89"/>
         <element name="PlaylistSong" positionX="-252" positionY="27" width="128" height="89"/>
-        <element name="Song" positionX="-437.8984375" positionY="131.203125" width="128" height="163"/>
+        <element name="Song" positionX="-437.8984375" positionY="131.203125" width="128" height="149"/>
         <element name="User" positionX="-243.81640625" positionY="156.03515625" width="128" height="133"/>
         <element name="UserData" positionX="-68.51171875" positionY="-130.66796875" width="128" height="74"/>
     </elements>

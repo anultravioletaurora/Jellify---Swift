@@ -57,6 +57,7 @@ struct SettingsView: View {
                 })
                     .buttonStyle(PlainButtonStyle())
             }
+//            .overlay(PlayerView())
             .navigationTitle("Settings")
         }
                     }

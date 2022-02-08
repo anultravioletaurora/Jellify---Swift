@@ -101,6 +101,10 @@
 		04E10759270CD81B002CACB0 /* JellyfinService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E10757270CD81B002CACB0 /* JellyfinService.swift */; };
 		04E10766270CFB82002CACB0 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04E10765270CFB82002CACB0 /* Colors.xcassets */; };
 		04E10767270CFB83002CACB0 /* Colors.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04E10765270CFB82002CACB0 /* Colors.xcassets */; };
+		04E2806A27B13D06009082B1 /* NetworkingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E2806927B13D06009082B1 /* NetworkingManager.swift */; };
+		04E2806B27B13D06009082B1 /* NetworkingManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E2806927B13D06009082B1 /* NetworkingManager.swift */; };
+		04E2806E27B1B307009082B1 /* ArrayExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E2806D27B1B307009082B1 /* ArrayExtensions.swift */; };
+		04E2806F27B1B308009082B1 /* ArrayExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E2806D27B1B307009082B1 /* ArrayExtensions.swift */; };
 		04E2DE19270E264B007ABE38 /* ArtistDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E2DE18270E264B007ABE38 /* ArtistDetailView.swift */; };
 		04E2DE1A270E264B007ABE38 /* ArtistDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E2DE18270E264B007ABE38 /* ArtistDetailView.swift */; };
 		04E2DE1C270E48D9007ABE38 /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E2DE1B270E48D9007ABE38 /* TabBarView.swift */; };
@@ -158,7 +162,7 @@
 		04CBCDC72713D1F0003E9BE9 /* LibraryResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibraryResult.swift; sourceTree = "<group>"; };
 		04CBCDCA2714BEBA003E9BE9 /* SongService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongService.swift; sourceTree = "<group>"; };
 		04CBCDCD271509AD003E9BE9 /* FinTune (iOS).entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = "FinTune (iOS).entitlements"; sourceTree = "<group>"; };
-		04CBCDCE27150DB2003E9BE9 /* FinTune--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = "FinTune--iOS--Info.plist"; sourceTree = "<group>"; };
+		04CBCDCE27150DB2003E9BE9 /* JellyTuner--iOS--Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "JellyTuner--iOS--Info.plist"; sourceTree = "<group>"; };
 		04CBCDD02715B700003E9BE9 /* Player.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Player.swift; sourceTree = "<group>"; };
 		04CBCDD327160097003E9BE9 /* PlaylistService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistService.swift; sourceTree = "<group>"; };
 		04CBCDDC27169BBA003E9BE9 /* CoreData.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = CoreData.xcdatamodel; sourceTree = "<group>"; };
@@ -177,8 +181,8 @@
 		04E10701270CD304002CACB0 /* FinTuneApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FinTuneApp.swift; sourceTree = "<group>"; };
 		04E10702270CD304002CACB0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		04E10703270CD307002CACB0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		04E10708270CD307002CACB0 /* FinTune.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinTune.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		04E1070E270CD307002CACB0 /* FinTune.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = FinTune.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		04E10708270CD307002CACB0 /* JellyTuner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JellyTuner.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		04E1070E270CD307002CACB0 /* JellyTuner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = JellyTuner.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		04E10710270CD307002CACB0 /* macOS.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = macOS.entitlements; sourceTree = "<group>"; };
 		04E10715270CD307002CACB0 /* Tests iOS.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Tests iOS.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		04E10719270CD307002CACB0 /* Tests_iOS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tests_iOS.swift; sourceTree = "<group>"; };
@@ -193,6 +197,8 @@
 		04E10753270CD6FA002CACB0 /* SettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsView.swift; sourceTree = "<group>"; };
 		04E10757270CD81B002CACB0 /* JellyfinService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JellyfinService.swift; sourceTree = "<group>"; };
 		04E10765270CFB82002CACB0 /* Colors.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Colors.xcassets; sourceTree = "<group>"; };
+		04E2806927B13D06009082B1 /* NetworkingManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkingManager.swift; sourceTree = "<group>"; };
+		04E2806D27B1B307009082B1 /* ArrayExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArrayExtensions.swift; sourceTree = "<group>"; };
 		04E2DE18270E264B007ABE38 /* ArtistDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistDetailView.swift; sourceTree = "<group>"; };
 		04E2DE1B270E48D9007ABE38 /* TabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
 		04E2DE22270E4A48007ABE38 /* BlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurView.swift; sourceTree = "<group>"; };
@@ -318,7 +324,7 @@
 		04E106FB270CD304002CACB0 = {
 			isa = PBXGroup;
 			children = (
-				04CBCDCE27150DB2003E9BE9 /* FinTune--iOS--Info.plist */,
+				04CBCDCE27150DB2003E9BE9 /* JellyTuner--iOS--Info.plist */,
 				04CBCDCD271509AD003E9BE9 /* FinTune (iOS).entitlements */,
 				04E10700270CD304002CACB0 /* Shared */,
 				04E1070F270CD307002CACB0 /* macOS */,
@@ -331,6 +337,8 @@
 		04E10700270CD304002CACB0 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
+				04E2806C27B1B2FD009082B1 /* Extensions */,
+				04E2806827B13CFC009082B1 /* Networking */,
 				04FBD83527A631B500E780F3 /* Helpers */,
 				041D3E6B271AC0C6002185CF /* Cache */,
 				04D4B60127135DCB0089CFC3 /* Results */,
@@ -351,8 +359,8 @@
 		04E10709270CD307002CACB0 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				04E10708270CD307002CACB0 /* FinTune.app */,
-				04E1070E270CD307002CACB0 /* FinTune.app */,
+				04E10708270CD307002CACB0 /* JellyTuner.app */,
+				04E1070E270CD307002CACB0 /* JellyTuner.app */,
 				04E10715270CD307002CACB0 /* Tests iOS.xctest */,
 				04E10721270CD307002CACB0 /* Tests macOS.xctest */,
 			);
@@ -418,6 +426,22 @@
 			path = Services;
 			sourceTree = "<group>";
 		};
+		04E2806827B13CFC009082B1 /* Networking */ = {
+			isa = PBXGroup;
+			children = (
+				04E2806927B13D06009082B1 /* NetworkingManager.swift */,
+			);
+			path = Networking;
+			sourceTree = "<group>";
+		};
+		04E2806C27B1B2FD009082B1 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				04E2806D27B1B307009082B1 /* ArrayExtensions.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 		04E2DE1E270E49E8007ABE38 /* BottomBar */ = {
 			isa = PBXGroup;
 			children = (
@@ -458,9 +482,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		04E10707270CD307002CACB0 /* FinTune (iOS) */ = {
+		04E10707270CD307002CACB0 /* JellyTuner (iOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 04E10731270CD307002CACB0 /* Build configuration list for PBXNativeTarget "FinTune (iOS)" */;
+			buildConfigurationList = 04E10731270CD307002CACB0 /* Build configuration list for PBXNativeTarget "JellyTuner (iOS)" */;
 			buildPhases = (
 				04E10704270CD307002CACB0 /* Sources */,
 				04E10705270CD307002CACB0 /* Frameworks */,
@@ -470,17 +494,17 @@
 			);
 			dependencies = (
 			);
-			name = "FinTune (iOS)";
+			name = "JellyTuner (iOS)";
 			packageProductDependencies = (
 				041D3E78271DABF1002185CF /* JellyfinAPI */,
 			);
 			productName = "FinTune (iOS)";
-			productReference = 04E10708270CD307002CACB0 /* FinTune.app */;
+			productReference = 04E10708270CD307002CACB0 /* JellyTuner.app */;
 			productType = "com.apple.product-type.application";
 		};
-		04E1070D270CD307002CACB0 /* FinTune (macOS) */ = {
+		04E1070D270CD307002CACB0 /* JellyTuner (macOS) */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 04E10734270CD307002CACB0 /* Build configuration list for PBXNativeTarget "FinTune (macOS)" */;
+			buildConfigurationList = 04E10734270CD307002CACB0 /* Build configuration list for PBXNativeTarget "JellyTuner (macOS)" */;
 			buildPhases = (
 				04E1070A270CD307002CACB0 /* Sources */,
 				04E1070B270CD307002CACB0 /* Frameworks */,
@@ -490,9 +514,9 @@
 			);
 			dependencies = (
 			);
-			name = "FinTune (macOS)";
+			name = "JellyTuner (macOS)";
 			productName = "FinTune (macOS)";
-			productReference = 04E1070E270CD307002CACB0 /* FinTune.app */;
+			productReference = 04E1070E270CD307002CACB0 /* JellyTuner.app */;
 			productType = "com.apple.product-type.application";
 		};
 		04E10714270CD307002CACB0 /* Tests iOS */ = {
@@ -539,7 +563,7 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
 				LastSwiftUpdateCheck = 1300;
-				LastUpgradeCheck = 1300;
+				LastUpgradeCheck = 1320;
 				TargetAttributes = {
 					04E10707270CD307002CACB0 = {
 						CreatedOnToolsVersion = 13.0;
@@ -557,7 +581,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 04E106FF270CD304002CACB0 /* Build configuration list for PBXProject "FinTune" */;
+			buildConfigurationList = 04E106FF270CD304002CACB0 /* Build configuration list for PBXProject "JellyTuner" */;
 			compatibilityVersion = "Xcode 13.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -573,8 +597,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				04E10707270CD307002CACB0 /* FinTune (iOS) */,
-				04E1070D270CD307002CACB0 /* FinTune (macOS) */,
+				04E10707270CD307002CACB0 /* JellyTuner (iOS) */,
+				04E1070D270CD307002CACB0 /* JellyTuner (macOS) */,
 				04E10714270CD307002CACB0 /* Tests iOS */,
 				04E10720270CD307002CACB0 /* Tests macOS */,
 			);
@@ -634,6 +658,7 @@
 				04E2DE23270E4A48007ABE38 /* BlurView.swift in Sources */,
 				04D4B5F62711E34F0089CFC3 /* AuthenticationService.swift in Sources */,
 				04848BCC2725AAFE0072A81E /* AlbumThumbnail.swift in Sources */,
+				04E2806A27B13D06009082B1 /* NetworkingManager.swift in Sources */,
 				04CBCDC52713C945003E9BE9 /* LibrarySelectionService.swift in Sources */,
 				04848BCA2725AA610072A81E /* ItemThumbnail.swift in Sources */,
 				04E1072B270CD307002CACB0 /* ContentView.swift in Sources */,
@@ -660,6 +685,7 @@
 				04D4B5F92712246D0089CFC3 /* Login.swift in Sources */,
 				04CBCDD12715B700003E9BE9 /* Player.swift in Sources */,
 				04D4B5FC271232B90089CFC3 /* UserResponse.swift in Sources */,
+				04E2806E27B1B307009082B1 /* ArrayExtensions.swift in Sources */,
 				04CBCDB927139AA1003E9BE9 /* UserDataResult.swift in Sources */,
 				04CBCDE027169CF9003E9BE9 /* PersistenceController.swift in Sources */,
 				04CBCDDD27169BBA003E9BE9 /* CoreData.xcdatamodeld in Sources */,
@@ -699,6 +725,7 @@
 				04E1074C270CD6E6002CACB0 /* AlbumsView.swift in Sources */,
 				04848BE827271F760072A81E /* AlbumRow.swift in Sources */,
 				04CBCDC32713C915003E9BE9 /* LibrarySelectionView.swift in Sources */,
+				04E2806F27B1B308009082B1 /* ArrayExtensions.swift in Sources */,
 				04E10759270CD81B002CACB0 /* JellyfinService.swift in Sources */,
 				04E2DE1D270E48D9007ABE38 /* TabBarView.swift in Sources */,
 				04CBCDC92713D1F0003E9BE9 /* LibraryResult.swift in Sources */,
@@ -712,6 +739,7 @@
 				04CBCDDE27169BBA003E9BE9 /* CoreData.xcdatamodeld in Sources */,
 				04D4B5F72711E34F0089CFC3 /* AuthenticationService.swift in Sources */,
 				04D4B60427135DD50089CFC3 /* LoginResult.swift in Sources */,
+				04E2806B27B13D06009082B1 /* NetworkingManager.swift in Sources */,
 				04E2DE2C270FE282007ABE38 /* PlayerView.swift in Sources */,
 				04CBCDD527160097003E9BE9 /* PlaylistService.swift in Sources */,
 				04D4B60E27135FA50089CFC3 /* ArtistResult.swift in Sources */,
@@ -752,12 +780,12 @@
 /* Begin PBXTargetDependency section */
 		04E10717270CD307002CACB0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 04E10707270CD307002CACB0 /* FinTune (iOS) */;
+			target = 04E10707270CD307002CACB0 /* JellyTuner (iOS) */;
 			targetProxy = 04E10716270CD307002CACB0 /* PBXContainerItemProxy */;
 		};
 		04E10723270CD307002CACB0 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = 04E1070D270CD307002CACB0 /* FinTune (macOS) */;
+			target = 04E1070D270CD307002CACB0 /* JellyTuner (macOS) */;
 			targetProxy = 04E10722270CD307002CACB0 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
@@ -818,6 +846,7 @@
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
+				PRODUCT_NAME = JellyTuner;
 				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -871,6 +900,7 @@
 				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
+				PRODUCT_NAME = JellyTuner;
 				SWIFT_COMPILATION_MODE = wholemodule;
 				SWIFT_OPTIMIZATION_LEVEL = "-O";
 			};
@@ -887,7 +917,7 @@
 				DEVELOPMENT_TEAM = WAH9CZ8BPG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "FinTune--iOS--Info.plist";
+				INFOPLIST_FILE = "JellyTuner--iOS--Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -900,7 +930,7 @@
 				);
 				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = Jellyfin.FinTune;
-				PRODUCT_NAME = FinTune;
+				PRODUCT_NAME = JellyTuner;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -920,7 +950,7 @@
 				DEVELOPMENT_TEAM = WAH9CZ8BPG;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = "FinTune--iOS--Info.plist";
+				INFOPLIST_FILE = "JellyTuner--iOS--Info.plist";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -933,7 +963,7 @@
 				);
 				MARKETING_VERSION = 0.1;
 				PRODUCT_BUNDLE_IDENTIFIER = Jellyfin.FinTune;
-				PRODUCT_NAME = FinTune;
+				PRODUCT_NAME = JellyTuner;
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -949,6 +979,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -962,7 +993,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Jellyfin.FinTune;
-				PRODUCT_NAME = FinTune;
+				PRODUCT_NAME = JellyTuner;
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -975,6 +1006,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = macOS/macOS.entitlements;
+				CODE_SIGN_IDENTITY = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
@@ -988,7 +1020,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 11.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = Jellyfin.FinTune;
-				PRODUCT_NAME = FinTune;
+				PRODUCT_NAME = JellyTuner;
 				SDKROOT = macosx;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -1095,7 +1127,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		04E106FF270CD304002CACB0 /* Build configuration list for PBXProject "FinTune" */ = {
+		04E106FF270CD304002CACB0 /* Build configuration list for PBXProject "JellyTuner" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				04E1072F270CD307002CACB0 /* Debug */,
@@ -1104,7 +1136,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		04E10731270CD307002CACB0 /* Build configuration list for PBXNativeTarget "FinTune (iOS)" */ = {
+		04E10731270CD307002CACB0 /* Build configuration list for PBXNativeTarget "JellyTuner (iOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				04E10732270CD307002CACB0 /* Debug */,
@@ -1113,7 +1145,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		04E10734270CD307002CACB0 /* Build configuration list for PBXNativeTarget "FinTune (macOS)" */ = {
+		04E10734270CD307002CACB0 /* Build configuration list for PBXNativeTarget "JellyTuner (macOS)" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				04E10735270CD307002CACB0 /* Debug */,

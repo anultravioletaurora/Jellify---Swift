@@ -72,7 +72,7 @@ class AuthenticationService : JellyfinService {
         
         print("Device Names equal: \(deviceName == deviceName2)")
         
-        request.setValue("MediaBrowser Client=\"FinTune\", Device=\"\(deviceName2)\", DeviceId=\"\(UIDevice.current.model)\", Version=\"\(getAppCurrentVersionNumber())\"", forHTTPHeaderField: "X-Emby-Authorization")
+        request.setValue("MediaBrowser Client=\"JellyTuner\", Device=\"\(deviceName2)\", DeviceId=\"\(UIDevice.current.model)\", Version=\"\(getAppCurrentVersionNumber())\"", forHTTPHeaderField: "X-Emby-Authorization")
         
         request.setValue("application/json", forHTTPHeaderField: "Accept")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")

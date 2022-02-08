@@ -8,15 +8,15 @@
 import SwiftUI
 
 struct ContentView: View {
-    
-    @Environment(\.managedObjectContext)
-    var managedObjectContext
-    
+        
     @ObservedObject
     var authenticationService = AuthenticationService.shared
     
     @ObservedObject
     var librarySelectionService = LibrarySelectionService.shared
+    
+    @ObservedObject
+    var networkingManager = NetworkingManager.shared
     
     init() {
         
@@ -47,7 +47,25 @@ struct ContentView: View {
         else {
             
             ZStack(alignment: Alignment(horizontal: .center, vertical: .bottom), content: {
-                TabBarView()
+                
+
+                switch networkingManager.loadingPhase {
+                    case .artists:
+                        ProgressView("Loading Artists")
+                    case .albums:
+                        ProgressView("Loading Albums")
+                    case .songs:
+                        ProgressView("Loading Songs")
+                    case .playlists:
+                        ProgressView("Loading Playlists")
+                    case .artwork:
+                        ProgressView("Loading Artwork")
+                    default:
+                        TabBarView()
+                }
+            })
+            .onAppear(perform: {
+                networkingManager.syncLibrary()
             })
         }
     }

@@ -50,21 +50,6 @@ class AlbumService : JellyfinService {
                                     song.addToArtists(album.albumArtists!)
                                 }
 
-                                ImageAPI.getItemImage(itemId: albumResult.id!, imageType: .primary)
-                                    .sink(receiveCompletion: { completion in
-                                        print("Album art retrieval \(completion)")
-                                    }, receiveValue: { response in
-                                        album.artwork = response
-                                        
-                                        ImageAPI.getItemImage(itemId: albumResult.id!, imageType: .primary, width: 250, height: 250, apiResponseQueue: JellyfinAPI.apiResponseQueue)
-                                            .sink(receiveCompletion: { completion in
-                                                print("Album art thumbnail retrieval \(completion)")
-                                            }, receiveValue: { response in
-                                                album.thumbnail = response
-                                            })
-                                            .store(in: &self.cancellables)
-                                    })
-                                    .store(in: &self.cancellables)
                             }
                         })
                         
@@ -116,24 +101,7 @@ class AlbumService : JellyfinService {
                         album.productionYear = Int16(albumDto!.productionYear ?? 0)
                         
                         // Retrieve Album Thumbnail and Image
-                        ImageAPI.getItemImage(itemId: albumDto!.id!, imageType: .primary)
-                            .sink(receiveCompletion: { completion in
-                                print("Album art retrieval \(completion)")
-                            }, receiveValue: { response in
-                                
-                                print("Handling album art response \(album.name)")
-                                album.artwork = response
-                                
-                                ImageAPI.getItemImage(itemId: albumDto!.id!, imageType: .primary, width: 250, height: 250, apiResponseQueue: JellyfinAPI.apiResponseQueue)
-                                    .sink(receiveCompletion: { completion in
-                                        print("Album art thumbnail retrieval \(completion)")
-                                    }, receiveValue: { response in
-                                        album.thumbnail = response
-                                    })
-                                    .store(in: &self.cancellables)
-                                
-                            })
-                            .store(in: &self.cancellables)
+                        self.retrieveAlbumImages(album: album)
                         
 //                        self.artistService.retrieveArtist(artistId: albumDto!.albumArtist!, complete: { artist in
 //                            
@@ -204,6 +172,25 @@ class AlbumService : JellyfinService {
 //            })
 
         }
+    }
+    
+    func retrieveAlbumImages(album: Album) {
+        ImageAPI.getItemImage(itemId: album.jellyfinId!, imageType: .primary)
+            .sink(receiveCompletion: { completion in
+                print("Album art retrieval \(completion)")
+            }, receiveValue: { response in
+                album.artwork = response
+                
+                ImageAPI.getItemImage(itemId: album.jellyfinId!, imageType: .primary, width: 250, height: 250, apiResponseQueue: JellyfinAPI.apiResponseQueue)
+                    .sink(receiveCompletion: { completion in
+                        print("Album art thumbnail retrieval \(completion)")
+                    }, receiveValue: { response in
+                        album.thumbnail = response
+                    })
+                    .store(in: &self.cancellables)
+            })
+            .store(in: &self.cancellables)
+
     }
 }
 

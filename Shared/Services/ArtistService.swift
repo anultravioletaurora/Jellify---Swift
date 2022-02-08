@@ -118,9 +118,10 @@ class ArtistService : JellyfinService {
                     
                     response.items!.forEach({ artistResult in
                         
+                        let artist : Artist? = self.retrieveArtistFromCore(artistId: artistResult.id!).first
                             // Check if artist already exists in store
-                        if self.retrieveArtistFromCore(artistId: artistResult.id!).isEmpty {
-                            let artist : Artist = Artist(context: JellyfinService.context)
+                        if artist == nil {
+                            let artist = Artist(context: JellyfinService.context)
                             
                             artist.jellyfinId = artistResult.id!
                             artist.name = artistResult.name ?? ""
@@ -138,16 +139,26 @@ class ArtistService : JellyfinService {
     //
                                 })
                                 .store(in: &self.cancellables)
+                            
+//                            self.albumService.retrieveAlbums(artist: artist, complete: {
+//                                if response.items!.last == artistResult {
+//
+//                                    self.saveContext()
+//                                    complete()
+//                                }
+//                            })
                         }
                                                 
                         // Retrieve the artists albums
-//                        self.albumService.retrieveAlbums(artist: artist, complete: {
+                        self.albumService.retrieveAlbums(artist: artist, complete: {
+                            
+                            print("Retrieved albums for \(artist!.name)")
                             if response.items!.last == artistResult {
-                                
+
                                 self.saveContext()
                                 complete()
                             }
-//                        })
+                        })
                     })
                 }
             })

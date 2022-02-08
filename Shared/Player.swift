@@ -479,7 +479,7 @@ class Player: ObservableObject {
             
                     let info: [String: Any] = [
                         MPMediaItemPropertyArtist: artistNameArray.joined(separator: ", "),
-                        MPMediaItemPropertyAlbumTitle: currentItem.song.album ?? "Unknown Album",
+                        MPMediaItemPropertyAlbumTitle: currentItem.song.album?.name ?? "Unknown Album",
                         MPMediaItemPropertyTitle: currentItem.song.name ?? "Unknown Track",
                         MPMediaItemPropertyArtwork: MPMediaItemArtwork(boundsSize: CGSize(width: 500, height: 500), requestHandler: { (size: CGSize) -> UIImage in
                             return self.getAlbumUiImage(url: self.currentSong?.song.album?.artwork) ?? self.placeholderImage

@@ -15,6 +15,8 @@ struct PlaylistDetailView: View {
     let playlistService = PlaylistService.shared
     
     let artistService = ArtistService.shared
+    
+    let albumService = AlbumService.shared
 
     var fetchRequest: FetchRequest<PlaylistSong>
     
@@ -67,6 +69,11 @@ struct PlaylistDetailView: View {
                         
                         Spacer()
                     })
+                })
+                .onAppear(perform: {
+                    if playlistSong.song!.album!.thumbnail == nil {
+                        albumService.retrieveAlbumImages(album: playlistSong.song!.album!)
+                    }
                 })
                 .swipeActions(allowsFullSwipe: true, content: {
                     Button(action: {

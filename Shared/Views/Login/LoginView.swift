@@ -92,7 +92,7 @@ struct LoginView: View {
                 .buttonStyle(DefaultButtonStyle())
             }
             .padding()
-            .navigationTitle(Text("Welcome to FinTune"))
+            .navigationTitle(Text("Sign In"))
         }
     }
 }

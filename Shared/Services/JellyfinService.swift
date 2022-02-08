@@ -25,7 +25,7 @@ class JellyfinService: ObservableObject {
     let processingQueue = DispatchQueue(label: "FinTuneProcessingQueue")
     
     static let sharedParent = JellyfinService()
-        
+    
     @FetchRequest(
         entity: User.entity(),
         sortDescriptors: [
@@ -193,7 +193,7 @@ class JellyfinService: ObservableObject {
         #endif
         
         var header = "MediaBrowser "
-        header.append("Client=\"FinTune\", ")
+        header.append("Client=\"JellyTuner\", ")
         header.append("Device=\"\(deviceName)\", ")
         header.append("DeviceId=\"\(UIDevice.current.identifierForVendor!)\", ")
         header.append("Version=\"\(appVersion ?? "0.0.1")\", ")
@@ -284,6 +284,10 @@ class JellyfinService: ObservableObject {
             // TODO: handle the error
             print(error)
         }
+    }
+    
+    public func loadLibrary() -> Void {
+        print("Loading library : TODO")
     }
 
 }

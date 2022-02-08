@@ -16,8 +16,8 @@ struct ProgressBarView: View {
     private let seekSize: CGFloat = 25
     @State private var seekStart: CGFloat = 0
     @State private var offset: CGFloat = -(25 / 2)
-    @State private var elapsedOffset: CGFloat = -7.5
-    @State private var durationOffset: CGFloat = -7.5
+    @State private var elapsedOffset: CGFloat = 0
+    @State private var durationOffset: CGFloat = 0
     @State private var canAnimate: Bool = false
     @State private var appeared: Bool = false
     
@@ -104,18 +104,18 @@ struct ProgressBarView: View {
                             .offset(y: durationOffset)
                             .animation(.linear(duration: 0.25), value: durationOffset)
                     }
-                    .onReceive(player.$playProgressAhead, perform: { _ in
-                            if prog < 50 && player.seeking{
-                                    elapsedOffset = 0
-                            }else{
-                                    elapsedOffset = -7.5
-                            }
-                            if prog > geometry.size.width - seekSize - 50 && player.seeking {
-                                    durationOffset = 0
-                            }else{
-                                    durationOffset = -7.5
-                            }
-                    })
+//                    .onReceive(player.$playProgressAhead, perform: { _ in
+//                            if prog < 50 && player.seeking{
+//                                elapsedOffset = -7.5
+//                            }else{
+//                                    elapsedOffset = -7.5
+//                            }
+//                            if prog > geometry.size.width - seekSize - 50 && player.seeking {
+//                                durationOffset = -7.5
+//                            }else{
+//                                    durationOffset = -7.5
+//                            }
+//                    })
                     .foregroundColor(Color.primary)
                     .padding(.horizontal, seekSize / 2)
                     .font(.system(size: 13))

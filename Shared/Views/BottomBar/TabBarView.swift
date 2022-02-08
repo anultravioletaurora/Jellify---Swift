@@ -65,11 +65,17 @@ struct TabBarView: View {
                 }
         }
         .edgesIgnoringSafeArea(.top)
+        .toolbar(content: {
+            Button(action: {
+                print("syncing library")
+            }, label: {
+                Image(systemName: "arrow.triangle.2.circlepath")
+            })
+                .buttonStyle(PlainButtonStyle())
+        })
 
         .overlay(
             PlayerView()
-
-//                .offset(y: showMediaPlayer ? 0 : UIScreen.main.bounds.height / 3 + 19)
         )
 //        .introspectTabBarController(customize: { (UITabBarController) in
 //            UITabBarController.back

@@ -22,6 +22,9 @@ struct PlayerSheetView: View {
     @Binding
     var showMediaPlayer : Bool
     
+    @State
+    var shuffled : Bool = false
+    
     var body: some View {
 
         VStack(alignment: .center) {
@@ -87,15 +90,50 @@ struct PlayerSheetView: View {
                     .padding(.horizontal, 30)
                 }
                 .padding(.bottom, 80)
+                .padding(.top, 20)
                             
-                // Dismiss player sheet button
-                Button(action: {
-                    showMediaPlayer.toggle()
-                }, label: {
-                    Image(systemName: "chevron.down")
-                        .font(.largeTitle)
-                })
-                .buttonStyle(PlainButtonStyle())
+                HStack {
+                    
+                    Button(action: {
+                        player.repeatMode.toggle()
+                    }, label: {
+                        
+                        switch player.repeatMode {
+                        case .reapeatAll:
+                            Image(systemName: "repeat.circle.fill")
+                                .font(.largeTitle)
+                        case .repeatOne:
+                            Image(systemName: "repeat.1.circle.fill")
+                                .font(.largeTitle)
+                        case .none:
+                            Image(systemName: "repeat.circle")
+                                .font(.largeTitle)
+                        }
+                    })
+                        .buttonStyle(PlainButtonStyle())
+                        .padding(.trailing, 50)
+                    
+                    // Dismiss player sheet button
+                    Button(action: {
+                        showMediaPlayer.toggle()
+                    }, label: {
+                        Image(systemName: "chevron.down")
+                            .font(.largeTitle)
+                    })
+                    .buttonStyle(PlainButtonStyle())
+                    
+                    Button(action: {
+                        player.songs.shuffle()
+                        shuffled.toggle()
+                    }, label: {
+                        Image(systemName: shuffled ? "shuffle.circle.fill" : "shuffle.circle")
+                            .font(.largeTitle)
+                    })
+                        .buttonStyle(PlainButtonStyle())
+                        .padding(.leading, 50)
+
+
+                }
             }
     
                 // Blurred album artwork background
