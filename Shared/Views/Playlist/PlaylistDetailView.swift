@@ -11,18 +11,14 @@ struct PlaylistDetailView: View {
     
     @ObservedObject
     var playlist : Playlist
-    
-    let playlistService = PlaylistService.shared
-    
-    let artistService = ArtistService.shared
-    
-    let albumService = AlbumService.shared
-
+        
     var fetchRequest: FetchRequest<PlaylistSong>
     
     var playlistSongs: FetchedResults<PlaylistSong>{
         fetchRequest.wrappedValue
     }
+    
+    let networkingManager : NetworkingManager = NetworkingManager.shared
 
     @State
     var songs : [Song] = []
@@ -32,7 +28,7 @@ struct PlaylistDetailView: View {
         
         self.fetchRequest = FetchRequest(
             entity: PlaylistSong.entity(),
-            sortDescriptors: [NSSortDescriptor(key: "indexNumber", ascending: true)],
+            sortDescriptors: [],
             predicate: NSPredicate(format: "(playlist == %@)", playlist)
         )
     }
@@ -71,15 +67,15 @@ struct PlaylistDetailView: View {
                     })
                 })
                 .onAppear(perform: {
-                    if playlistSong.song!.album!.thumbnail == nil {
-                        albumService.retrieveAlbumImages(album: playlistSong.song!.album!)
+                    if playlistSong.song!.album != nil && playlistSong.song!.album!.thumbnail == nil {
+                        networkingManager.loadAlbumArtwork(album: playlistSong.song!.album!)
                     }
                 })
                 .swipeActions(allowsFullSwipe: true, content: {
                     Button(action: {
                         print("Playlist Item Swiped to delete")
                         
-                        playlistService.deleteFromPlaylist(playlist: playlist, playlistSong: playlistSong)
+                        networkingManager.deleteFromPlaylist(playlist: playlist, playlistSong: playlistSong)
                     }) {
                         Image(systemName: "trash")
                             .background(.red)
@@ -95,6 +91,7 @@ struct PlaylistDetailView: View {
         .padding(.bottom, 69)
         .listStyle(PlainListStyle())
         .navigationTitle(playlist.name ?? "Unknown Playlist")
+        .navigationBarTitleDisplayMode(.inline)
 
     }
     

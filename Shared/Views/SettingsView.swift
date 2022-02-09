@@ -9,56 +9,51 @@ import SwiftUI
 
 struct SettingsView: View {
     
-    @ObservedObject
-    var authenticationService = AuthenticationService.shared
+    let networkingManager = NetworkingManager.shared
     
     var body: some View {
         NavigationView {
-            
-            List {
+            Form {
                 
-                HStack {
+                Section(header: Text("Current User")) {
+                    HStack {
+                        Text("User ID")
+                        Spacer()
+                        Text(networkingManager.userId)
+                    }
                     
-                    Text("User ID")
-                    
-                    Text(authenticationService.userId)
+                    HStack {
+                        Text("Access Token")
+                        Spacer()
+                        Text(networkingManager.accessToken)
+                    }
                 }
                 
-                HStack {
-                    Text("Access Token")
+                Section(header: Text("Libraries")) {
+                    HStack {
+                        Text("Music Library ID")
+                        Spacer()
+                        Text(networkingManager.libraryId)
+                    }
                     
-                    Text(authenticationService.accessToken)
-                }
-
-                HStack {
-                    Text("Music Library")
-                    
-                    Text(authenticationService.libraryId)
-                }
-                
-                HStack {
-                    Text("Playlist Library")
-                    
-                    Text(authenticationService.playlistId)
+                    HStack {
+                        Text("Playlist Library ID")
+                        Spacer()
+                        Text(networkingManager.playlistId)
+                    }
                 }
                 
-                Button(action: {
-                    authenticationService.deleteAllEntities()
-                }, label: {
-                    Text("Clear Data")
-                })
-                    .buttonStyle(PlainButtonStyle())
-                
-                Button(action: {
-                    
-                    authenticationService.logOut()
-                }, label: {
-                    Text("Log out")
-                })
-                    .buttonStyle(PlainButtonStyle())
+                Section {
+                    Button(action: {
+                        networkingManager.logOut()
+                    }, label: {
+                        Text("Log out")
+                    })
+                        .buttonStyle(PlainButtonStyle())
+                }
             }
 //            .overlay(PlayerView())
             .navigationTitle("Settings")
         }
-                    }
+    }
 }

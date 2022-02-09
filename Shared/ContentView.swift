@@ -32,7 +32,7 @@ struct ContentView: View {
         /**
         If the user is not yet auth'd, then we will prompt them to login
         */
-        if !authenticationService.authenticated {
+        if networkingManager.userId == "" {
             LoginView()
                 .transition(.slide)
         }

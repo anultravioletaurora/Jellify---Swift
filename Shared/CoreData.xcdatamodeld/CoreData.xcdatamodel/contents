@@ -2,12 +2,12 @@
 <model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="19574" systemVersion="21C52" minimumToolsVersion="Automatic" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="Album" representedClassName="Album" syncable="YES" codeGenerationType="class">
         <attribute name="albumArtist" optional="YES" attributeType="String"/>
-        <attribute name="artwork" optional="YES" attributeType="URI"/>
+        <attribute name="artwork" optional="YES" attributeType="Binary"/>
         <attribute name="jellyfinId" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="productionYear" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="serverId" optional="YES" attributeType="String"/>
-        <attribute name="thumbnail" optional="YES" attributeType="URI"/>
+        <attribute name="thumbnail" optional="YES" attributeType="Binary"/>
         <relationship name="albumArtists" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Artist" inverseName="albums" inverseEntity="Artist"/>
         <relationship name="genres" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Genre" inverseName="albums" inverseEntity="Genre"/>
         <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Song" inverseName="album" inverseEntity="Song"/>
@@ -18,7 +18,7 @@
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="overview" optional="YES" attributeType="String"/>
         <attribute name="serverId" optional="YES" attributeType="String"/>
-        <attribute name="thumbnail" optional="YES" attributeType="URI"/>
+        <attribute name="thumbnail" optional="YES" attributeType="Binary"/>
         <relationship name="albums" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Album" inverseName="albumArtists" inverseEntity="Album"/>
         <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Song" inverseName="artists" inverseEntity="Song"/>
     </entity>
@@ -30,7 +30,7 @@
     <entity name="Playlist" representedClassName="Playlist" syncable="YES" codeGenerationType="class">
         <attribute name="jellyfinId" attributeType="String"/>
         <attribute name="name" attributeType="String"/>
-        <attribute name="thumbnail" optional="YES" attributeType="URI"/>
+        <attribute name="thumbnail" optional="YES" attributeType="Binary"/>
         <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PlaylistSong" inverseName="playlist" inverseEntity="PlaylistSong"/>
     </entity>
     <entity name="PlaylistSong" representedClassName="PlaylistSong" syncable="YES" codeGenerationType="class">

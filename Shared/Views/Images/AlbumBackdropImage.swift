@@ -19,25 +19,23 @@ struct AlbumBackdropImage: View {
 
     var body: some View {
         if album.artwork != nil {
-            AsyncImage(url: album.artwork!) { image in
-                
-                ZStack {
-                    image.resizable()
+            ZStack {
+                Image(data: album.artwork)
+                    .resizable()
                         .frame(width: height, height: height)
-                        .brightness(colorScheme == .dark ? -0.3 : 0.0)
+                        .brightness(colorScheme == .dark ? -0.1 : 0.0)
                         .ignoresSafeArea()
-                    
-                    BlurView()
-                }
-
-
-            } placeholder: {
-                Image("appIcon")
-                    .frame(width: height, height: height)
-            }
+                
+                BlurView()
+            }            
         } else {
-            Image("appIcon")
-                .frame(width: height, height: height)
-        }
+            ZStack {
+                Image("placeholder")
+                    .frame(width: height, height: height)
+                    .brightness(colorScheme == .dark ? -0.3 : 0.0)
+                    .ignoresSafeArea()
+                
+                BlurView()
+            }        }
     }
 }

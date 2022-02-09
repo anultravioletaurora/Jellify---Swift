@@ -350,8 +350,8 @@
             filePath = "Shared/Services/AlbumService.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "26"
-            endingLineNumber = "26"
+            startingLineNumber = "24"
+            endingLineNumber = "24"
             landmarkName = "retrieveAlbums(artist:complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -366,8 +366,8 @@
             filePath = "Shared/Services/AlbumService.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "31"
-            endingLineNumber = "31"
+            startingLineNumber = "29"
+            endingLineNumber = "29"
             landmarkName = "retrieveAlbums(artist:complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -430,8 +430,8 @@
             filePath = "Shared/Views/Album/AlbumDetailView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "110"
-            endingLineNumber = "110"
+            startingLineNumber = "101"
+            endingLineNumber = "101"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -446,8 +446,8 @@
             filePath = "Shared/Views/Album/AlbumDetailView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "193"
-            endingLineNumber = "193"
+            startingLineNumber = "184"
+            endingLineNumber = "184"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -478,8 +478,8 @@
             filePath = "Shared/Views/Playlist/PlaylistDetailView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "46"
-            endingLineNumber = "46"
+            startingLineNumber = "42"
+            endingLineNumber = "42"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -494,8 +494,8 @@
             filePath = "Shared/Services/AlbumService.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "137"
-            endingLineNumber = "137"
+            startingLineNumber = "135"
+            endingLineNumber = "135"
             landmarkName = "retrieveAlbum(albumId:complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -510,8 +510,8 @@
             filePath = "Shared/Services/AlbumService.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "131"
-            endingLineNumber = "131"
+            startingLineNumber = "129"
+            endingLineNumber = "129"
             landmarkName = "retrieveAlbum(albumId:complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -526,8 +526,8 @@
             filePath = "Shared/Services/AlbumService.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "67"
-            endingLineNumber = "67"
+            startingLineNumber = "65"
+            endingLineNumber = "65"
             landmarkName = "retrieveAlbum(albumId:complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -542,8 +542,8 @@
             filePath = "Shared/Services/AlbumService.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "86"
-            endingLineNumber = "86"
+            startingLineNumber = "84"
+            endingLineNumber = "84"
             landmarkName = "retrieveAlbum(albumId:complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -558,8 +558,8 @@
             filePath = "Shared/Services/AlbumService.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "125"
-            endingLineNumber = "125"
+            startingLineNumber = "123"
+            endingLineNumber = "123"
             landmarkName = "retrieveAlbum(albumId:complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -590,8 +590,8 @@
             filePath = "Shared/Views/Player/PlayerView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "52"
-            endingLineNumber = "52"
+            startingLineNumber = "48"
+            endingLineNumber = "48"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -638,8 +638,8 @@
             filePath = "Shared/Views/Playlist/PlaylistsView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "51"
-            endingLineNumber = "51"
+            startingLineNumber = "43"
+            endingLineNumber = "43"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -654,8 +654,8 @@
             filePath = "Shared/Services/AlbumService.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "95"
-            endingLineNumber = "95"
+            startingLineNumber = "93"
+            endingLineNumber = "93"
             landmarkName = "retrieveAlbum(albumId:complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -670,8 +670,8 @@
             filePath = "Shared/Services/AlbumService.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "27"
-            endingLineNumber = "27"
+            startingLineNumber = "25"
+            endingLineNumber = "25"
             landmarkName = "retrieveAlbums(artist:complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -711,22 +711,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "7506B04A-3D91-46F5-81BA-EB6465872803"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Shared/Views/Artist/ArtistsView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "84"
-            endingLineNumber = "84"
-            landmarkName = "ArtistsView"
-            landmarkType = "14">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "E324BA30-F001-43FB-A8B7-DEBA470CFAF6"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -743,22 +727,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "EA9DA7AD-41BF-442D-9A57-EAFCB5F50753"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Shared/Views/Playlist/PlaylistsView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "113"
-            endingLineNumber = "113"
-            landmarkName = "forceFetchPlaylists()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "939DF8FF-D870-4D0F-93D3-E65549C1035C"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -766,8 +734,8 @@
             filePath = "Shared/Services/AlbumService.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "109"
-            endingLineNumber = "109"
+            startingLineNumber = "107"
+            endingLineNumber = "107"
             landmarkName = "retrieveAlbum(albumId:complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -903,22 +871,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "F9EB15AE-4EF3-4D3B-82EC-FC72CADD203D"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Shared/Views/Playlist/PlaylistsView.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "127"
-            endingLineNumber = "127"
-            landmarkName = "retrievePlaylists()"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "9AAB5FA8-5581-4E3B-A6CE-EF94D51AB952"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -990,8 +942,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "529"
-            endingLineNumber = "529"
+            startingLineNumber = "745"
+            endingLineNumber = "745"
             landmarkName = "retrieveArtistFromCore(artistName:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1006,8 +958,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "546"
-            endingLineNumber = "546"
+            startingLineNumber = "762"
+            endingLineNumber = "762"
             landmarkName = "retrieveAlbumFromCore(albumId:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1022,8 +974,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "564"
-            endingLineNumber = "564"
+            startingLineNumber = "796"
+            endingLineNumber = "796"
             landmarkName = "retrieveSongFromCore(songId:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1038,8 +990,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "520"
-            endingLineNumber = "520"
+            startingLineNumber = "736"
+            endingLineNumber = "736"
             landmarkName = "retrieveArtistFromCore(artistName:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1054,8 +1006,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "384"
-            endingLineNumber = "384"
+            startingLineNumber = "565"
+            endingLineNumber = "565"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1070,8 +1022,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "380"
-            endingLineNumber = "380"
+            startingLineNumber = "561"
+            endingLineNumber = "561"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1086,8 +1038,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "288"
-            endingLineNumber = "288"
+            startingLineNumber = "469"
+            endingLineNumber = "469"
             landmarkName = "loadAlbums(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1102,8 +1054,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "276"
-            endingLineNumber = "276"
+            startingLineNumber = "457"
+            endingLineNumber = "457"
             landmarkName = "loadAlbums(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1118,8 +1070,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "544"
-            endingLineNumber = "544"
+            startingLineNumber = "760"
+            endingLineNumber = "760"
             landmarkName = "retrieveAlbumFromCore(albumId:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1134,8 +1086,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "322"
-            endingLineNumber = "322"
+            startingLineNumber = "503"
+            endingLineNumber = "503"
             landmarkName = "loadSongs(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1150,8 +1102,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "268"
-            endingLineNumber = "268"
+            startingLineNumber = "442"
+            endingLineNumber = "442"
             landmarkName = "loadAlbums(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1166,8 +1118,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "278"
-            endingLineNumber = "278"
+            startingLineNumber = "459"
+            endingLineNumber = "459"
             landmarkName = "loadAlbums(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1182,8 +1134,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "334"
-            endingLineNumber = "334"
+            startingLineNumber = "515"
+            endingLineNumber = "515"
             landmarkName = "loadSongs(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1192,14 +1144,14 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "F1CAB560-DDB5-42D5-96A5-6B6EAC3FCB6D"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "464"
-            endingLineNumber = "464"
+            startingLineNumber = "645"
+            endingLineNumber = "645"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1214,8 +1166,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "446"
-            endingLineNumber = "446"
+            startingLineNumber = "627"
+            endingLineNumber = "627"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1230,8 +1182,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "408"
-            endingLineNumber = "408"
+            startingLineNumber = "589"
+            endingLineNumber = "589"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1246,8 +1198,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "466"
-            endingLineNumber = "466"
+            startingLineNumber = "647"
+            endingLineNumber = "647"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1262,8 +1214,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "476"
-            endingLineNumber = "476"
+            startingLineNumber = "657"
+            endingLineNumber = "657"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1278,8 +1230,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "478"
-            endingLineNumber = "478"
+            startingLineNumber = "659"
+            endingLineNumber = "659"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1294,8 +1246,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "397"
-            endingLineNumber = "397"
+            startingLineNumber = "578"
+            endingLineNumber = "578"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1310,8 +1262,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "447"
-            endingLineNumber = "447"
+            startingLineNumber = "628"
+            endingLineNumber = "628"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1326,8 +1278,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "399"
-            endingLineNumber = "399"
+            startingLineNumber = "580"
+            endingLineNumber = "580"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1342,8 +1294,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "491"
-            endingLineNumber = "491"
+            startingLineNumber = "672"
+            endingLineNumber = "672"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1358,8 +1310,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "497"
-            endingLineNumber = "497"
+            startingLineNumber = "678"
+            endingLineNumber = "678"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1368,14 +1320,14 @@
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
             uuid = "41E013DB-7919-430E-AF0C-46D62424C491"
-            shouldBeEnabled = "Yes"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "507"
-            endingLineNumber = "507"
+            startingLineNumber = "688"
+            endingLineNumber = "688"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1390,8 +1342,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "505"
-            endingLineNumber = "505"
+            startingLineNumber = "686"
+            endingLineNumber = "686"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1406,8 +1358,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "468"
-            endingLineNumber = "468"
+            startingLineNumber = "649"
+            endingLineNumber = "649"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1422,8 +1374,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "474"
-            endingLineNumber = "474"
+            startingLineNumber = "655"
+            endingLineNumber = "655"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1438,8 +1390,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "448"
-            endingLineNumber = "448"
+            startingLineNumber = "629"
+            endingLineNumber = "629"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1454,8 +1406,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "456"
-            endingLineNumber = "456"
+            startingLineNumber = "637"
+            endingLineNumber = "637"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1470,24 +1422,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "437"
-            endingLineNumber = "437"
-            landmarkName = "loadPlaylists(complete:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "5F0C97CE-3126-48D9-A186-033D77F245B2"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Shared/Networking/NetworkingManager.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "444"
-            endingLineNumber = "444"
+            startingLineNumber = "618"
+            endingLineNumber = "618"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1502,8 +1438,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "452"
-            endingLineNumber = "452"
+            startingLineNumber = "633"
+            endingLineNumber = "633"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1518,8 +1454,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "441"
-            endingLineNumber = "441"
+            startingLineNumber = "622"
+            endingLineNumber = "622"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1534,8 +1470,8 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "431"
-            endingLineNumber = "431"
+            startingLineNumber = "612"
+            endingLineNumber = "612"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1550,8 +1486,24 @@
             filePath = "Shared/Networking/NetworkingManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "451"
-            endingLineNumber = "451"
+            startingLineNumber = "632"
+            endingLineNumber = "632"
+            landmarkName = "loadPlaylists(complete:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "73BBBE47-D4F9-4063-9CCD-E30F05339FA0"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Shared/Networking/NetworkingManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "598"
+            endingLineNumber = "598"
             landmarkName = "loadPlaylists(complete:)"
             landmarkType = "7">
          </BreakpointContent>

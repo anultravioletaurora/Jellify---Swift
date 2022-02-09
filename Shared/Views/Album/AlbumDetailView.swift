@@ -11,9 +11,7 @@ import AVFoundation
 struct AlbumDetailView: View {
     
     var album: Album
-    
-    var artist: Artist
-    
+        
     @Environment(\.managedObjectContext)
     var managedObjectContext
 
@@ -25,13 +23,7 @@ struct AlbumDetailView: View {
 
     @State
     var songResults: [SongResult] = []
-        
-    var songService: SongService = SongService.shared
-    
-    var artistService: ArtistService = ArtistService.shared
-    
-    var playlistService: PlaylistService = PlaylistService.shared
-    
+            
     @State
     var showPlaylistSheet: Bool = false
         
@@ -44,9 +36,8 @@ struct AlbumDetailView: View {
     @State
     var loading : Bool = true
             
-    init(album: Album, artist: Artist) {
+    init(album: Album) {
         self.album = album
-        self.artist = artist
         
         self.fetchRequest = FetchRequest(
             entity: Song.entity(),
@@ -101,7 +92,7 @@ struct AlbumDetailView: View {
             List {
                                         
                 AlbumArtwork(album: album)
-                    .listRowSeparator(.hidden)
+                    .listRowSeparator(Visibility.hidden)
                 
                 ForEach(songs) { song in
                     SongButton(song: song, selectedSong: $selectedSong, songs: Array(songs), showPlaylistSheet: $showPlaylistSheet)
@@ -204,9 +195,7 @@ struct AlbumDetailView: View {
     struct AlbumArtwork: View {
         
         var album: Album
-        
-        var artistService: ArtistService = ArtistService.shared
-        
+                
         var height = UIScreen.main.bounds.height / 4
         
         var body: some View {
@@ -227,18 +216,15 @@ struct AlbumDetailView: View {
         
         @Binding
         var song: Song?
-        
-        @State
-        var playlistName: String = ""
-        
+                
         @Binding
         var showPlaylistSheet: Bool
         
         @State
         var showNewPlaylistAlert: Bool = false
         
-        var playlistService: PlaylistService = PlaylistService.shared
-        
+        let networkingManager : NetworkingManager = NetworkingManager.shared
+                
         @FetchRequest(
             entity: Playlist.entity(),
             sortDescriptors: [NSSortDescriptor(key: "name", ascending: true)])
@@ -248,38 +234,59 @@ struct AlbumDetailView: View {
             
             VStack {
             
-                HStack {
-                    Spacer()
-                    
-                    Button(action: {
-                        
-                    }, label: {
-                        Text("New Playlist")
-                    })
-                }
-                .padding(.trailing, 15)
-                .padding(.top, 15)
+                CreatePlaylistForm(showPlaylistSheet: $showPlaylistSheet, playlistSong: song!)
+                    .padding(.horizontal, 15)
+                    .padding(.vertical, 30)
                 
                 List(playlists) { playlist in
                     Button(action: {
-                        playlistService.addToPlaylist(playlist: playlist, song: self.song!, complete: {
+                        networkingManager.addToPlaylist(playlist: playlist, song: song!, complete: {
                             showPlaylistSheet = false
                         })
                     }, label: {
-                        Text(playlist.name!)
+                        VStack(alignment: .leading) {
+                            Text(playlist.name!)
+                                .font(.body)
+                            
+                            Text("\(String(playlist.songs?.count ?? 0)) songs")
+                                .font(.body)
+                                .opacity(0.6)
+                        }
                     })
+                        .padding(.vertical, 5)
                 }
+                .listStyle(PlainListStyle())
             }
         }
     }
     
     struct CreatePlaylistForm: View {
         
+        @State
+        var playlistName: String = ""
+        
         @Binding
-        var playlistName: String
+        var showPlaylistSheet : Bool
+        
+        var networkingManager : NetworkingManager = NetworkingManager.shared
+        
+        var playlistSong : Song
         
         var body: some View {
-            TextField("Playlist Name", text: $playlistName)
+            HStack {
+                TextField("Playlist Name", text: $playlistName)
+                
+                Spacer()
+                
+                Button(action: {
+                    // Create Playlist
+                    networkingManager.createPlaylist(name: playlistName, songs: [playlistSong], complete: {
+                        showPlaylistSheet = false
+                    })
+                }, label: {
+                    Text("Create")
+                })
+            }
         }
     }
 }

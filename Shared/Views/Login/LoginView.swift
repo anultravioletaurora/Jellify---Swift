@@ -23,6 +23,8 @@ struct LoginView: View {
     
     var authenticationService = AuthenticationService.shared
     
+    var networkingManager = NetworkingManager.shared
+    
     var body: some View {
         
         NavigationView {
@@ -69,13 +71,8 @@ struct LoginView: View {
                 
                 // Submit Button
                 Button(action: {
-                    authenticationService.authenticate(server: serverUrl, username: username, password: password, completion: {result in
+                    networkingManager.login(serverUrl: serverUrl, userId: username, password: password, complete: {
                         
-                        if result {
-                            print("We did it!!")
-                        } else {
-                            print("BOOOOOOO")
-                        }
                     })
                 }) {
                     

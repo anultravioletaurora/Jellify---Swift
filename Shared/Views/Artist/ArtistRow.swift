@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct ArtistRow: View {
-    
-    let artistService : ArtistService = ArtistService.shared
-    
+        
     @ObservedObject
     var artist : FetchedResults<Artist>.Element
     
@@ -51,12 +49,5 @@ struct ArtistRow: View {
             }
             .tint(.purple)
         }
-        .onAppear(perform: {
-            if artist.thumbnail == nil {
-                artistService.fetchArtistThumbnail(artist: artist, complete: {
-                    print("yeet")
-                })
-            }
-        })
     }
 }

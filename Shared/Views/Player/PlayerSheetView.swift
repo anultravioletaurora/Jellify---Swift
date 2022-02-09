@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct PlayerSheetView: View {
-    
-    let artistService = ArtistService.shared
-    
+        
     @ObservedObject
     var player = Player.shared
     
@@ -21,10 +19,7 @@ struct PlayerSheetView: View {
     
     @Binding
     var showMediaPlayer : Bool
-    
-    @State
-    var shuffled : Bool = false
-    
+        
     var body: some View {
 
         VStack(alignment: .center) {
@@ -48,7 +43,8 @@ struct PlayerSheetView: View {
                 Text(player.currentSong?.song.album?.name ?? "Unknown Album")
                     .font(.body)
                     .transition(.opacity)
-        
+                    .foregroundColor(.accentColor)
+                    
                 ProgressBarView()
                     .padding(.all)
 
@@ -100,13 +96,15 @@ struct PlayerSheetView: View {
                         
                         switch player.repeatMode {
                         case .reapeatAll:
-                            Image(systemName: "repeat.circle.fill")
+                            Image(systemName: "repeat")
                                 .font(.largeTitle)
+                                .foregroundColor(.accentColor)
                         case .repeatOne:
-                            Image(systemName: "repeat.1.circle.fill")
+                            Image(systemName: "repeat.1")
                                 .font(.largeTitle)
+                                .foregroundColor(.accentColor)
                         case .none:
-                            Image(systemName: "repeat.circle")
+                            Image(systemName: "repeat")
                                 .font(.largeTitle)
                         }
                     })
@@ -123,18 +121,18 @@ struct PlayerSheetView: View {
                     .buttonStyle(PlainButtonStyle())
                     
                     Button(action: {
-                        player.songs.shuffle()
-                        shuffled.toggle()
+                        player.playmode.toggle()
                     }, label: {
-                        Image(systemName: shuffled ? "shuffle.circle.fill" : "shuffle.circle")
+                        Image(systemName: "shuffle")
                             .font(.largeTitle)
+                            .foregroundColor(player.playmode == .random ? .accentColor : .primary)
                     })
                         .buttonStyle(PlainButtonStyle())
                         .padding(.leading, 50)
 
 
-                }
-            }
+                }            
+        }
     
                 // Blurred album artwork background
             .background(content: {

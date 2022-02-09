@@ -9,6 +9,7 @@ import Foundation
 import JellyfinAPI
 import CoreData
 import Combine
+import UIKit
 
 class NetworkingManager : ObservableObject {
     
@@ -22,9 +23,7 @@ class NetworkingManager : ObservableObject {
     
     let context : NSManagedObjectContext = PersistenceController.shared.container.viewContext
         
-    let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-    
-    let playlistsContainer = NSPersistentContainer(name: "Playlists")
+    let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)    
     
     var loadingPhase : LoadingPhase? = nil
     
@@ -61,6 +60,12 @@ class NetworkingManager : ObservableObject {
     
     init() {
         privateContext.parent = context
+        
+        JellyfinAPI.basePath = server
+        
+        if (user != nil) {
+            setCustomHeaders()
+        }
     }
     
     var user: User? {
@@ -185,8 +190,153 @@ class NetworkingManager : ObservableObject {
         return loadingPhase != nil
     }
     
-    public func syncLibrary() -> Void {
+    public func addToPlaylist(playlist: Playlist, song: Song, complete: @escaping () -> Void) -> Void {
         
+        print("Adding \(song.name!) to playlist \(playlist.name!)")
+
+        PlaylistsAPI.addToPlaylist(playlistId: playlist.jellyfinId!, ids: [song.jellyfinId!], userId: self.userId, apiResponseQueue: JellyfinAPI.apiResponseQueue)
+            .sink(receiveCompletion: { completion in
+                print("Call to add song to playlist complete: \(completion)")
+            }, receiveValue: { response in
+                print("Playlist addition response: \(response)")
+                self.loadPlaylistItems(playlist: playlist, complete: { playlistItems in
+                    print("Playlist addition and refresh")
+                    complete()
+                })
+            })
+            .store(in: &cancellables)
+    }
+
+    public func createPlaylist(name: String, songs: [Song], complete: @escaping () -> Void) -> Void {
+                
+        var dto = CreatePlaylistDto()
+        
+        dto.userId = self.userId
+        dto.name = name
+        dto.ids = songs.map { $0.jellyfinId! }
+        dto.mediaType = "Audio"
+        
+        PlaylistsAPI.createPlaylist(createPlaylistDto: dto, apiResponseQueue: processingQueue)
+            .sink(receiveCompletion: { completion in
+                print("Creating playlist receive completion: \(completion)")
+            }, receiveValue: { response in
+                
+                let newPlaylist = Playlist(context: self.context)
+                
+                newPlaylist.jellyfinId = response.id
+                newPlaylist.name = name
+                                
+                self.loadPlaylistItems(playlist: newPlaylist, complete: { playlistSongs in
+                    
+                    playlistSongs.forEach({ playlistSong in
+                        newPlaylist.addToSongs(playlistSong)
+                    })
+                    
+                    self.saveContext()
+                    
+                    complete()
+                })
+            })
+            .store(in: &self.cancellables)
+    }
+    
+    public func deleteFromPlaylist(playlist: Playlist, playlistSong: PlaylistSong) -> Void {
+
+        print("Removing \(playlistSong.song!.name!) - \(playlistSong.jellyfinId!) from playlist \(playlist.name!) - \(playlist.jellyfinId!)")
+                
+        PlaylistsAPI.removeFromPlaylist(playlistId: playlist.jellyfinId!, entryIds: [playlistSong.jellyfinId!], apiResponseQueue: JellyfinAPI.apiResponseQueue)
+            .sink(receiveCompletion: { completion in
+                print("Call to remove song from playlist complete: \(completion)")
+            }, receiveValue: { response in
+
+                print("Playlist removal response: \(response)")
+                self.context.delete(playlistSong)
+                
+                self.saveContext()
+            })
+            .store(in: &cancellables)
+    }
+
+    public func loadAlbumArtwork(album: Album) -> Void {
+        ImageAPI.getItemImage(itemId: album.jellyfinId!, imageType: .primary)
+            .sink(receiveCompletion: { completion in
+                print("Image receive completion: \(completion)")
+            }, receiveValue: { url in
+                           
+                album.artwork = try! Data(contentsOf: url)
+                album.thumbnail = try! Data(contentsOf: url)
+                
+                self.saveContext()
+            })
+            .store(in: &self.cancellables)
+
+    }
+    
+    public func loadArtistImage(artist: Artist) -> Void {
+        ImageAPI.getItemImage(itemId: artist.jellyfinId!, imageType: .primary)
+            .sink(receiveCompletion: { completion in
+                print("Artist image receive completion: \(completion)")
+            }, receiveValue: { url in
+                                
+                artist.thumbnail = try! Data(contentsOf: url)
+                
+                self.saveContext()
+            })
+            .store(in: &self.cancellables)
+    }
+    
+    public func loadPlaylistImage(playlist: Playlist) -> Void {
+        ImageAPI.getItemImage(itemId: playlist.jellyfinId!, imageType: .primary)
+            .sink(receiveCompletion: { completion in
+                print("Artist image receive completion: \(completion)")
+            }, receiveValue: { url in
+                                
+                playlist.thumbnail = try! Data(contentsOf: url)
+                
+                self.saveContext()
+            })
+            .store(in: &self.cancellables)
+    }
+    
+    // TODO: Hash password to SHA-1
+    public func login(serverUrl: String, userId: String, password: String, complete: @escaping () -> Void) -> Void {
+        
+        JellyfinAPI.basePath = serverUrl
+        
+        UserAPI.authenticateUser(userId: userId, pw: password, apiResponseQueue: processingQueue)
+            .sink(receiveCompletion: { complete in
+                print("Login completion: \(complete)")
+            }, receiveValue: { response in
+                var user : User = User(context: self.privateContext)
+                
+                user.userId = response.user!.id!
+                user.server = serverUrl
+                user.authToken = response.accessToken
+                user.serverId = response.serverId
+                
+                self.saveContext()
+                
+                complete()
+            })
+            .store(in: &cancellables)
+    }
+    
+    public func logOut() -> Void {
+        self.deleteAllOfEntity(entityName: "User")
+        self.deleteAllOfEntity(entityName: "Album")
+        self.deleteAllOfEntity(entityName: "Song")
+        self.deleteAllOfEntity(entityName: "Artist")
+        self.deleteAllOfEntity(entityName: "Playlist")
+        self.deleteAllOfEntity(entityName: "Genre")
+        self._server = ""
+        self._userId = ""
+        self._accessToken = ""
+        self._playlistId = ""
+        self._libraryId = ""
+    }
+
+    public func syncLibrary() -> Void {
+                
         print("Loading Artists")
         
         self.loadingPhase = .artists
@@ -218,6 +368,30 @@ class NetworkingManager : ObservableObject {
             })
         })
     }
+    
+    private func deleteAllEntities() -> Void {
+        
+        deleteAllOfEntity(entityName: "PlaylistSong")
+        deleteAllOfEntity(entityName: "Song")
+        deleteAllOfEntity(entityName: "Album")
+        deleteAllOfEntity(entityName: "Playlist")
+        deleteAllOfEntity(entityName: "Artist")
+        
+        saveContext()
+    }
+    
+    private func deleteAllOfEntity(entityName: String)-> Void{
+        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: entityName)
+        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+
+        do {
+            try context.execute(deleteRequest)
+        } catch let error as NSError {
+            // TODO: handle the error
+            print(error)
+        }
+    }
+
     
     private func loadArtists(complete: @escaping () -> Void) -> Void {
         ArtistsAPI.getAlbumArtists(minCommunityRating: nil, startIndex: nil, limit: nil, searchTerm: nil, parentId: nil, fields: [ItemFields.primaryImageAspectRatio, ItemFields.sortName, ItemFields.basicSyncInfo], excludeItemTypes: nil, includeItemTypes: nil, filters: nil, isFavorite: nil, mediaTypes: nil, genres: nil, genreIds: nil, officialRatings: nil, tags: nil, years: nil, enableUserData: true, imageTypeLimit: nil, enableImageTypes: nil, person: nil, personIds: nil, personTypes: nil, studios: nil, studioIds: nil, userId: self.userId, nameStartsWithOrGreater: nil, nameStartsWith: nil, nameLessThan: nil, enableImages: true, enableTotalRecordCount: nil, apiResponseQueue: processingQueue)
@@ -267,41 +441,48 @@ class NetworkingManager : ObservableObject {
             }, receiveValue: { response in
                 if response.items != nil {
                     
-                        DispatchQueue.concurrentPerform(iterations: response.items!.count) { index in
+                    var albumIds = Set(response.items!.map { $0.id})
+                    
+                    albumIds.subtract(Set(self.retrieveAllAlbumsFromCore().map { $0.jellyfinId}))
+                                                
+                    let newAlbums = response.items!.filter { albumIds.contains($0.id)}
 
-                            let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-                            
-                            privateContext.parent = self.privateContext
+                    
+                    DispatchQueue.concurrentPerform(iterations: newAlbums.count) { index in
 
-                            let albumResult = response.items![index]
+                        let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+                        
+                        privateContext.parent = self.privateContext
+
+                        let albumResult = newAlbums[index]
+                        
+                        print("Album \(index) of \(response.items!.count)")
+                        
+                        if (self.retrieveAlbumFromCore(albumId: albumResult.id!) == nil) {
                             
-                            print("Album \(index) of \(response.items!.count)")
+                            let album = Album(context: privateContext)
                             
-                            if (self.retrieveAlbumFromCore(albumId: albumResult.id!) == nil) {
+                            album.jellyfinId = albumResult.id!
+                            album.name = albumResult.name!
+                            album.productionYear = Int16(albumResult.productionYear ?? 0)
+                            
+                            var artist : Artist? = nil
+                            
+                            if (albumResult.albumArtist != nil) {
                                 
-                                let album = Album(context: privateContext)
-                                
-                                album.jellyfinId = albumResult.id!
-                                album.name = albumResult.name!
-                                album.productionYear = Int16(albumResult.productionYear ?? 0)
-                                
-                                var artist : Artist? = nil
-                                
-                                if (albumResult.albumArtist != nil) {
-                                    
-                                    if (self.retrieveArtistFromCore(artistName: albumResult.albumArtist!) != nil) {
-                                        artist = privateContext.object(with: self.retrieveArtistFromCore(artistName: albumResult.albumArtist!)!) as! Artist?
-                                    }
-                                }
-                                
-                                if (artist != nil) {
-                                    album.albumArtist = artist!.jellyfinId!
-                                    album.addToAlbumArtists(artist!)
+                                if (self.retrieveArtistFromCore(artistName: albumResult.albumArtist!) != nil) {
+                                    artist = privateContext.object(with: self.retrieveArtistFromCore(artistName: albumResult.albumArtist!)!) as! Artist?
                                 }
                             }
                             
-                            try! privateContext.save()
+                            if (artist != nil) {
+                                album.albumArtist = artist!.jellyfinId!
+                                album.addToAlbumArtists(artist!)
+                            }
                         }
+                        
+                        try! privateContext.save()
+                    }
                     
                     self.saveContext()
                     complete()
@@ -441,7 +622,7 @@ class NetworkingManager : ObservableObject {
                                 print("Playlist song retrieval for playlist \(playlist.name): \(complete)")
                             }, receiveValue: { playlistItems in
                                 
-                                print(playlistItems.items!.map { $0.id! })
+//                                print(playlistItems.items!.map { $0.id! })
                                 
                                 if playlistItems.items != nil {
                                                                     
@@ -512,6 +693,41 @@ class NetworkingManager : ObservableObject {
         complete()
     }
     
+    private func loadPlaylistItems(playlist: Playlist, complete: @escaping ([PlaylistSong]) -> Void) -> Void {
+        PlaylistsAPI.getPlaylistItems(playlistId: playlist.jellyfinId!, userId: self.userId, apiResponseQueue: self.processingQueue)
+        .sink(receiveCompletion: { complete in
+            print("Playlist song retrieval for playlist \(playlist.name): \(complete)")
+        }, receiveValue: { playlistItems in
+            if playlistItems.items != nil {
+                
+                var playlistSongs : [PlaylistSong] = []
+                
+                playlistItems.items!.forEach({ playlistItem in
+                    
+                    if (self.retrievePlaylistSongFromCore(playlistSongId: playlistItem.playlistItemId!) == nil) {
+                        let playlistSong = PlaylistSong(context: self.context)
+                        
+                        playlistSong.jellyfinId = playlistItem.playlistItemId
+                        
+                        playlistSong.playlist = playlist
+                        
+                        let song: Song = self.context.object(with: self.retrieveSongFromCore(songId: playlistItem.id!)!) as! Song
+                        playlistSong.song = song
+                        song.addToPlaylists(playlistSong)
+                        
+                        playlistSongs.append(playlistSong)
+                    } else {
+                        playlistSongs.append(self.context.object(with: self.retrievePlaylistSongFromCore(playlistSongId: playlistItem.playlistItemId!)!) as! PlaylistSong)
+                    }
+                })
+                
+                complete(playlistSongs)
+            }
+        })
+        .store(in: &self.cancellables)
+
+    }
+    
     private func loadImages() -> Void {
         
     }
@@ -546,6 +762,22 @@ class NetworkingManager : ObservableObject {
             print("Error retrieving album from CoreData: \(error)")
             
             return nil
+        }
+    }
+    
+    private func retrieveAllAlbumsFromCore() -> [Album] {
+        let fetchRequest = Album.fetchRequest()
+        
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        
+        privateContext.parent = self.privateContext
+        
+        do {
+            return try self.context.fetch(fetchRequest)
+        } catch let error as NSError {
+            print("Error retrieving all albums from CoreData: \(error)")
+            
+            return []
         }
     }
     
@@ -623,6 +855,29 @@ class NetworkingManager : ObservableObject {
             
             return nil
         }
+    }
+    
+    private func setCustomHeaders() -> Void {
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        var deviceName = UIDevice.current.name
+        deviceName = deviceName.folding(options: .diacriticInsensitive, locale: .current)
+        deviceName = String(deviceName.unicodeScalars.filter { CharacterSet.urlQueryAllowed.contains($0) })
+        
+        let platform: String
+        #if os(tvOS)
+        platform = "tvOS"
+        #else
+        platform = "iOS"
+        #endif
+        
+        var header = "MediaBrowser "
+        header.append("Client=\"JellyTuner\", ")
+        header.append("Device=\"\(deviceName)\", ")
+        header.append("DeviceId=\"\(UIDevice.current.identifierForVendor!)\", ")
+        header.append("Version=\"\(appVersion ?? "0.0.1")\", ")
+        header.append("Token=\"\(user!.authToken!)\"")
+        
+        JellyfinAPI.customHeaders["X-Emby-Authorization"] = header
     }
 }
 

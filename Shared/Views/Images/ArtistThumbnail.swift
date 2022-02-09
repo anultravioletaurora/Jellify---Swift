@@ -12,7 +12,15 @@ struct ArtistThumbnail: View {
     @ObservedObject
     var artist : FetchedResults<Artist>.Element
     
+    let networkingManager : NetworkingManager = NetworkingManager.shared
+    
     var body: some View {
         ItemThumbnail(thumbnail: artist.thumbnail, itemId: artist.jellyfinId!, frame: 60, cornerRadius: 100)
+            .onAppear(perform: {
+                
+                if (artist.thumbnail == nil) {
+                    networkingManager.loadArtistImage(artist: artist)
+                }
+            })
     }
 }

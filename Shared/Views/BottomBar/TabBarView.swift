@@ -65,14 +65,6 @@ struct TabBarView: View {
                 }
         }
         .edgesIgnoringSafeArea(.top)
-        .toolbar(content: {
-            Button(action: {
-                print("syncing library")
-            }, label: {
-                Image(systemName: "arrow.triangle.2.circlepath")
-            })
-                .buttonStyle(PlainButtonStyle())
-        })
 
         .overlay(
             PlayerView()

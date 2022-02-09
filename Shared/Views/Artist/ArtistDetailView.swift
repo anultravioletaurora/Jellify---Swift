@@ -11,13 +11,7 @@ struct ArtistDetailView: View {
     
     @Environment(\.managedObjectContext)
     var managedObjectContext
-    
-    let albumService : AlbumService = AlbumService.shared
-    
-    let songService : SongService = SongService.shared
-    
-    let artistService : ArtistService = ArtistService.shared
-    
+        
     var fetchRequest: FetchRequest<Album>
     
     var albums: FetchedResults<Album>{
@@ -49,10 +43,22 @@ struct ArtistDetailView: View {
                    
         VStack {
             
-                List(albums) { album in
+            List {
+                
+                HStack {
+                    Spacer()
+                    ArtistImage(artist: artist)
+                    Spacer()
+                }
+                .listRowSeparator(.hidden)
+
+                ForEach(albums) { album in
                     AlbumRow(album: album, artist: artist)
                         .padding(.bottom, albums.last! == album ? 65 : 0)
+                        .listRowSeparator(albums.last! == album ? .hidden : .visible)
+
                 }
+            }
             .listStyle(PlainListStyle())
 //        .searchable(text: $search, prompt: "Search \(artist.name ?? "Unknown Artist") albums")
 //        .onChange(of: search, perform: { newSearch in
@@ -61,73 +67,5 @@ struct ArtistDetailView: View {
 //        })
         }
         .navigationTitle(artist.name ?? "Unknown Artist")
-//        .onAppear(perform: {
-//                       
-//            print(self.albums)
-//            
-//            if self.albums.isEmpty {
-//            
-//                print("No core data albums, fetching them from server")
-//                albumService.retrieveAlbums(artist: artist, complete: {
-//                    loading = false
-//                })
-//                                
-//                print("Albums retrieved")
-//            } else {
-//                loading = false
-//            }
-//                        
-//        })
-
-//        ScrollView {
-//            HStack(alignment: .center, spacing: 5) {
-//
-//                // Artist Image
-//    //            Image("profile")
-//    //                .resizable()
-//    //                .frame(width: 64, height: 64, alignment: .leading)
-//    //                .clipShape(Circle())
-//    //                .padding()
-//
-//            }
-//            .frame(maxWidth: .infinity)
-//            .fixedSize(horizontal: true, vertical: true)
-//
-//            // List of albums
-//            VStack(alignment: .leading, content: {
-//                ForEach($albums) { $album in
-//
-//                    Divider()
-//
-//                    NavigationLink(destination: AlbumDetailView(album: $album)) {
-//
-//                        HStack {
-//                            // Album Image
-//                            Image(systemName: "questionmark.square")
-//                                .resizable()
-//                                .frame(width: 64, height: 64, alignment: .leading)
-//                                .cornerRadius(5)
-//
-//                            VStack(alignment: .leading) {
-//
-//                                Text(album.name)
-//                                    .font(.body)
-//
-//                                Text(album.productionYear != nil ? String(album.productionYear!) : "")
-//                                    .font(.body)
-//                                    .opacity(0.6)
-//                            }
-//
-//                            Spacer()
-//
-//                            Image(systemName: "chevron.right")
-//                        }
-//                        .contentShape(Rectangle())
-//                    }
-//                }
-//                .buttonStyle(PlainButtonStyle())
-//                .padding(.horizontal)
-//            })
-//        }
     }
 }

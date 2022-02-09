@@ -172,7 +172,7 @@ class Player: ObservableObject {
         }
     }
     public var songIndex: Int = 0
-    private let placeholderImage = UIImage(named: "profile")!
+    private let placeholderImage = UIImage(named: "placeholder")!
 //    @Published public var currentSongImage: UIImage = UIImage(named: "Placeholder")! {
 //        didSet{
 //            currentSongImage.getColors { colors in
@@ -405,8 +405,8 @@ class Player: ObservableObject {
                         player?.insert(currentItem!, after: player?.currentItem)
                     }
                 }else if repeatMode == .repeatOne{
-//                    self.appendSongsNext([newSong.song])
-//                    player?.advanceToNextItem()
+                    self.appendSongsNext([newSong.song])
+                    player?.advanceToNextItem()
                 }
             }else{
                 songIndex = 0
@@ -482,7 +482,7 @@ class Player: ObservableObject {
                         MPMediaItemPropertyAlbumTitle: currentItem.song.album?.name ?? "Unknown Album",
                         MPMediaItemPropertyTitle: currentItem.song.name ?? "Unknown Track",
                         MPMediaItemPropertyArtwork: MPMediaItemArtwork(boundsSize: CGSize(width: 500, height: 500), requestHandler: { (size: CGSize) -> UIImage in
-                            return self.getAlbumUiImage(url: self.currentSong?.song.album?.artwork) ?? self.placeholderImage
+                            return self.getAlbumUiImage(data: self.currentSong?.song.album?.artwork) ?? self.placeholderImage
                         })
 
 //                         MPMediaItemPropertyArtwork: MPMediaItemArtwork(boundsSize: CGSize(width: 500, height: 500),
@@ -500,13 +500,11 @@ class Player: ObservableObject {
     }
     }
     
-    private func getAlbumUiImage(url: URL?) -> UIImage? {
+    private func getAlbumUiImage(data: Data?) -> UIImage? {
         var image: UIImage?
 
-        if url != nil {
-            if let imageData: NSData = NSData(contentsOf: url!) {
-                image = UIImage(data: imageData as Data)
-            }
+        if data != nil {
+            image = UIImage(data: data!)
         }
 
         return image

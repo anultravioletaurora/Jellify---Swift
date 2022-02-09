@@ -15,7 +15,7 @@ struct AlbumRow: View {
     let artist : FetchedResults<Artist>.Element
     
     var body: some View {
-        NavigationLink(destination: AlbumDetailView(album: album, artist: artist)) {
+        NavigationLink(destination: AlbumDetailView(album: album)) {
                 
             HStack {
                 // Album Image

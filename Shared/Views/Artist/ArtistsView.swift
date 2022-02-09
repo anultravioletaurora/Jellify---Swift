@@ -8,9 +8,7 @@
 import SwiftUI
 
 struct ArtistsView: View {
-    
-    let artistService = ArtistService.shared
-    
+        
     var artists: FetchedResults<Artist>{
         fetchRequest.wrappedValue
     }
@@ -61,34 +59,27 @@ struct ArtistsView: View {
             List(artists) { artist in
                 ArtistRow(artist: artist)
                     .padding(.bottom, artists.last! == artist ? 65 : 0)
+                    .listRowSeparator(artists.last! == artist ? .hidden : .visible)
             }
             .searchable(text: $search, prompt: "Search artists")
             .disableAutocorrection(true)
             .onChange(of: search, perform: { newSearch in
-                                                    
+                                
                 artists.nsPredicate = newSearch.isEmpty ? nil : NSPredicate(format: "%K contains[c] %@", #keyPath(Artist.name), newSearch.trimmingCharacters(in: .whitespaces))
             })
             .listStyle(PlainListStyle())
             .navigationTitle("Artists")
-//                .refreshable {
-//                    
-//                    if !loading {
-//                        self.forceFetchArtists()
-//                    }
-//                }
+            .toolbar(content: {
+                ToolbarItem(content: {
+                    Button(action: {
+                        print("syncing library")
+                    }, label: {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                    })
+                        .buttonStyle(PlainButtonStyle())
+
+                })
+            })
         }
     }
-    
-//    func forceFetchArtists() -> Void {
-//        
-//        loading = true
-//        
-//        artistService.deleteAllEntities()
-//        
-//        artistService.retrieveArtists(complete: {
-//            loading = false
-//        })
-//        
-//        loading = false
-//    }
 }

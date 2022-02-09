@@ -15,6 +15,6 @@ struct ArtistImage: View {
     var height = UIScreen.main.bounds.height / 5
     
     var body: some View {
-        ItemThumbnail(thumbnail: artist.thumbnail, itemId: artist.jellyfinId!, frame: height, cornerRadius: 10)
+        ItemThumbnail(thumbnail: artist.thumbnail, itemId: artist.jellyfinId!, frame: height, cornerRadius: 100)
     }
 }

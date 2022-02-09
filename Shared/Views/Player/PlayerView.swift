@@ -26,11 +26,7 @@ struct PlayerView: View {
     var seekPos = 0.0
         
     var height = UIScreen.main.bounds.height / 2.5
-    
-    var artistService = ArtistService.shared
-    
-    var albumService = AlbumService.shared
-    
+        
     @State
     var offset : CGFloat = 0
                 
@@ -56,11 +52,11 @@ struct PlayerView: View {
                             }
                             
                             else {
-                                Image(systemName: "opticaldisc")
+                                
+                                Image("placeholder")
                                         .resizable()
                                         .frame(width: 60, height: 60)
-                                        .cornerRadius(5)
-                                        .shadow(radius: 6, x: 0, y: 3)
+                                        .cornerRadius(2)
                                         .padding(.trailing, 5)
 
                             }
@@ -113,7 +109,7 @@ struct PlayerView: View {
             PlayerSheetView(showMediaPlayer: $showMediaPlayer)
         })
         .offset(y: UIScreen.main.bounds.height / 3 + 19)        
-        .padding()
+//        .padding()
     }
     
     func getWrappedArtists(artists: NSSet?) -> String {
