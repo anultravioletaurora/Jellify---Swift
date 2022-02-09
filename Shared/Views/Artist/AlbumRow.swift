@@ -26,9 +26,11 @@ struct AlbumRow: View {
                     Text(album.name ?? "Unknown Album")
                         .font(.body)
 
-                    Text(String(album.productionYear))
-                        .font(.body)
-                        .opacity(0.6)
+                    HStack {                        
+                        Text(String(album.productionYear))
+                            .font(.body)
+                            .opacity(0.6)
+                    }
                 }
             }
             .contentShape(Rectangle())

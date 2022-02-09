@@ -369,8 +369,9 @@ class Player: ObservableObject {
     }
     
     public func previous() {
-        if timeElasped < "0:03"{
+        if timeElasped < "0:03" {
             changeSong(newIndex: -1)
+            seek(progress: 0.0)
         }else{
             seek(progress: 0.0)
         }
@@ -387,8 +388,10 @@ class Player: ObservableObject {
             if !skipping{
                 addToHistory()
             }
-            index += newIndex
-            if index < songs.count {
+                    
+        index += newIndex
+
+            if index < songs.count && index >= 0 {
                 let newSong = songs[index]
                 currentSong = newSong
                 songIndex = index
@@ -398,17 +401,27 @@ class Player: ObservableObject {
                         player?.advanceToNextItem()
                     }
                 }else if newIndex < 0 {
-                    player?.insert(newSong, after: player?.currentItem)
-                    let currentItem = player?.currentItem
-                    player?.advanceToNextItem()
-                    if currentItem != nil{
-                        player?.insert(currentItem!, after: player?.currentItem)
+                    
+                    // Check if we're already at the beginning of the queue
+                    if newSong == player?.currentItem {
+                        seek(progress: 0.0)
+                    } else {
+                        player?.insert(newSong, after: player?.currentItem)
+                        let currentItem = player?.currentItem
+                        seek(progress: 0.0)
+                        player?.advanceToNextItem()
+                        if currentItem != nil{
+                            player?.insert(currentItem!, after: player?.currentItem)
+                        }
                     }
+                    
                 }else if repeatMode == .repeatOne{
                     self.appendSongsNext([newSong.song])
                     player?.advanceToNextItem()
                 }
-            }else{
+            } else if index == -1 {
+                seek(progress: 0.0)
+            } else {
                 songIndex = 0
                 isPlaying = false
                 if songs.count > 0{

@@ -12,9 +12,6 @@ struct AlbumDetailView: View {
     
     var album: Album
         
-    @Environment(\.managedObjectContext)
-    var managedObjectContext
-
     var fetchRequest: FetchRequest<Song>
     
     var songs: FetchedResults<Song>{
@@ -32,9 +29,8 @@ struct AlbumDetailView: View {
         
     @State
     var player : AVPlayer = AVPlayer()
-    
-    @State
-    var loading : Bool = true
+        
+    let networkingManager : NetworkingManager = NetworkingManager.shared
             
     init(album: Album) {
         self.album = album
@@ -94,19 +90,32 @@ struct AlbumDetailView: View {
                 AlbumArtwork(album: album)
                     .listRowSeparator(Visibility.hidden)
                 
+                HStack {
+                    Spacer()
+                    Text(networkingManager.retrieveArtistByName(name: album.albumArtistName ?? "Unknown Artist")?.name ?? "Unknown Artist")
+                        .opacity(0.6)
+                    
+                    Image(systemName: "circle.fill")
+                        .resizable()
+                        .frame(width: 5, height: 5)
+                        .opacity(0.6)
+                    
+                    Text(String(album.productionYear)).font(.body)
+                        .opacity(0.6)
+                    Spacer()
+                }
+                
                 ForEach(songs) { song in
                     SongButton(song: song, selectedSong: $selectedSong, songs: Array(songs), showPlaylistSheet: $showPlaylistSheet)
             }
-            .sheet(isPresented: $showPlaylistSheet, content: {
-                PlaylistSelectionSheet(song: $selectedSong, showPlaylistSheet: $showPlaylistSheet)
-            })
+                .sheet(isPresented: $showPlaylistSheet, content: {
+                    PlaylistSelectionSheet(song: $selectedSong, showPlaylistSheet: $showPlaylistSheet)
+                })
+            }
 
-        }
-            .padding(.bottom, 60)
-
-            .listStyle(PlainListStyle())
+        .listStyle(PlainListStyle())
         .navigationTitle(album.name ?? "Unknown Album")
-    }
+        }
     }
     
     func getRuntime(runTimeTicks: Int) -> String{
@@ -159,6 +168,12 @@ struct AlbumDetailView: View {
                     VStack(alignment: .leading, spacing: 10) {
                         Text(song.name ?? "Unknown Song")
                             .padding(.leading, 5)
+                                         
+                        if song.artists!.count > 1 {
+                            Text((song.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: ", "))
+                                .font(.subheadline)
+                                .opacity(0.6)
+                        }
                     }
                     
                     Spacer()

@@ -184,6 +184,6 @@ struct PlayerSheetView: View {
                 artistNameArray.append((artist as! Artist).name ?? "")
             })
 
-            return artistNameArray.joined(separator: ",")
+            return artistNameArray.joined(separator: ", ")
         }
     }

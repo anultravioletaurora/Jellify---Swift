@@ -29,21 +29,20 @@ struct ContentView: View {
         
         
         
-        /**
-        If the user is not yet auth'd, then we will prompt them to login
-        */
-        if networkingManager.userId == "" {
+        // Prompt the user to login if they haven't already
+        // TODO: Fix this
+        if networkingManager.accessToken == "" {
             LoginView()
                 .transition(.slide)
         }
         
+        // Else if a library hasn't been selected yet, tell them to select a library
         else if !librarySelectionService.selected {
             LibrarySelectionView()
+                .transition(.slide)
         }
         
-        /**
-         Else render the app, since *hacker noise* they're in
-         */
+        // Else have them start listening
         else {
             
             ZStack(alignment: Alignment(horizontal: .center, vertical: .bottom), content: {
@@ -65,8 +64,11 @@ struct ContentView: View {
                 }
             })
             .onAppear(perform: {
+                
+                // Sync library on app startup
                 networkingManager.syncLibrary()
             })
+            .transition(.opacity)
         }
     }
 }

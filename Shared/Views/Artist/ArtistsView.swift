@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct ArtistsView: View {
         
@@ -18,8 +19,8 @@ struct ArtistsView: View {
     @Environment(\.managedObjectContext)
     var managedObjectContext
         
-    @State
-    var search : String = ""
+    @StateObject
+    var searchBar = SearchBarViewModel()
         
     @FocusState
     var isSearchFocused : Bool
@@ -61,12 +62,17 @@ struct ArtistsView: View {
                     .padding(.bottom, artists.last! == artist ? 65 : 0)
                     .listRowSeparator(artists.last! == artist ? .hidden : .visible)
             }
-            .searchable(text: $search, prompt: "Search artists")
+            .searchable(text: $searchBar.search, prompt: "Search artists")
             .disableAutocorrection(true)
-            .onChange(of: search, perform: { newSearch in
-                                
-                artists.nsPredicate = newSearch.isEmpty ? nil : NSPredicate(format: "%K contains[c] %@", #keyPath(Artist.name), newSearch.trimmingCharacters(in: .whitespaces))
-            })
+            .onReceive(
+                        
+                searchBar.$search.debounce(for: .seconds(1), scheduler: DispatchQueue.main)
+            ) {
+                guard !$0.isEmpty else {
+                    return
+                }
+                artists.nsPredicate = searchBar.search.isEmpty ? nil : NSPredicate(format: "%K contains[c] %@", #keyPath(Artist.name), searchBar.search.trimmingCharacters(in: .whitespaces))
+            }
             .listStyle(PlainListStyle())
             .navigationTitle("Artists")
             .toolbar(content: {
@@ -82,4 +88,8 @@ struct ArtistsView: View {
             })
         }
     }
+}
+
+class SearchBarViewModel : ObservableObject {
+    @Published var search : String = ""
 }

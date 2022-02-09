@@ -56,9 +56,18 @@ struct PlaylistDetailView: View {
                             HStack {
 //                                Text(playlistSong.song?.album?.name! ?? "Unknown Album")
 //                                    .font(.subheadline)
-                                Text(getArtistNameArray(playlistSong: playlistSong))
+                                
+                                if playlistSong.song!.artists!.count > 1 {
+                                Text((playlistSong.song!.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: ", "))
                                     .font(.subheadline)
-                                    .foregroundColor(.gray)
+                                    .opacity(0.6)
+                                } else {
+                                    Text(playlistSong.song!.album!.albumArtistName!)
+                                        .font(.subheadline)
+                                        .opacity(0.6)
+
+                                }
+
                             }
                         }
                         .padding(.leading, 5)
@@ -93,15 +102,5 @@ struct PlaylistDetailView: View {
         .navigationTitle(playlist.name ?? "Unknown Playlist")
         .navigationBarTitleDisplayMode(.inline)
 
-    }
-    
-    func getArtistNameArray(playlistSong: PlaylistSong) -> String {
-        var artistNameArray : [String] = []
-
-        playlistSong.song?.artists?.forEach({ artist in
-            artistNameArray.append((artist as! Artist).name ?? "")
-        })
-
-        return artistNameArray.joined(separator: ", ")
     }
 }

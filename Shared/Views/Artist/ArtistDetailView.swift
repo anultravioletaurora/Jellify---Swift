@@ -35,7 +35,7 @@ struct ArtistDetailView: View {
         self.fetchRequest = FetchRequest(
             entity: Album.entity(),
             sortDescriptors: [NSSortDescriptor(key: "productionYear", ascending: false)],
-            predicate: NSPredicate(format: "albumArtist == %@", artist.jellyfinId!)
+            predicate: NSPredicate(format: "albumArtistName == %@", artist.name!)
         )
     }
     

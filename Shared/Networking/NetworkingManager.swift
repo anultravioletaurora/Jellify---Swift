@@ -63,7 +63,7 @@ class NetworkingManager : ObservableObject {
         
         JellyfinAPI.basePath = server
         
-        if (user != nil) {
+        if (userId != "") {
             setCustomHeaders()
         }
     }
@@ -256,6 +256,14 @@ class NetworkingManager : ObservableObject {
             })
             .store(in: &cancellables)
     }
+    
+    public func retrieveArtistByJellyfinId(jellyfinId: String) -> Artist? {
+        return self.context.object(with: self.retrieveArtistFromCoreById(jellyfinId: jellyfinId)!) as? Artist
+    }
+    
+    public func retrieveArtistByName(name: String) -> Artist? {
+        return self.context.object(with: self.retrieveArtistFromCore(artistName: name)!) as? Artist
+    }
 
     public func loadAlbumArtwork(album: Album) -> Void {
         ImageAPI.getItemImage(itemId: album.jellyfinId!, imageType: .primary)
@@ -301,13 +309,20 @@ class NetworkingManager : ObservableObject {
     // TODO: Hash password to SHA-1
     public func login(serverUrl: String, userId: String, password: String, complete: @escaping () -> Void) -> Void {
         
+        print("logging in")
         JellyfinAPI.basePath = serverUrl
+        setAuthHeaders()
         
-        UserAPI.authenticateUser(userId: userId, pw: password, apiResponseQueue: processingQueue)
+        var dto = AuthenticateUserByName()
+        
+        dto.username = userId
+        dto.pw = password
+        
+        UserAPI.authenticateUserByName(authenticateUserByName: dto, apiResponseQueue: processingQueue)
             .sink(receiveCompletion: { complete in
                 print("Login completion: \(complete)")
             }, receiveValue: { response in
-                var user : User = User(context: self.privateContext)
+                let user : User = User(context: self.privateContext)
                 
                 user.userId = response.user!.id!
                 user.server = serverUrl
@@ -476,8 +491,11 @@ class NetworkingManager : ObservableObject {
                             }
                             
                             if (artist != nil) {
-                                album.albumArtist = artist!.jellyfinId!
-                                album.addToAlbumArtists(artist!)
+                                album.albumArtistName = artist!.name!
+                                
+                                self.retrieveArtistsFromCoreByJellyfinIds(jellyfinIds: albumResult.albumArtists!.map { $0.id! }).forEach({ artistObjectId in
+                                    album.addToAlbumArtists(privateContext.object(with: artistObjectId) as! Artist)
+                                })
                             }
                         }
                         
@@ -536,7 +554,9 @@ class NetworkingManager : ObservableObject {
                                     
                                     if (album != nil) {
                                         song.album = album!
-                                        song.artists = album!.albumArtists
+                                        self.retrieveArtistsFromCoreByJellyfinIds(jellyfinIds: songResult.artistItems!.map { $0.id! }).forEach({ artistObjectId in
+                                            song.addToArtists(privateContext.object(with: artistObjectId) as! Artist)
+                                        })
                                     }
                                     
                                     try! privateContext.save()
@@ -748,6 +768,61 @@ class NetworkingManager : ObservableObject {
         }
     }
     
+    private func retrieveArtistFromCoreById(jellyfinId: String) -> NSManagedObjectID? {
+        let fetchRequest = Artist.fetchRequest()
+        
+        fetchRequest.predicate = NSPredicate(format: "jellyfinId == %@", jellyfinId)
+        
+        do {
+            return try self.context.fetch(fetchRequest).first?.objectID
+        } catch {
+            print("Error retrieving artist from CoreData: \(error)")
+            
+            return nil
+        }
+    }
+    
+    private func retrieveArtistsFromCoreByJellyfinIds(jellyfinIds: [String]) -> [NSManagedObjectID] {
+        let fetchRequest = Artist.fetchRequest()
+
+        let predicates = jellyfinIds.map {
+            NSPredicate(format: "jellyfinId == %@", $0)
+        }
+        
+        // TODO: Fix this since it isn't retrieving the artist
+        fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: predicates)
+                
+        do {
+            return try self.context.fetch(fetchRequest).map { $0.objectID }
+        } catch {
+            // TODO: handle the error
+             print(error)
+            
+            return []
+        }
+
+    }
+    
+    private func retrieveArtistsFromCoreByNames(names: [String]) -> [Artist] {
+        let fetchRequest = Artist.fetchRequest()
+
+        let predicates = names.map {
+            NSPredicate(format: "name ==[c] %@", $0)
+        }
+        
+        // TODO: Fix this since it isn't retrieving the artist
+        fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: predicates)
+                
+        do {
+            return try self.context.fetch(fetchRequest)
+        } catch {
+            // TODO: handle the error
+             print(error)
+            
+            return []
+        }
+    }
+ 
     private func retrieveAlbumFromCore(albumId: String) -> NSManagedObjectID? {
         let fetchRequest = Album.fetchRequest()
         
@@ -855,6 +930,21 @@ class NetworkingManager : ObservableObject {
             
             return nil
         }
+    }
+            
+    private func setAuthHeaders() -> Void {
+        
+        let appName = Bundle.main.infoDictionary?["CFBundleName"] as? String
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        var deviceName = UIDevice.current.name
+        deviceName = deviceName.folding(options: .diacriticInsensitive, locale: .current)
+        deviceName = String(deviceName.unicodeScalars.filter { CharacterSet.urlQueryAllowed.contains($0) })
+        
+        let deviceId = UIDevice.current.identifierForVendor!.uuidString
+        
+        let header = "MediaBrowser Client=\"\(appName ?? "JellyTuner")\", Device=\"\(deviceName)\", DeviceId=\"\(deviceId)\", Version=\"\(appVersion)\""
+        
+        JellyfinAPI.customHeaders["X-Emby-Authorization"] = header
     }
     
     private func setCustomHeaders() -> Void {

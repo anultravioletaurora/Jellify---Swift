@@ -31,7 +31,7 @@ struct LoginView: View {
             VStack {
                 
                 // Splash Image
-                Image("AppIcon")
+                Image("placeholder")
                     .resizable()
                     .frame(width: 200, height: 200)
                     .padding()
@@ -89,7 +89,7 @@ struct LoginView: View {
                 .buttonStyle(DefaultButtonStyle())
             }
             .padding()
-            .navigationTitle(Text("Sign In"))
+            .navigationTitle(Text("Tune In"))
         }
     }
 }
