@@ -25,7 +25,14 @@ class NetworkingManager : ObservableObject {
         
     let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)    
     
+    @Published
     var loadingPhase : LoadingPhase? = nil
+    
+    @Published
+    var libraryIsPopulated = false
+    
+    @Published
+    var userIsLoggedIn = false
     
 //
 //    static var accessToken = UserDefaults.standard.string(forKey: "AccessToken") {
@@ -65,7 +72,10 @@ class NetworkingManager : ObservableObject {
         
         if (userId != "") {
             setCustomHeaders()
+            userIsLoggedIn = true
         }
+        
+        libraryIsPopulated = libraryIsPopulatedWithAtLeastSomething()
     }
     
     var user: User? {
@@ -188,6 +198,10 @@ class NetworkingManager : ObservableObject {
     
     public func syncing() -> Bool {
         return loadingPhase != nil
+    }
+    
+    public func libraryIsPopulatedWithAtLeastSomething() -> Bool {
+        self.retrieveAllSongsFromCore().count > 0
     }
     
     public func addToPlaylist(playlist: Playlist, song: Song, complete: @escaping () -> Void) -> Void {
@@ -318,7 +332,7 @@ class NetworkingManager : ObservableObject {
         dto.username = userId
         dto.pw = password
         
-        UserAPI.authenticateUserByName(authenticateUserByName: dto, apiResponseQueue: processingQueue)
+        UserAPI.authenticateUserByName(authenticateUserByName: dto, apiResponseQueue: DispatchQueue.main)
             .sink(receiveCompletion: { complete in
                 print("Login completion: \(complete)")
             }, receiveValue: { response in
@@ -331,12 +345,22 @@ class NetworkingManager : ObservableObject {
                 
                 self.saveContext()
                 
+                self.setCustomHeaders()
+                
+                self.userIsLoggedIn = true
+                
                 complete()
             })
             .store(in: &cancellables)
     }
     
     public func logOut() -> Void {
+        
+        DispatchQueue.main.async {
+            Player.shared.isPlaying = false
+            Player.shared.songs.removeAll()
+        }
+        
         self.deleteAllOfEntity(entityName: "User")
         self.deleteAllOfEntity(entityName: "Album")
         self.deleteAllOfEntity(entityName: "Song")
@@ -348,6 +372,8 @@ class NetworkingManager : ObservableObject {
         self._accessToken = ""
         self._playlistId = ""
         self._libraryId = ""
+        
+        userIsLoggedIn = false
     }
 
     public func syncLibrary() -> Void {
@@ -374,10 +400,10 @@ class NetworkingManager : ObservableObject {
                     
                     self.loadingPhase = .playlists
                     self.loadPlaylists(complete: {
-                        
-                        print("Loading Images in the background")
-                        self.loadImages()
+
+                        print("Loading complete!")
                         self.loadingPhase = nil
+                        self.libraryIsPopulated = true
                     })
                 })
             })
@@ -662,7 +688,9 @@ class NetworkingManager : ObservableObject {
                                                 currentPlaylistSongs.append(currentPlaylistSong as! PlaylistSong)
                                             })
                                             
-                                            playlistSongIds.subtract(currentPlaylistSongs.map({ ($0 as! PlaylistSong).song!.jellyfinId! }))
+                                            if !currentPlaylistSongs.isEmpty {
+                                                playlistSongIds.subtract(currentPlaylistSongs.filter { $0.song != nil }.map { $0.song!.jellyfinId! })
+                                            }
                                                                         
                                             newSongs = playlistItems.items!.filter { playlistSongIds.contains($0.id!)}
                                         } else {

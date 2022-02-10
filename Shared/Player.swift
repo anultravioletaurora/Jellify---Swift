@@ -10,6 +10,7 @@ import SwiftUI
 import Combine
 import AVFoundation
 import MediaPlayer
+import JellyfinAPI
 
 public class Globals{
     public static let playTimeInterval: Double = 0.1
@@ -24,7 +25,8 @@ open class AVPlayerItemId: AVPlayerItem, Identifiable{
     public var initialOrder: Int
     public let song: Song
     public let playSessionId: String
-    static let jellyfinService = JellyfinService.sharedParent
+    private var cancellables = Set<AnyCancellable>()
+    static let networkingManager = NetworkingManager.shared
             
     init(song: Song, localAsset: AVURLAsset, order: Int){
         self.playSessionId = "\(Double.random(in: 0..<1496213367201))".replacingOccurrences(of: ".", with: "")
@@ -35,35 +37,37 @@ open class AVPlayerItemId: AVPlayerItem, Identifiable{
     
     init(song: Song, order: Int){
         let seshId = "\(Double.random(in: 0..<1496213367201))".replacingOccurrences(of: ".", with: "")
-        
+
         self.playSessionId = seshId
         self.song = song
         self.initialOrder = order
-        
-        let headers: [String: String] = [ "X-Emby-Token": AVPlayerItemId.jellyfinService.accessToken ]
+//
+        let headers: [String: String] = [ "X-Emby-Token": AVPlayerItemId.networkingManager.accessToken ]
         let assetItem = AVURLAsset(url: AVPlayerItemId.getStream(songId: song.jellyfinId!, sessionId: seshId), options: [
             "AVURLAssetHTTPHeaderFieldsKey": headers,
             AVURLAssetPreferPreciseDurationAndTimingKey : true
         ])
-        
+                
         super.init(asset: assetItem, automaticallyLoadedAssetKeys: nil)
     }
     
     private static func getStream(songId: String, sessionId: String) -> URL{
         let container = "opus,mp3,aac,m4a,flac,webma,webm,wav,ogg,mpa,wma"
+        
+        let transcodingContainer = "flac"
 
         var streamEndpointComponents = URLComponents()
         
         streamEndpointComponents.scheme = "https"
-        streamEndpointComponents.host = AVPlayerItemId.jellyfinService.server.replacingOccurrences(of: "https://", with: "")
+        streamEndpointComponents.host = AVPlayerItemId.networkingManager.server.replacingOccurrences(of: "https://", with: "")
         streamEndpointComponents.path = "/Audio/\(songId)/universal"
         streamEndpointComponents.queryItems = [
-            URLQueryItem(name: "UserId", value: AVPlayerItemId.jellyfinService.userId),
-            URLQueryItem(name: "DeviceId", value: "iPhone"),
+            URLQueryItem(name: "UserId", value: AVPlayerItemId.networkingManager.userId),
+            URLQueryItem(name: "DeviceId", value: UIDevice.current.identifierForVendor!.uuidString),
             URLQueryItem(name: "Container", value: container),
-            URLQueryItem(name: "TranscodingContainer", value: "aac"),
+            URLQueryItem(name: "TranscodingContainer", value: transcodingContainer),
             URLQueryItem(name: "TranscodingProtocol", value: "hls"),
-            URLQueryItem(name: "api_key", value: AVPlayerItemId.jellyfinService.accessToken),
+            URLQueryItem(name: "api_key", value: AVPlayerItemId.networkingManager.accessToken),
             URLQueryItem(name: "StartTimeTicks", value: "0"),
             URLQueryItem(name: "EnableRedirection", value: "true"),
             URLQueryItem(name: "EnableRemoteMedia", value: "true")
@@ -459,6 +463,31 @@ class Player: ObservableObject {
         MPRemoteCommandCenter.shared().previousTrackCommand.addTarget { [weak self] event in
             self?.previous()
             return .success
+        }
+        
+        MPRemoteCommandCenter.shared().changePlaybackPositionCommand.addTarget { [weak self] (event) -> MPRemoteCommandHandlerStatus in
+            guard let self = self else {
+                return .commandFailed
+            }
+            if let player = self.player {
+                let playerRate = player.rate
+                if let playbackPositionEvent = event as? MPChangePlaybackPositionCommandEvent {
+                    player.seek(to: CMTime(seconds: playbackPositionEvent.positionTime, preferredTimescale: CMTimeScale(1000)), completionHandler: { [weak self] success in
+                        guard let self = self else {
+                            return
+                        }
+                        if success {
+                            self.player?.rate = playerRate
+                        }
+                    })
+                    
+                    return .success
+                }
+                
+                return .commandFailed
+            }
+            
+            return .commandFailed
         }
     }
     

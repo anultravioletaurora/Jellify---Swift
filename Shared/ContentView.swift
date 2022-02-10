@@ -15,7 +15,7 @@ struct ContentView: View {
     @ObservedObject
     var librarySelectionService = LibrarySelectionService.shared
     
-    @ObservedObject
+    @StateObject
     var networkingManager = NetworkingManager.shared
     
     init() {
@@ -31,7 +31,7 @@ struct ContentView: View {
         
         // Prompt the user to login if they haven't already
         // TODO: Fix this
-        if networkingManager.accessToken == "" {
+        if !networkingManager.userIsLoggedIn {
             LoginView()
                 .transition(.slide)
         }
@@ -48,19 +48,23 @@ struct ContentView: View {
             ZStack(alignment: Alignment(horizontal: .center, vertical: .bottom), content: {
                 
 
-                switch networkingManager.loadingPhase {
-                    case .artists:
-                        ProgressView("Loading Artists")
-                    case .albums:
-                        ProgressView("Loading Albums")
-                    case .songs:
-                        ProgressView("Loading Songs")
-                    case .playlists:
-                        ProgressView("Loading Playlists")
-                    case .artwork:
-                        ProgressView("Loading Artwork")
-                    default:
-                        TabBarView()
+                if networkingManager.libraryIsPopulated {
+                    TabBarView()
+                } else {
+                    switch networkingManager.loadingPhase {
+                        case .artists:
+                            ProgressView("Loading Artists")
+                        case .albums:
+                            ProgressView("Loading Albums")
+                        case .songs:
+                            ProgressView("Loading Songs")
+                        case .playlists:
+                            ProgressView("Loading Playlists")
+                        case .artwork:
+                            ProgressView("Loading Artwork")
+                        default:
+                            ProgressView("Tuning in")
+                    }
                 }
             })
             .onAppear(perform: {

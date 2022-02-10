@@ -69,6 +69,7 @@ struct ArtistsView: View {
                 searchBar.$search.debounce(for: .seconds(1), scheduler: DispatchQueue.main)
             ) {
                 guard !$0.isEmpty else {
+                    artists.nsPredicate = nil
                     return
                 }
                 artists.nsPredicate = searchBar.search.isEmpty ? nil : NSPredicate(format: "%K contains[c] %@", #keyPath(Artist.name), searchBar.search.trimmingCharacters(in: .whitespaces))
