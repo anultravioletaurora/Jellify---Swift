@@ -28,7 +28,7 @@ struct AlbumRow: View {
 
                     HStack {                        
                         Text(String(album.productionYear))
-                            .font(.body)
+                            .font(.subheadline)
                             .opacity(0.6)
                     }
                 }

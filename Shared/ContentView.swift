@@ -69,6 +69,8 @@ struct ContentView: View {
             })
             .onAppear(perform: {
                 
+                networkingManager.openSession()
+                
                 // Sync library on app startup
                 networkingManager.syncLibrary()
             })

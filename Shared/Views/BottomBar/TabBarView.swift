@@ -8,15 +8,7 @@
 import SwiftUI
 
 struct TabBarView: View {
-    
-    @State private var isShowingSheet = false
-    
-    @State
-    var showMediaPlayer = false
-        
-    @Namespace
-    var animation
-    
+                    
     @State
     var selectedTab : Int = 1
         
@@ -25,52 +17,40 @@ struct TabBarView: View {
         TabView(selection: $selectedTab) {
             
             // Artists Tab
-            ArtistsView()
-                .tag(1)
-                .tabItem {
-                    Image(systemName: "music.mic")
-                    Text("Artists")
-                }
+            PlayerView(content: ArtistsView())
+                    .tag(1)
+                    .tabItem {
+                        Label("Artists", systemImage: "music.mic")
+                    }
+
             
             // Albums Tab
-            AlbumsView()
+            PlayerView(content: AlbumsView())
                 .tag(2)
                 .tabItem {
-                    Image(systemName: "square.stack.fill")
-                    Text("Albums")
+                    Label("Albums", systemImage: "square.stack.fill")
                 }
             
             // Songs Tab
-            SongsView()
+            PlayerView(content: SongsView())
                 .tag(3)
                 .tabItem {
-                    Image(systemName: "music.note")
-                    Text("Songs")
+                    Label("Songs", systemImage: "music.note")
                 }
             
             // Playlists Tab
-            PlaylistsView()
+            PlayerView(content: PlaylistsView())
                 .tag(4)
                 .tabItem {
-                    Image(systemName: "music.note.list")
-                    Text("Playlists")
+                    Label("Playlists", systemImage: "music.note.list")
                 }
 
             // Settings View
-            SettingsView()
+            PlayerView(content: SettingsView())
                 .tag(5)
                 .tabItem {
-                    Image(systemName: "gear")
-                    Text("Settings")
+                    Label("Settings", systemImage: "gear")
                 }
         }
-        .edgesIgnoringSafeArea(.top)
-
-        .overlay(
-            PlayerView()
-        )
-//        .introspectTabBarController(customize: { (UITabBarController) in
-//            UITabBarController.back
-//        })
     }
 }

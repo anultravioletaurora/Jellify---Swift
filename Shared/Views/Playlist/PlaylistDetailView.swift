@@ -28,7 +28,7 @@ struct PlaylistDetailView: View {
         
         self.fetchRequest = FetchRequest(
             entity: PlaylistSong.entity(),
-            sortDescriptors: [],
+            sortDescriptors: [NSSortDescriptor(key: #keyPath(PlaylistSong.indexNumber), ascending: true)],
             predicate: NSPredicate(format: "(playlist == %@)", playlist)
         )
     }
@@ -47,7 +47,7 @@ struct PlaylistDetailView: View {
                     print("Playing!")
                 }, label: {
                     HStack(alignment: .center, content: {
-                        
+                                                
                         AlbumThumbnail(album: playlistSong.song!.album!)
                                                            
                         VStack(alignment: .leading, spacing: 10) {

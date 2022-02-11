@@ -17,13 +17,13 @@ class NetworkingManager : ObservableObject {
     
     var cancellables = Set<AnyCancellable>()
     
-    let processingQueue = DispatchQueue(label: "JellyTunerrocessingQueue", qos: .userInteractive, attributes: .concurrent)
-    
-    let songsQueue = DispatchQueue(label: "LoadSongsProcessingQueue", qos: .userInteractive, attributes: .concurrent)
-    
+    let processingQueue = DispatchQueue(label: "JellifyProcessingQueue", attributes: .concurrent)
+        
     let context : NSManagedObjectContext = PersistenceController.shared.container.viewContext
         
-    let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)    
+    let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+    
+    let sessionId : UUID = UUID()
     
     @Published
     var loadingPhase : LoadingPhase? = nil
@@ -181,21 +181,6 @@ class NetworkingManager : ObservableObject {
         }
     }
     
-    public func saveContext() {
-        do {
-            try self.privateContext.save()
-            context.performAndWait {
-                do {
-                    try context.save()
-                } catch {
-                    fatalError("Failure to save main context: \(error)")
-                }
-            }
-        } catch {
-            fatalError("Error saving private context: \(error)")
-        }
-    }
-    
     public func syncing() -> Bool {
         return loadingPhase != nil
     }
@@ -288,7 +273,7 @@ class NetworkingManager : ObservableObject {
                 album.artwork = try! Data(contentsOf: url)
                 album.thumbnail = try! Data(contentsOf: url)
                 
-                self.saveContext()
+                // self.saveContext()
             })
             .store(in: &self.cancellables)
 
@@ -299,10 +284,16 @@ class NetworkingManager : ObservableObject {
             .sink(receiveCompletion: { completion in
                 print("Artist image receive completion: \(completion)")
             }, receiveValue: { url in
-                                
-                artist.thumbnail = try! Data(contentsOf: url)
-                
-                self.saveContext()
+                               
+                do {
+                    artist.thumbnail = try Data(contentsOf: url)
+                    
+                    self.saveContext()
+                } catch {
+                    print("Error setting thumbnail for artist: \(artist.name!)")
+                    
+                    artist.thumbnail = nil
+                }
             })
             .store(in: &self.cancellables)
     }
@@ -315,7 +306,7 @@ class NetworkingManager : ObservableObject {
                                 
                 playlist.thumbnail = try! Data(contentsOf: url)
                 
-                self.saveContext()
+                // self.saveContext()
             })
             .store(in: &self.cancellables)
     }
@@ -356,24 +347,45 @@ class NetworkingManager : ObservableObject {
     
     public func logOut() -> Void {
         
-        DispatchQueue.main.async {
-            Player.shared.isPlaying = false
-            Player.shared.songs.removeAll()
-        }
-        
-        self.deleteAllOfEntity(entityName: "User")
-        self.deleteAllOfEntity(entityName: "Album")
-        self.deleteAllOfEntity(entityName: "Song")
-        self.deleteAllOfEntity(entityName: "Artist")
-        self.deleteAllOfEntity(entityName: "Playlist")
-        self.deleteAllOfEntity(entityName: "Genre")
-        self._server = ""
-        self._userId = ""
-        self._accessToken = ""
-        self._playlistId = ""
-        self._libraryId = ""
-        
-        userIsLoggedIn = false
+        SessionAPI.reportSessionEnded()
+            .sink(receiveCompletion: { complete in
+                print("Logout request: \(complete)")
+            }, receiveValue: {
+                
+                DispatchQueue.main.async {
+                    Player.shared.isPlaying = false
+                    Player.shared.songs.removeAll()
+                }
+                
+                self.deleteAllOfEntity(entityName: "User")
+                self.deleteAllOfEntity(entityName: "Album")
+                self.deleteAllOfEntity(entityName: "Song")
+                self.deleteAllOfEntity(entityName: "PlaylistSong")
+                self.deleteAllOfEntity(entityName: "Artist")
+                self.deleteAllOfEntity(entityName: "Playlist")
+                self.deleteAllOfEntity(entityName: "Genre")
+                self._server = ""
+                self._userId = ""
+                self._accessToken = ""
+                self._playlistId = ""
+                self._libraryId = ""
+                
+                self.saveContext()
+                
+                self.userIsLoggedIn = false
+            })
+            .store(in: &self.cancellables)
+    }
+    
+    public func openSession() -> Void {
+                
+        SessionAPI.getSessions(controllableByUserId: self.userId, deviceId: UIDevice.current.identifierForVendor!.uuidString, apiResponseQueue: self.processingQueue)
+            .sink(receiveCompletion: { complete in
+                print("Session started: \(complete)")
+            }, receiveValue: { response in
+                print("Started session for user successfully")
+            })
+            .store(in: &self.cancellables)
     }
 
     public func syncLibrary() -> Void {
@@ -383,29 +395,40 @@ class NetworkingManager : ObservableObject {
         self.loadingPhase = .artists
         loadArtists(complete: {
             
-            print("Artists Loaded")
-            print("Loading Albums")
+            DispatchQueue.main.sync {
+                print("Artists Loaded")
+                print("Loading Albums")
+                
+                self.loadingPhase = .albums
+            }
             
-            self.loadingPhase = .albums
             self.loadAlbums(complete: {
 
-                print("Albums Loaded")
-                print("Loading Songs")
+                DispatchQueue.main.sync {
+                    print("Albums Loaded")
+                    print("Loading Songs")
+                    
+                    self.loadingPhase = .songs
+                }
                 
-                self.loadingPhase = .songs
                 self.loadSongs(complete: {
 
-                    print("Songs Loaded")
-                    print("Loading Playlists")
+                    DispatchQueue.main.sync {
+                        print("Songs Loaded")
+                        print("Loading Playlists")
+                        
+                        self.loadingPhase = .playlists
+                    }
                     
-                    self.loadingPhase = .playlists
                     self.loadPlaylists(complete: {
 
-                        print("Loading complete!")
-                        self.loadingPhase = nil
-                        self.libraryIsPopulated = true
+                        DispatchQueue.main.sync {
+                            print("Loading complete!")
+                            self.loadingPhase = nil
+                            self.libraryIsPopulated = true
+                        }
                     })
-                })
+                }, startIndex: nil)
             })
         })
     }
@@ -537,10 +560,13 @@ class NetworkingManager : ObservableObject {
             .store(in: &self.cancellables)
         }
         
-        private func loadSongs(complete: @escaping () -> Void) -> Void {
-            ItemsAPI.getItemsByUserId(userId: self.userId, maxOfficialRating: nil, hasThemeSong: nil, hasThemeVideo: nil, hasSubtitles: nil, hasSpecialFeature: nil, hasTrailer: nil, adjacentTo: nil, parentIndexNumber: nil, hasParentalRating: nil, isHd: nil, is4K: nil, locationTypes: nil, excludeLocationTypes: nil, isMissing: nil, isUnaired: nil, minCommunityRating: nil, minCriticRating: nil, minPremiereDate: nil, minDateLastSaved: nil, minDateLastSavedForUser: nil, maxPremiereDate: nil, hasOverview: nil, hasImdbId: nil, hasTmdbId: nil, hasTvdbId: nil, excludeItemIds: nil, startIndex: nil, limit: nil, recursive: true, searchTerm: nil, sortOrder: nil, parentId: nil, fields: nil, excludeItemTypes: nil, includeItemTypes: ["Audio"], filters: nil, isFavorite: nil, mediaTypes: nil, imageTypes: nil, sortBy: nil, isPlayed: nil, genres: nil, officialRatings: nil, tags: nil, years: nil, enableUserData: true, imageTypeLimit: nil, enableImageTypes: nil, person: nil, personIds: nil, personTypes: nil, studios: nil, artists: nil, excludeArtistIds: nil, artistIds: nil, albumArtistIds: nil, contributingArtistIds: nil, albums: nil, albumIds: nil, ids: nil, videoTypes: nil, minOfficialRating: nil, isLocked: nil, isPlaceHolder: nil, hasOfficialRating: nil, collapseBoxSetItems: nil, minWidth: nil, minHeight: nil, maxWidth: nil, maxHeight: nil, is3D: nil, seriesStatus: nil, nameStartsWithOrGreater: nil, nameStartsWith: nil, nameLessThan: nil, studioIds: nil, genreIds: nil, enableTotalRecordCount: nil, enableImages: false, apiResponseQueue: processingQueue)
+    private func loadSongs(complete: @escaping () -> Void, startIndex: Int?) -> Void {
+            ItemsAPI.getItemsByUserId(userId: self.userId, maxOfficialRating: nil, hasThemeSong: nil, hasThemeVideo: nil, hasSubtitles: nil, hasSpecialFeature: nil, hasTrailer: nil, adjacentTo: nil, parentIndexNumber: nil, hasParentalRating: nil, isHd: nil, is4K: nil, locationTypes: nil, excludeLocationTypes: nil, isMissing: nil, isUnaired: nil, minCommunityRating: nil, minCriticRating: nil, minPremiereDate: nil, minDateLastSaved: nil, minDateLastSavedForUser: nil, maxPremiereDate: nil, hasOverview: nil, hasImdbId: nil, hasTmdbId: nil, hasTvdbId: nil, excludeItemIds: nil, startIndex: startIndex, limit: 10000, recursive: true, searchTerm: nil, sortOrder: nil, parentId: nil, fields: nil, excludeItemTypes: nil, includeItemTypes: ["Audio"], filters: nil, isFavorite: nil, mediaTypes: nil, imageTypes: nil, sortBy: nil, isPlayed: nil, genres: nil, officialRatings: nil, tags: nil, years: nil, enableUserData: true, imageTypeLimit: nil, enableImageTypes: nil, person: nil, personIds: nil, personTypes: nil, studios: nil, artists: nil, excludeArtistIds: nil, artistIds: nil, albumArtistIds: nil, contributingArtistIds: nil, albums: nil, albumIds: nil, ids: nil, videoTypes: nil, minOfficialRating: nil, isLocked: nil, isPlaceHolder: nil, hasOfficialRating: nil, collapseBoxSetItems: nil, minWidth: nil, minHeight: nil, maxWidth: nil, maxHeight: nil, is3D: nil, seriesStatus: nil, nameStartsWithOrGreater: nil, nameStartsWith: nil, nameLessThan: nil, studioIds: nil, genreIds: nil, enableTotalRecordCount: nil, enableImages: false, apiResponseQueue: processingQueue)
                 .sink(receiveCompletion: { completion in
-                    print(completion)
+                    print("Finished song call at index \(startIndex)")
+                    
+                    self.saveContext()
+                    
                 }, receiveValue: { response in
 
                     
@@ -552,49 +578,95 @@ class NetworkingManager : ObservableObject {
                                                     
                         let newSongs = response.items!.filter { songIds.contains($0.id)}
                         
-                        DispatchQueue.concurrentPerform(iterations: newSongs.count) { index in
-                                                            
-                            let songResult = newSongs[index]
-                            
-                            print("Song \(index) of \(newSongs.count)")
-                                                                                            
-                            if (self.retrieveSongFromCore(songId: songResult.id!) == nil) {
+                        if !newSongs.isEmpty {
+                            DispatchQueue.concurrentPerform(iterations: newSongs.count) { index in
+                                                                
+                                let songResult = newSongs[index]
                                 
-                                self.processingQueue.sync {
-                                    let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+                                print("Song \(index) of \(newSongs.count)")
+                                                                                                
+                                if (self.retrieveSongFromCore(songId: songResult.id!) == nil) {
+                                    
+                                    self.processingQueue.sync {
+                                        let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 
-                                    privateContext.parent = self.privateContext
+                                        privateContext.parent = self.privateContext
+                                        
+                                        let song = Song(context: privateContext)
+                                        
+                                        song.jellyfinId = songResult.id!
+                                        song.name = songResult.name!
+                                        song.indexNumber = Int16(songResult.indexNumber!)
+                                        
+                                        var album : Album?
+                                        
+                                        if (songResult.albumId != nil) {
+                                                                                    
+                                            album = privateContext.object(with: self.retrieveAlbumFromCore(albumId: songResult.albumId!)!) as! Album?
+                                        }
+                                        
+                                        if (album != nil) {
+                                            song.album = album!
+                                            self.retrieveArtistsFromCoreByJellyfinIds(jellyfinIds: songResult.artistItems!.map { $0.id! }).forEach({ artistObjectId in
+                                                song.addToArtists(privateContext.object(with: artistObjectId) as! Artist)
+                                            })
+                                        }
+                                        
+                                        try! privateContext.save()
+                                    }
+                                }
+                                
+                                // Check if we've gone through everything the server has to offer
+                                if (songResult == newSongs.last!) {
                                     
-                                    let song = Song(context: privateContext)
-                                    
-                                    song.jellyfinId = songResult.id!
-                                    song.name = songResult.name!
-                                    song.indexNumber = Int16(songResult.indexNumber!)
-                                    
-                                    var album : Album?
-                                    
-                                    if (songResult.albumId != nil) {
-                                                                                
-                                        album = privateContext.object(with: self.retrieveAlbumFromCore(albumId: songResult.albumId!)!) as! Album?
+                                    // If this response is less than the configured fetch amount, it means the server doesn't
+                                    // have more to give and we should complete
+                                    if (response.items!.count < 10000) {
+                                        self.saveContext()
+                                        complete()
                                     }
                                     
-                                    if (album != nil) {
-                                        song.album = album!
-                                        self.retrieveArtistsFromCoreByJellyfinIds(jellyfinIds: songResult.artistItems!.map { $0.id! }).forEach({ artistObjectId in
-                                            song.addToArtists(privateContext.object(with: artistObjectId) as! Artist)
-                                        })
+                                    // Else it means there may be more songs on the server, let's go again!
+                                    else {
+                                        
+                                        var index = 10000
+                                        
+                                        if startIndex != nil {
+                                            index += startIndex!
+                                        }
+                                        
+                                        self.loadSongs(complete: {
+                                            self.saveContext()
+                                            complete()
+                                        }, startIndex: index)
                                     }
-                                    
-                                    try! privateContext.save()
                                 }
                             }
-                            
-                            if (songResult == newSongs.last!) {
+                        } else {
+                                
+                            // If this response is less than the configured fetch amount, it means the server doesn't
+                            // have more to give and we should complete
+                            if (response.items!.count < 10000) {
                                 self.saveContext()
+                                complete()
+                            }
+                            
+                            // Else it means there may be more songs on the server, let's go again!
+                            else {
+                                
+                                var index = 10000
+                                
+                                if startIndex != nil {
+                                    index += startIndex!
+                                }
+                                                                
+                                self.loadSongs(complete: {
+                                    complete()
+                                }, startIndex: index)
                             }
                         }
                         
-                        complete()
+//                        complete()
 
                     } else {
                         complete()
@@ -609,21 +681,24 @@ class NetworkingManager : ObservableObject {
                 print("Playlist retrieval: \(completion)")
             }, receiveValue: { response in
                 if response.items != nil {
-                    let dispatchGroup = DispatchGroup()
-                    
-                    dispatchGroup.enter()
                     
                     var loadingStatus : [Bool] = []
+                    
+                    
                                      
                     DispatchQueue.concurrentPerform(iterations: response.items!.count, execute: { index in
                         
                         let playlistResult = response.items![index]
-                                            
+                        
+                        let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+
+                        privateContext.parent = self.privateContext
+                        
                         print("Processing playlist: \(playlistResult.name!)")
                         
                         if (self.retrievePlaylistFromCore(playlistId: playlistResult.id!) == nil) {
                                 
-                            let playlist : Playlist = Playlist(context: self.privateContext)
+                            let playlist : Playlist = Playlist(context: privateContext)
                             
                             playlist.jellyfinId = playlistResult.id!
                             playlist.name = playlistResult.name!
@@ -634,35 +709,39 @@ class NetworkingManager : ObservableObject {
                             }, receiveValue: { playlistItems in
                                 if playlistItems.items != nil {
                                     playlistItems.items!.forEach({ playlistItem in
-                                        let playlistSong = PlaylistSong(context: self.privateContext)
+                                        let playlistSong = PlaylistSong(context: privateContext)
                                         
                                         playlistSong.jellyfinId = playlistItem.playlistItemId
                                         
                                         playlistSong.playlist = playlist
+                                        playlistSong.indexNumber = Int16(playlistItems.items!.firstIndex(of: playlistItem) ?? 0)
                                         
-                                        let song: Song = self.privateContext.object(with: self.retrieveSongFromCore(songId: playlistItem.id!)!) as! Song
+                                        let song: Song = privateContext.object(with: self.retrieveSongFromCore(songId: playlistItem.id!)!) as! Song
                                         playlistSong.song = song
                                         song.addToPlaylists(playlistSong)
+                                        
+                                        playlist.addToSongs(playlistSong)
                                     })
                                 }
+                                
+                                try! privateContext.save()
                                 
                                 loadingStatus.append(true)
                                 
                                 if loadingStatus.count == response.items!.count {
+                                    print("Playlist import complete")
                                     self.saveContext()
                                     complete()
+                                } else {
+                                    print("Preparing for next new playlist")
                                 }
                             })
                             .store(in: &self.cancellables)
                         } else {
-                            let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-
-                            privateContext.parent = self.privateContext
-
                             let playlist = privateContext.object(with: self.retrievePlaylistFromCore(playlistId: playlistResult.id!)!) as! Playlist
                             
                             print("Fetching songs in \(playlist.name!)")
-                                                        
+                                                                                    
                             PlaylistsAPI.getPlaylistItems(playlistId: playlistResult.id!, userId: self.userId, apiResponseQueue: self.processingQueue)
                             .sink(receiveCompletion: { complete in
                                 print("Playlist song retrieval for playlist \(playlist.name): \(complete)")
@@ -707,6 +786,7 @@ class NetworkingManager : ObservableObject {
                                         let playlistSong = PlaylistSong(context: privateContext)
                                         
                                         playlistSong.jellyfinId = playlistItem.playlistItemId
+                                        playlistSong.indexNumber = Int16(playlistItems.items!.firstIndex(of: playlistItem) ?? 0)
                                         
                                         playlistSong.playlist = playlist
                                         playlistSong.song = privateContext.object(with: self.retrieveSongFromCore(songId: playlistItem.id!)!) as? Song
@@ -737,8 +817,6 @@ class NetworkingManager : ObservableObject {
                 }
             })
             .store(in: &self.cancellables)
-        
-        complete()
     }
     
     private func loadPlaylistItems(playlist: Playlist, complete: @escaping ([PlaylistSong]) -> Void) -> Void {
@@ -750,6 +828,8 @@ class NetworkingManager : ObservableObject {
                 
                 var playlistSongs : [PlaylistSong] = []
                 
+                var index = 0
+                
                 playlistItems.items!.forEach({ playlistItem in
                     
                     if (self.retrievePlaylistSongFromCore(playlistSongId: playlistItem.playlistItemId!) == nil) {
@@ -758,6 +838,7 @@ class NetworkingManager : ObservableObject {
                         playlistSong.jellyfinId = playlistItem.playlistItemId
                         
                         playlistSong.playlist = playlist
+                        playlistSong.indexNumber = Int16(index)
                         
                         let song: Song = self.context.object(with: self.retrieveSongFromCore(songId: playlistItem.id!)!) as! Song
                         playlistSong.song = song
@@ -767,6 +848,8 @@ class NetworkingManager : ObservableObject {
                     } else {
                         playlistSongs.append(self.context.object(with: self.retrievePlaylistSongFromCore(playlistSongId: playlistItem.playlistItemId!)!) as! PlaylistSong)
                     }
+                    
+                    index += 1
                 })
                 
                 complete(playlistSongs)
@@ -817,11 +900,13 @@ class NetworkingManager : ObservableObject {
             NSPredicate(format: "jellyfinId == %@", $0)
         }
         
-        // TODO: Fix this since it isn't retrieving the artist
         fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: predicates)
+        
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        privateContext.parent = self.context
                 
         do {
-            return try self.context.fetch(fetchRequest).map { $0.objectID }
+            return try privateContext.fetch(fetchRequest).map { $0.objectID }
         } catch {
             // TODO: handle the error
              print(error)
@@ -838,7 +923,6 @@ class NetworkingManager : ObservableObject {
             NSPredicate(format: "name ==[c] %@", $0)
         }
         
-        // TODO: Fix this since it isn't retrieving the artist
         fetchRequest.predicate = NSCompoundPredicate(orPredicateWithSubpredicates: predicates)
                 
         do {
@@ -860,7 +944,7 @@ class NetworkingManager : ObservableObject {
         privateContext.parent = self.context
         
         do {
-            return try self.context.fetch(fetchRequest).first?.objectID
+            return try privateContext.fetch(fetchRequest).first?.objectID
         } catch {
             print("Error retrieving album from CoreData: \(error)")
             
@@ -891,10 +975,10 @@ class NetworkingManager : ObservableObject {
         
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         
-        privateContext.parent = self.privateContext
+        privateContext.parent = self.context
         
         do {
-            return try self.context.fetch(fetchRequest).first?.objectID
+            return try privateContext.fetch(fetchRequest).first?.objectID
         } catch let error as NSError {
             print("Error retrieving song from CoreData: \(error)")
             
@@ -910,7 +994,7 @@ class NetworkingManager : ObservableObject {
         privateContext.parent = self.privateContext
         
         do {
-            return try self.context.fetch(fetchRequest)
+            return try privateContext.fetch(fetchRequest)
         } catch let error as NSError {
             print("Error retrieving all songs from CoreData: \(error)")
             
@@ -959,11 +1043,26 @@ class NetworkingManager : ObservableObject {
             return nil
         }
     }
+    
+    private func saveContext() {
+        do {
+            try self.privateContext.save()
+            context.performAndWait {
+                do {
+                    try context.save()
+                } catch {
+                    fatalError("Failure to save main context: \(error)")
+                }
+            }
+        } catch {
+            fatalError("Error saving private context: \(error)")
+        }
+    }
             
     private func setAuthHeaders() -> Void {
         
         let appName = Bundle.main.infoDictionary?["CFBundleName"] as? String
-        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
         var deviceName = UIDevice.current.name
         deviceName = deviceName.folding(options: .diacriticInsensitive, locale: .current)
         deviceName = String(deviceName.unicodeScalars.filter { CharacterSet.urlQueryAllowed.contains($0) })
@@ -976,7 +1075,7 @@ class NetworkingManager : ObservableObject {
     }
     
     private func setCustomHeaders() -> Void {
-        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String
+        let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
         var deviceName = UIDevice.current.name
         deviceName = deviceName.folding(options: .diacriticInsensitive, locale: .current)
         deviceName = String(deviceName.unicodeScalars.filter { CharacterSet.urlQueryAllowed.contains($0) })
@@ -992,7 +1091,7 @@ class NetworkingManager : ObservableObject {
         header.append("Client=\"JellyTuner\", ")
         header.append("Device=\"\(deviceName)\", ")
         header.append("DeviceId=\"\(UIDevice.current.identifierForVendor!)\", ")
-        header.append("Version=\"\(appVersion ?? "0.0.1")\", ")
+        header.append("Version=\"\(appVersion)\", ")
         header.append("Token=\"\(user!.authToken!)\"")
         
         JellyfinAPI.customHeaders["X-Emby-Authorization"] = header

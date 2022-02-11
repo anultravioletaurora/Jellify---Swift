@@ -10,7 +10,7 @@ import MediaPlayer
 import StoreKit
 
 @main
-struct FinTuneApp: App {
+struct JellifyApp: App {
     
     /**
      Shared instance of the PersistenceController for storing to CoreData

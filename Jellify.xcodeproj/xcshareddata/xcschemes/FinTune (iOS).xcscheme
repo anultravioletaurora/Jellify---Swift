@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "04E10707270CD307002CACB0"
-               BuildableName = "JellyTuner.app"
+               BuildableName = "Jellify.app"
                BlueprintName = "Jellify (iOS)"
                ReferencedContainer = "container:Jellify.xcodeproj">
             </BuildableReference>
@@ -55,7 +55,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "04E10707270CD307002CACB0"
-            BuildableName = "JellyTuner.app"
+            BuildableName = "Jellify.app"
             BlueprintName = "Jellify (iOS)"
             ReferencedContainer = "container:Jellify.xcodeproj">
          </BuildableReference>
@@ -72,7 +72,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "04E10707270CD307002CACB0"
-            BuildableName = "JellyTuner.app"
+            BuildableName = "Jellify.app"
             BlueprintName = "Jellify (iOS)"
             ReferencedContainer = "container:Jellify.xcodeproj">
          </BuildableReference>

@@ -223,6 +223,7 @@ class Player: ObservableObject {
     @Published public var repeatMode = RepeatMode.none
     @Published public var duration = "0:00"
     @Published public var timeElasped = "0:00"
+    @Published public var timeRemaining = "0:00"
     @Published public var playProgress: Float = 0
     @Published public var playProgressAhead: Float = 0
     @Published public var trigger: Bool = false
@@ -234,7 +235,7 @@ class Player: ObservableObject {
         }
     }
     
-    private var player: AVQueuePlayer?
+    public var player: AVQueuePlayer?
     private var timeTimer: Timer?
     @Published public var animationTimer = Timer.publish(every: 9, on: .main, in: .common).autoconnect()
     init() {
@@ -501,41 +502,24 @@ class Player: ObservableObject {
             }
             UIApplication.shared.beginReceivingRemoteControlEvents()
             
-//            SDWebImageDownloader.shared.downloadImage(with:
-//                                                        jfApiService.songImage(
-//                                                            id: (currentItem.song.album?.id!)!, maxSize: 500))
-//            { [weak self] (image, _, _, _) in
-//                if let image = image {
-//                    if self?.currentSongImage.pngData() != image.pngData(){
-//                        self?.currentSongImage = image
-//                    }
-//                }else{
-//            self.currentSongImage = self.placeholderImage
-////                }
-//
             var artistNameArray : [String] = []
 
             currentItem.song.artists?.forEach({ artist in
                 artistNameArray.append((artist as! Artist).name ?? "")
             })
             
-                    let info: [String: Any] = [
-                        MPMediaItemPropertyArtist: artistNameArray.joined(separator: ", "),
-                        MPMediaItemPropertyAlbumTitle: currentItem.song.album?.name ?? "Unknown Album",
-                        MPMediaItemPropertyTitle: currentItem.song.name ?? "Unknown Track",
-                        MPMediaItemPropertyArtwork: MPMediaItemArtwork(boundsSize: CGSize(width: 500, height: 500), requestHandler: { (size: CGSize) -> UIImage in
-                            return self.getAlbumUiImage(data: self.currentSong?.song.album?.artwork) ?? self.placeholderImage
-                        })
-
-//                         MPMediaItemPropertyArtwork: MPMediaItemArtwork(boundsSize: CGSize(width: 500, height: 500),
-//                            requestHandler: { (size: CGSize) -> UIImage in
-//                return UIImage(self.currentSong?.song.album?.artwork) ?? self.placeholderImage
-//                     })
+            let info: [String: Any] = [
+                MPMediaItemPropertyArtist: artistNameArray.joined(separator: ", "),
+                MPMediaItemPropertyAlbumTitle: currentItem.song.album?.name ?? "Unknown Album",
+                MPMediaItemPropertyTitle: currentItem.song.name ?? "Unknown Track",
+                MPMediaItemPropertyArtwork: MPMediaItemArtwork(boundsSize: CGSize(width: 500, height: 500), requestHandler: { (size: CGSize) -> UIImage in
+                    return self.getAlbumUiImage(data: self.currentSong?.song.album?.artwork) ?? self.placeholderImage
+                })
             ]
-            MPNowPlayingInfoCenter.default().playbackState = self.isPlaying ?? false ? MPNowPlayingPlaybackState.playing : .paused
-                    MPNowPlayingInfoCenter.default().nowPlayingInfo = info
+            MPNowPlayingInfoCenter.default().playbackState = self.isPlaying ? MPNowPlayingPlaybackState.playing : .paused
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = info
                 
-            }
+        }
             
         else {
             self.isPlaying = false
@@ -583,11 +567,20 @@ class Player: ObservableObject {
     
     public func setTimeElapsed(progress: Double){
         if let duration = player?.currentItem?.duration.seconds{
-            let playTimeSecs = Int(duration * progress)
+            
+            let playTime = duration * progress
+            
+            let playTimeSecs = Int(playTime)
             let playTimeSeconds = Int(playTimeSecs % 3600) % 60
             let playTimeMinutes = Int(playTimeSecs % 3600) / 60
             let timeElapsedString = "\(playTimeMinutes):\(String(format: "%02d", playTimeSeconds))"
             self.timeElasped = timeElapsedString
+            
+            let remainingTimeSecs = Int(duration - playTime)
+            let remainingTimeSeconds = Int(remainingTimeSecs % 3600) % 60
+            let remainingTimeMinutes = Int(remainingTimeSecs % 3600) / 60
+            let remainingTimeString = "-\(remainingTimeMinutes):\(String(format: "%02d", remainingTimeSeconds))"
+            self.timeRemaining = remainingTimeString
             
             if(self.player != nil && self.player!.status == AVPlayer.Status.readyToPlay && self.player!.currentItem!.status == AVPlayerItem.Status.readyToPlay) {
                 self.playProgress = Float(progress)
@@ -615,34 +608,39 @@ class Player: ObservableObject {
     
     private func refreshPlayingInfo() {
         if !seeking, let duration = player?.currentItem?.duration.seconds,
-            let playTime = player?.currentItem?.currentTime().seconds,
-            !duration.isNaN, !playTime.isNaN {
-            let durationSecs = Int(duration)
-            let durationSeconds = Int(durationSecs % 3600 ) % 60
-            let durationMinutes = Int(durationSecs % 3600) / 60
-            let durationString = "\(durationMinutes):\(String(format: "%02d", durationSeconds))"
-            self.duration = durationString
-            
-            let playTimeSecs = Int(playTime)
-            let playTimeSeconds = Int(playTimeSecs % 3600) % 60
-            let playTimeMinutes = Int(playTimeSecs % 3600) / 60
-            let timeElapsedString = "\(playTimeMinutes):\(String(format: "%02d", playTimeSeconds))"
-            self.timeElasped = timeElapsedString
-            
-            if(self.player != nil && self.player!.status == AVPlayer.Status.readyToPlay && self.player!.currentItem!.status == AVPlayerItem.Status.readyToPlay) {
-                self.playProgress = Float(playTime) / Float(duration)
-                self.playProgressAhead = Float(playTime + Globals.playTimeInterval) / Float(duration)
-            }else{
-                self.playProgress = 0
-                self.playProgressAhead = 0
-            }
-            self.trigger = false
+            let playTime = player?.currentItem?.currentTime().seconds, !duration.isNaN, !playTime.isNaN {
+                let durationSecs = Int(duration)
+                let durationSeconds = Int(durationSecs % 3600 ) % 60
+                let durationMinutes = Int(durationSecs % 3600) / 60
+                let durationString = "\(durationMinutes):\(String(format: "%02d", durationSeconds))"
+                self.duration = durationString
+                
+                let playTimeSecs = Int(playTime)
+                let playTimeSeconds = Int(playTimeSecs % 3600) % 60
+                let playTimeMinutes = Int(playTimeSecs % 3600) / 60
+                let timeElapsedString = "\(playTimeMinutes):\(String(format: "%02d", playTimeSeconds))"
+                self.timeElasped = timeElapsedString
+                
+                let remainingTimeSecs = Int(duration - playTime)
+                let remainingTimeSeconds = Int(remainingTimeSecs % 3600) % 60
+                let remainingTimeMinutes = Int(remainingTimeSecs % 3600) / 60
+                let remainingTimeString = "-\(remainingTimeMinutes):\(String(format: "%02d", remainingTimeSeconds))"
+                self.timeRemaining = remainingTimeString
+                
+                if(self.player != nil && self.player!.status == AVPlayer.Status.readyToPlay && self.player!.currentItem!.status == AVPlayerItem.Status.readyToPlay) {
+                    self.playProgress = Float(playTime) / Float(duration)
+                    self.playProgressAhead = Float(playTime + Globals.playTimeInterval) / Float(duration)
+                }else{
+                    self.playProgress = 0
+                    self.playProgressAhead = 0
+                }
+                self.trigger = false
 
-            var infos = MPNowPlayingInfoCenter.default().nowPlayingInfo
-            infos?[MPMediaItemPropertyPlaybackDuration] = duration
-            infos?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = playTime
-            MPNowPlayingInfoCenter.default().nowPlayingInfo = infos
-        }
+                var infos = MPNowPlayingInfoCenter.default().nowPlayingInfo
+                infos?[MPMediaItemPropertyPlaybackDuration] = duration
+                infos?[MPNowPlayingInfoPropertyElapsedPlaybackTime] = playTime
+                MPNowPlayingInfoCenter.default().nowPlayingInfo = infos
+            }
     }
     
     func getRuntime(ticks: Int) -> String{

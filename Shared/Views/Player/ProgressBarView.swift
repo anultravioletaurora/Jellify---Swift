@@ -47,7 +47,7 @@ struct ProgressBarView: View {
                             Circle()
                                 .fill(Color.accentColor)
                                 .frame(width: player.seeking ? seekSize : 10, height: player.seeking ? seekSize : 10)
-                                .animation(.easeOut(duration: 0.3), value: player.seeking)
+                                .animation(.easeInOut(duration: 0.2), value: player.seeking)
                             )
                         .frame(width: seekSize, height: seekSize)
                         .offset(x:min(min(prog, progNoAnim), geometry.size.width), y: 0)
@@ -97,12 +97,12 @@ struct ProgressBarView: View {
                         Text(player.timeElasped)
                             .frame(width: 50, height: nil, alignment: .leading)
                             .offset(y: elapsedOffset)
-                            .animation(.linear(duration: 0.25), value: elapsedOffset)
+                            // .animation(.linear(duration: 0.25), value: elapsedOffset)
                         Spacer()
-                        Text("\(player.duration)")
+                        Text("\(player.timeRemaining)")
                             .frame(width: 50, height: nil, alignment: .trailing)
                             .offset(y: durationOffset)
-                            .animation(.linear(duration: 0.25), value: durationOffset)
+//                            .animation(.linear(duration: 0.25), value: durationOffset)
                     }
 //                    .onReceive(player.$playProgressAhead, perform: { _ in
 //                            if prog < 50 && player.seeking{

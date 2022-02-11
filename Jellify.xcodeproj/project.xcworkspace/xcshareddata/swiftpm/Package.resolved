@@ -18,6 +18,15 @@
           "revision": "f315671ced976a7ec75ce6a1f37e00b4880cbf4b",
           "version": null
         }
+      },
+      {
+        "package": "Marquee",
+        "repositoryURL": "https://github.com/SwiftUIKit/Marquee",
+        "state": {
+          "branch": null,
+          "revision": "69d7b7c6c34ed41d9299cfa8406f91f529c4fef3",
+          "version": "0.3.0"
+        }
       }
     ]
   },

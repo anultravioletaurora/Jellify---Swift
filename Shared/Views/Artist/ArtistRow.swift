@@ -22,22 +22,23 @@ struct ArtistRow: View {
                     Text(artist.name ?? "Unknown Artist")
                         .font(.body)
 
-//                            HStack {
-//                                let albumCount = artist.albums.count
-//
-//                                let albumText : String = albumCount == 1 ? "album" : "albums"
-//
-//
-//                                let songCount : Int = getSongCount(artist: artist)
-//
-//                                let songText : String = songCount == 1 ? "song" : "songs"
-//
-//                                Text("\(albumCount) \(albumText), \(songCount) \(songText)")
-//                                    .font(.subheadline)
-//                                    .fontWeight(.light)
-//
-//
-//                            }
+                    HStack {
+                        let albumCount = artist.albums?.count ?? 0
+
+                        let albumText : String = albumCount == 1 ? "album" : "albums"
+
+
+                        let songCount : Int = artist.songs?.count ?? 0
+
+                        let songText : String = songCount == 1 ? "song" : "songs"
+
+                        Text("\(albumCount) \(albumText), \(songCount) \(songText)")
+                            .font(.subheadline)
+                            .fontWeight(.light)
+                            .font(.subheadline)
+                            .opacity(0.6)
+
+                    }
                 }
             }
         }

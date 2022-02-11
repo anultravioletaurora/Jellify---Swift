@@ -33,30 +33,12 @@ struct ArtistsView: View {
         )
     }
     
-    func getSongCount(artist : Artist) -> Int{
-        
-        var songCount : Int = 0
-        
-        if (artist.albums != nil) {
-            for album in artist.albums! {
-                songCount += (album as! Album).songs!.count
-            }
-        }
-        
-        return songCount
-    }
-    
-//    func viewDidLoad() {
-//        artistService.retrieveArtist(complete: { result in
-//            storeArtists(items: result.items)
-//        })
-//    }
-//
     var body: some View {
         NavigationView {
 
                                 
             // Artists List
+            // TODO: Turn this into a sectioned list with alphabetical seperators
             List(artists) { artist in
                 ArtistRow(artist: artist)
                     .padding(.bottom, artists.last! == artist ? 65 : 0)
@@ -68,6 +50,8 @@ struct ArtistsView: View {
                         
                 searchBar.$search.debounce(for: .seconds(1), scheduler: DispatchQueue.main)
             ) {
+                artists.nsPredicate = NSPredicate(format: "%K contains %@", #keyPath(Artist.name), UUID().uuidString)
+ 
                 guard !$0.isEmpty else {
                     artists.nsPredicate = nil
                     return

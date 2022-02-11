@@ -60,9 +60,9 @@ struct PlaylistsView: View {
 //                    .refreshable {
 //                        self.forceFetchPlaylists()
 //                    }
-                    .overlay(
-                        PlayerView()
-                    )
+//                    .overlay(
+//                        PlayerView()
+//                    )
         }
 //        .onAppear(perform: {
 //            

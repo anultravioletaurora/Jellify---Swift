@@ -7,12 +7,15 @@
 
 import SwiftUI
 import MediaPlayer
+import Marquee
 
 /**
  Component for the now playing bar that morphs into the full player UI
  */
-struct PlayerView: View {
+struct PlayerView<Content: View>: View {
         
+    var content : Content
+    
     @ObservedObject
     var player: Player = Player.shared
     
@@ -33,6 +36,8 @@ struct PlayerView: View {
     @ViewBuilder
     var body: some View {
         ZStack(alignment: .bottom) {
+            
+            content
                         
             ZStack(alignment: .bottom) {
                 HStack {
@@ -60,10 +65,13 @@ struct PlayerView: View {
                                         .padding(.trailing, 5)
 
                             }
-                            
-                            Text(player.currentSong?.song.name ?? "Nothing Playing")
-                                .foregroundColor(player.currentSong == nil ? .gray : nil)
-                                .bold()
+                                          
+                            Marquee {
+                                Text(player.currentSong?.song.name ?? "Nothing Playing")
+                                    .bold()
+                                    .foregroundColor(player.currentSong == nil ? .gray : nil)
+                            }.marqueeWhenNotFit(true)
+                                .marqueeDuration(10.0)
                         }
                         .transition(.opacity)
                     }
@@ -101,15 +109,18 @@ struct PlayerView: View {
                 .frame(width: UIScreen.main.bounds.size.width, height: 66)
                 .background(BlurView())
 
-                Divider()
+                // Divider()
+            }
+            .onTapGesture {
+                if (player.currentSong != nil) {
+                    showMediaPlayer.toggle()
+                }
             }
         }
         // Fullscreen player sheet
         .sheet(isPresented: $showMediaPlayer, onDismiss: {}, content: {
             PlayerSheetView(showMediaPlayer: $showMediaPlayer)
         })
-        .offset(y: UIScreen.main.bounds.height / 3 + 19)        
-//        .padding()
     }
     
     func getWrappedArtists(artists: NSSet?) -> String {
