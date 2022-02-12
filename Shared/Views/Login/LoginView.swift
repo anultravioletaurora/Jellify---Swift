@@ -28,68 +28,48 @@ struct LoginView: View {
     var body: some View {
         
         NavigationView {
-            VStack {
-                
-                // Splash Image
-                Image("placeholder")
-                    .resizable()
-                    .frame(width: 200, height: 200)
-                    .padding()
-                
-                // Server URL Input
-                    
-                HStack {
-                    Image(systemName: "server.rack")
+            
+            Form {
                     TextField("serverUrl", text: $serverUrl, prompt: Text("Enter Jellyfin Server URL"))
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
                         .keyboardType(.alphabet)
                         ._tightPadding()
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
 
-                }
                                     
                 // Username Input
-                HStack {
-                    Image(systemName: "person.fill")
                     TextField("username", text: $username, prompt: Text("Enter Username"))
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
                         ._tightPadding()
-                }
                 
                 // Password Input
-                HStack {
-                    Image(systemName: "key.fill")
                     TextField("password", text: $password, prompt: Text("Enter Password"))
                         .autocapitalization(.none)
                         .disableAutocorrection(true)
-                        .textFieldStyle(RoundedBorderTextFieldStyle())
                         ._tightPadding()
-                }
                 
                 // Submit Button
                 Button(action: {
+                    loggingIn = false
                     networkingManager.login(serverUrl: serverUrl, userId: username, password: password, complete: {
                         
                     })
                 }) {
                     
                         Text("Let me in!")
-                        .font(.headline)
-                        .padding()
-                        .frame(width: nil, height: 50, alignment: .center)
-                        .foregroundColor(.white)
-                        .background(Color.accentColor.opacity(loggingIn ? 0.3 : 1))
-                        .cornerRadius(15)
+//                        .font(.headline)
+//                        .padding()
+//                        .frame(width: nil, height: 50, alignment: .center)
+//                        .foregroundColor(.white)
+//                        .background(Color.accentColor.opacity(loggingIn ? 0.3 : 1))
+//                        .cornerRadius(15)
                 }
                 .disabled(loggingIn)
-                .frame(maxWidth: .infinity)
-                .buttonStyle(DefaultButtonStyle())
+//                .frame(maxWidth: .infinity)
+
             }
-            .padding()
-            .navigationTitle(Text("Tune In"))
+            .navigationTitle(Text("Login"))
         }
     }
 }

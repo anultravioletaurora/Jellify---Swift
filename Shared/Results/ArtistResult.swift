@@ -13,7 +13,6 @@ class ArtistResult: Codable, Identifiable {
     let genreItems: [GenreItem]?
     let imageTags: ImageTags
     let backdropImageTags: [String]
-    var userData: UserDataResult
 
     enum CodingKeys: String, CodingKey {
         case name = "Name"
@@ -25,7 +24,6 @@ class ArtistResult: Codable, Identifiable {
         case genreItems = "GenreItems"
         case imageTags = "ImageTags"
         case backdropImageTags = "BackdropImageTags"
-        case userData = "UserData"
     }
 }
 struct GenreItem: Codable {
@@ -53,7 +51,6 @@ struct AlbumResult: Codable, Hashable, Identifiable {
     let productionYear: Int?
     let albumArtists: [GenericItem]
     let imageTags: ImageTags
-    var userData: UserData?
 
     enum CodingKeys: String, CodingKey {
         case name = "Name"
@@ -110,7 +107,6 @@ struct PlaylistItem: Codable, Hashable, Identifiable {
     let productionYear, indexNumber, parentIndexNumber: Int?
     let artists: [String]
     let artistItems: [GenericItem]
-    var userData: UserData?
     
     enum CodingKeys: String, CodingKey {
         case name = "Name"
@@ -137,7 +133,6 @@ public struct SongResult: Codable, Hashable, Identifiable {
     let productionYear, indexNumber, parentIndexNumber: Int?
     let artists: [String]
     let artistItems: [GenericItem]
-    var userData: UserData?
     
     enum CodingKeys: String, CodingKey {
         case name = "Name"

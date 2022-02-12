@@ -25,6 +25,9 @@ struct PlaylistsView: View {
     
     let editing = true
     
+    @StateObject
+    var searchBar = SearchBarViewModel()
+    
     @State
     var loading : Bool = true
             
@@ -52,10 +55,20 @@ struct PlaylistsView: View {
                                 Text(playlist.name ?? "Unknown Playlist")
                             }
                         })
-
+                            .listRowSeparator(playlists.last! == playlist ? .hidden : .visible)
                     }
                     .listStyle(PlainListStyle())
-                    .padding(.bottom, 60)
+                    .padding(.bottom, 66)
+                    .searchable(text: $searchBar.search, prompt: "Search playlists")
+                    .disableAutocorrection(true)
+                    .onReceive(searchBar.$search.debounce(for: .seconds(1), scheduler: DispatchQueue.main))
+                    {
+                        guard !$0.isEmpty else {
+                            playlists.nsPredicate = nil
+                            return
+                        }
+                        playlists.nsPredicate = searchBar.search.isEmpty ? nil : NSPredicate(format: "%K contains[c] %@", #keyPath(Playlist.name), searchBar.search.trimmingCharacters(in: .whitespaces))
+                    }
                     .navigationTitle("Playlists")
 //                    .refreshable {
 //                        self.forceFetchPlaylists()

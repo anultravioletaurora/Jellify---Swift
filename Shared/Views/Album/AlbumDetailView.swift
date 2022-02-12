@@ -106,8 +106,8 @@ struct AlbumDetailView: View {
                 }
                 
                 ForEach(songs) { song in
-                    SongButton(song: song, selectedSong: $selectedSong, songs: Array(songs), showPlaylistSheet: $showPlaylistSheet)
-            }
+                    SongRow(song: song, selectedSong: $selectedSong, songs: Array(songs), showPlaylistSheet: $showPlaylistSheet, type: .album)
+                }
                 .sheet(isPresented: $showPlaylistSheet, content: {
                     PlaylistSelectionSheet(song: $selectedSong, showPlaylistSheet: $showPlaylistSheet)
                 })
@@ -135,78 +135,7 @@ struct AlbumDetailView: View {
         
         return runtimeString.joined(separator: " ")
     }
-    
-    struct SongButton: View {
-        
-        var song: Song
-        
-        @Binding
-        var selectedSong: Song?
-        
-        var songs: [Song]
-        
-        @Binding
-        var showPlaylistSheet: Bool
-        
-        var body: some View{
-            Button(action: {
-                print("Playing \(song.name ?? "Unknown Song")")
-                
-                Player.shared.loadSongs(Array(songs), songId: song.jellyfinId!)
-                Player.shared.isPlaying = true
-                                
-                print("Playing!")
-            }, label: {
-                HStack(alignment: .center, content: {
-                    
-                    VStack(alignment: .center, spacing: 10, content: {
-                        Text(String(song.indexNumber))
-                            .font(.subheadline)
-                            .padding(.trailing, 5)
-                    }).padding(.trailing, 5)
-                                            
-                    VStack(alignment: .leading, spacing: 10) {
-                        Text(song.name ?? "Unknown Song")
-                            .padding(.leading, 5)
-                                         
-                        if song.artists!.count > 1 {
-                            Text((song.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: ", "))
-                                .font(.subheadline)
-                                .opacity(0.6)
-                        }
-                    }
-                    
-                    Spacer()
-                })
-            })
-            .padding(.horizontal, 10)
-            .padding(.vertical, 5)
-            .buttonStyle(PlainButtonStyle())
-            .swipeActions {
-                Button(action: {
-                    print("Artist Swiped")
-                }) {
-                    Image(systemName: "heart")
-                }
-                .tint(.purple)
-                
-                Button(action: {
-                    print("Add to playlist sheet activated")
-                    selectedSong = song
-                    
-                    print("Showing playlist sheet for: \(selectedSong!.name)")
-                    
-                    showPlaylistSheet.toggle()
-                    
-                    print(showPlaylistSheet ? "Showing Playlist Sheet" : "Hiding Playlist Sheet")
-                }) {
-                    Image(systemName: "music.note.list")
-                }
-                .tint(.blue)
-            }
-        }
-    }
-    
+}
     struct AlbumArtwork: View {
         
         var album: Album
@@ -304,4 +233,3 @@ struct AlbumDetailView: View {
             }
         }
     }
-}

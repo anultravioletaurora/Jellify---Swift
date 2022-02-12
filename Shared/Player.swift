@@ -285,6 +285,7 @@ class Player: ObservableObject {
             if options.contains(.shouldResume) {
                 // Interruption ended. Playback should resume.
                 print("Should resume")
+                player?.play()
             }else{
                 if let time = player?.currentTime(), player?.currentItem != nil{
                     self.player?.removeAllItems()

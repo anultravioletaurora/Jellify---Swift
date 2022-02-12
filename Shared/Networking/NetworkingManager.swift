@@ -265,7 +265,7 @@ class NetworkingManager : ObservableObject {
     }
 
     public func loadAlbumArtwork(album: Album) -> Void {
-        ImageAPI.getItemImage(itemId: album.jellyfinId!, imageType: .primary)
+        ImageAPI.getItemImage(itemId: album.jellyfinId!, imageType: .primary, apiResponseQueue: processingQueue)
             .sink(receiveCompletion: { completion in
                 print("Image receive completion: \(completion)")
             }, receiveValue: { url in
@@ -635,6 +635,8 @@ class NetworkingManager : ObservableObject {
                                             index += startIndex!
                                         }
                                         
+                                        self.saveContext()
+                                        
                                         self.loadSongs(complete: {
                                             self.saveContext()
                                             complete()
@@ -957,10 +959,10 @@ class NetworkingManager : ObservableObject {
         
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         
-        privateContext.parent = self.privateContext
+        privateContext.parent = self.context
         
         do {
-            return try self.context.fetch(fetchRequest)
+            return try privateContext.fetch(fetchRequest)
         } catch let error as NSError {
             print("Error retrieving all albums from CoreData: \(error)")
             
@@ -991,7 +993,7 @@ class NetworkingManager : ObservableObject {
         
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         
-        privateContext.parent = self.privateContext
+        privateContext.parent = self.context
         
         do {
             return try privateContext.fetch(fetchRequest)
@@ -1047,9 +1049,9 @@ class NetworkingManager : ObservableObject {
     private func saveContext() {
         do {
             try self.privateContext.save()
-            context.performAndWait {
+            context.perform {
                 do {
-                    try context.save()
+                    try self.context.save()
                 } catch {
                     fatalError("Failure to save main context: \(error)")
                 }

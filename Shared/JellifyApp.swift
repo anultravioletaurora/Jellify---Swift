@@ -17,20 +17,22 @@ struct JellifyApp: App {
      */
     let persistenceController = PersistenceController.shared
     
-    /**
-     Watches the scene phase of the app, so we can perform a save when the user
-     navigates away
-     */
-    @Environment(\.scenePhase)
-    var scenePhase
+    let networkingManager = NetworkingManager.shared
+    
+//    /**
+//     Watches the scene phase of the app, so we can perform a save when the user
+//     navigates away
+//     */
+//    @Environment(\.scenePhase)
+//    var scenePhase
 
     var body: some Scene {
         WindowGroup {
                 ContentView()
-                .environment(\.managedObjectContext, persistenceController.container.viewContext)
+                .environment(\.managedObjectContext, networkingManager.context)
         }
-        .onChange(of: scenePhase) { _ in
-            persistenceController.save()
-        }
+//        .onChange(of: scenePhase) { _ in
+//            persistenceController.save()
+//        }
     }
 }

@@ -25,6 +25,9 @@ struct AlbumsView: View {
     @State
     var search: String = ""
     
+    @StateObject
+    var searchBar = SearchBarViewModel()
+    
     let height = UIScreen.main.bounds.height / 5
     
     @State
@@ -52,11 +55,18 @@ struct AlbumsView: View {
                     }
                 }
             }
-            .searchable(text: $search, prompt: "Search albums")
+            .padding(.bottom, 66)
+            .searchable(text: $searchBar.search, prompt: "Search albums")
             .disableAutocorrection(true)
-            .onChange(of: search, perform: { newSearch in
-                albums.nsPredicate = newSearch.isEmpty ? nil : NSPredicate(format: "%K contains[c] %@", #keyPath(Album.name), newSearch.trimmingCharacters(in: .whitespaces))
-            })
+            .onReceive(searchBar.$search.debounce(for: .seconds(0.5), scheduler: DispatchQueue.main))
+            {
+                guard !$0.isEmpty else {
+                    albums.nsPredicate = nil
+                    return
+                }
+                albums.nsPredicate = searchBar.search.isEmpty ? nil : NSPredicate(format: "%K contains[c] %@", #keyPath(Album.name), searchBar.search.trimmingCharacters(in: .whitespaces))
+            }
+
             .listStyle(PlainListStyle())
             .navigationTitle("Albums")
             .toolbar(content: {

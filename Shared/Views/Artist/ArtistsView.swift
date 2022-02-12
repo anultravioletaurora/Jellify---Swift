@@ -41,9 +41,9 @@ struct ArtistsView: View {
             // TODO: Turn this into a sectioned list with alphabetical seperators
             List(artists) { artist in
                 ArtistRow(artist: artist)
-                    .padding(.bottom, artists.last! == artist ? 65 : 0)
                     .listRowSeparator(artists.last! == artist ? .hidden : .visible)
             }
+            .padding(.bottom, 66)
             .searchable(text: $searchBar.search, prompt: "Search artists")
             .disableAutocorrection(true)
             .onReceive(

@@ -9,9 +9,6 @@ import SwiftUI
 import MediaPlayer
 import Marquee
 
-/**
- Component for the now playing bar that morphs into the full player UI
- */
 struct PlayerView<Content: View>: View {
         
     var content : Content
@@ -28,7 +25,7 @@ struct PlayerView<Content: View>: View {
     @State
     var seekPos = 0.0
         
-    var height = UIScreen.main.bounds.height / 2.5
+    var height = 65
         
     @State
     var offset : CGFloat = 0

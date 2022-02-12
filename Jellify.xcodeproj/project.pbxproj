@@ -78,6 +78,7 @@
 		04D4B60A27135DEA0089CFC3 /* SessionInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B60827135DEA0089CFC3 /* SessionInfo.swift */; };
 		04D4B60D27135FA50089CFC3 /* ArtistResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B60C27135FA50089CFC3 /* ArtistResult.swift */; };
 		04D4B60E27135FA50089CFC3 /* ArtistResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B60C27135FA50089CFC3 /* ArtistResult.swift */; };
+		04DCB7E827B71575005355C0 /* SongRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DCB7E727B71575005355C0 /* SongRow.swift */; };
 		04E1071A270CD307002CACB0 /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E10719270CD307002CACB0 /* Tests_iOS.swift */; };
 		04E1071C270CD307002CACB0 /* Tests_iOSLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E1071B270CD307002CACB0 /* Tests_iOSLaunchTests.swift */; };
 		04E10726270CD307002CACB0 /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E10725270CD307002CACB0 /* Tests_macOS.swift */; };
@@ -89,7 +90,6 @@
 		04E1072D270CD307002CACB0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04E10703270CD307002CACB0 /* Assets.xcassets */; };
 		04E1072E270CD307002CACB0 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 04E10703270CD307002CACB0 /* Assets.xcassets */; };
 		04E10748270CD6B8002CACB0 /* SongsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E10747270CD6B8002CACB0 /* SongsView.swift */; };
-		04E10749270CD6B8002CACB0 /* SongsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E10747270CD6B8002CACB0 /* SongsView.swift */; };
 		04E1074B270CD6E6002CACB0 /* AlbumsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E1074A270CD6E6002CACB0 /* AlbumsView.swift */; };
 		04E1074E270CD6ED002CACB0 /* ArtistsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E1074D270CD6ED002CACB0 /* ArtistsView.swift */; };
 		04E1074F270CD6ED002CACB0 /* ArtistsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E1074D270CD6ED002CACB0 /* ArtistsView.swift */; };
@@ -175,6 +175,7 @@
 		04D4B60527135DE50089CFC3 /* UserResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserResult.swift; sourceTree = "<group>"; };
 		04D4B60827135DEA0089CFC3 /* SessionInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SessionInfo.swift; sourceTree = "<group>"; };
 		04D4B60C27135FA50089CFC3 /* ArtistResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistResult.swift; sourceTree = "<group>"; };
+		04DCB7E727B71575005355C0 /* SongRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongRow.swift; sourceTree = "<group>"; };
 		04E10701270CD304002CACB0 /* JellifyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JellifyApp.swift; sourceTree = "<group>"; };
 		04E10702270CD304002CACB0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		04E10703270CD307002CACB0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -327,6 +328,15 @@
 			path = Authentication;
 			sourceTree = "<group>";
 		};
+		04DCB7E627B7156B005355C0 /* Song */ = {
+			isa = PBXGroup;
+			children = (
+				04E10747270CD6B8002CACB0 /* SongsView.swift */,
+				04DCB7E727B71575005355C0 /* SongRow.swift */,
+			);
+			path = Song;
+			sourceTree = "<group>";
+		};
 		04E106FB270CD304002CACB0 = {
 			isa = PBXGroup;
 			children = (
@@ -402,12 +412,12 @@
 		04E1073D270CD63F002CACB0 /* Views */ = {
 			isa = PBXGroup;
 			children = (
+				04DCB7E627B7156B005355C0 /* Song */,
 				04848BC62725A9F00072A81E /* Images */,
 				041D3E67271A90DB002185CF /* Player */,
 				04D4B5F12710E9C80089CFC3 /* Login */,
 				04E2DE26270FC827007ABE38 /* Album */,
 				04E2DE1E270E49E8007ABE38 /* BottomBar */,
-				04E10747270CD6B8002CACB0 /* SongsView.swift */,
 				04E2DE25270FA67D007ABE38 /* Artist */,
 				041D3E70271C41F8002185CF /* Playlist */,
 				04E10753270CD6FA002CACB0 /* SettingsView.swift */,
@@ -656,6 +666,7 @@
 				04E1072B270CD307002CACB0 /* ContentView.swift in Sources */,
 				04D4B60327135DD50089CFC3 /* LoginResult.swift in Sources */,
 				04848BE427271D810072A81E /* ArtistRow.swift in Sources */,
+				04DCB7E827B71575005355C0 /* SongRow.swift in Sources */,
 				04CBCDC82713D1F0003E9BE9 /* LibraryResult.swift in Sources */,
 				04D4B60627135DE50089CFC3 /* UserResult.swift in Sources */,
 				04FBD83927A635F200E780F3 /* SongHelper.swift in Sources */,
@@ -712,7 +723,6 @@
 				041D3E76271CAF89002185CF /* BackgroundCleanerView.swift in Sources */,
 				04E2DE24270E4A48007ABE38 /* BlurView.swift in Sources */,
 				04E1072C270CD307002CACB0 /* ContentView.swift in Sources */,
-				04E10749270CD6B8002CACB0 /* SongsView.swift in Sources */,
 				04E1074F270CD6ED002CACB0 /* ArtistsView.swift in Sources */,
 				04E2DE1A270E264B007ABE38 /* ArtistDetailView.swift in Sources */,
 				04848BDC272650050072A81E /* AlbumBackdropImage.swift in Sources */,
@@ -903,7 +913,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "FinTune (iOS).entitlements";
+				CODE_SIGN_ENTITLEMENTS = "Jellify (iOS).entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = WAH9CZ8BPG;
@@ -922,7 +932,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1;
+				MARKETING_VERSION = 0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jackcaulifield.Jellify;
 				PRODUCT_NAME = Jellify;
 				SDKROOT = iphoneos;
@@ -938,7 +948,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "FinTune (iOS).entitlements";
+				CODE_SIGN_ENTITLEMENTS = "Jellify (iOS).entitlements";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = WAH9CZ8BPG;
@@ -957,7 +967,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.1;
+				MARKETING_VERSION = 0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jackcaulifield.Jellify;
 				PRODUCT_NAME = Jellify;
 				SDKROOT = iphoneos;
