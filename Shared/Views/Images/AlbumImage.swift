@@ -20,8 +20,10 @@ struct AlbumImage: View {
         ItemThumbnail(thumbnail: album.artwork, itemId: album.jellyfinId!, frame: height, cornerRadius: 2)
             .onAppear(perform: {
                 
-                if (album.thumbnail == nil) {
-                    networkingManager.loadAlbumArtwork(album: album)
+                networkingManager.processingQueue.async {
+                    if (album.artwork == nil) {
+                        networkingManager.loadAlbumArtwork(album: album)
+                    }
                 }
             })
     }

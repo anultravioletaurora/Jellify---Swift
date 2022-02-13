@@ -30,7 +30,7 @@ struct SongRow: View {
                         Text(String(song.indexNumber))
                             .font(.subheadline)
                             .padding(.trailing, 5)
-                    }).frame(width: 20)
+                    }).frame(width: 40)
                 } else {
                     
                     if song.album != nil {

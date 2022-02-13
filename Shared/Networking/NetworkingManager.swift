@@ -198,6 +198,14 @@ class NetworkingManager : ObservableObject {
                 print("Call to add song to playlist complete: \(completion)")
             }, receiveValue: { response in
                 print("Playlist addition response: \(response)")
+                
+                if playlist.songs != nil {
+                    
+                    playlist.songs!.forEach({ playlistSong in
+                        self.context.delete(playlistSong as! NSManagedObject)
+                    })
+                    
+                }
                 self.loadPlaylistItems(playlist: playlist, complete: { playlistItems in
                     print("Playlist addition and refresh")
                     complete()
@@ -249,7 +257,7 @@ class NetworkingManager : ObservableObject {
             }, receiveValue: { response in
 
                 print("Playlist removal response: \(response)")
-                self.context.delete(playlistSong)
+                self.privateContext.delete(playlistSong)
                 
                 self.saveContext()
             })
@@ -265,15 +273,19 @@ class NetworkingManager : ObservableObject {
     }
 
     public func loadAlbumArtwork(album: Album) -> Void {
-        ImageAPI.getItemImage(itemId: album.jellyfinId!, imageType: .primary, apiResponseQueue: processingQueue)
+        ImageAPI.getItemImage(itemId: album.jellyfinId!, imageType: .primary)
             .sink(receiveCompletion: { completion in
                 print("Image receive completion: \(completion)")
             }, receiveValue: { url in
-                           
-                album.artwork = try! Data(contentsOf: url)
-                album.thumbnail = try! Data(contentsOf: url)
-                
-                // self.saveContext()
+                      
+                do {
+                    album.artwork = try Data(contentsOf: url)
+                    album.thumbnail = try Data(contentsOf: url)
+                    
+                    // self.saveContext()
+                } catch {
+                    print("Error setting artwork for album: \(album.name!)")
+                }                
             })
             .store(in: &self.cancellables)
 
@@ -685,8 +697,6 @@ class NetworkingManager : ObservableObject {
                 if response.items != nil {
                     
                     var loadingStatus : [Bool] = []
-                    
-                    
                                      
                     DispatchQueue.concurrentPerform(iterations: response.items!.count, execute: { index in
                         
@@ -753,32 +763,27 @@ class NetworkingManager : ObservableObject {
                                 
                                 if playlistItems.items != nil {
                                                                     
-                                    var playlistSongIds = Set(playlistItems.items!.map { $0.id! })
+                                    var playlistSongIds = Set(playlistItems.items!.map { $0.playlistItemId! })
                                     
                                     var newSongs : [BaseItemDto]
+                                                                            
+                                    print(playlist.songs!.count)
                                     
-                                    
-                                    do {
+                                    if playlist.songs != nil {
                                         
-                                        print(playlist.songs!.count)
-                                        if playlist.songs != nil {
-                                            
-                                            var currentPlaylistSongs : [PlaylistSong] = []
-                                            
-                                            playlist.songs!.forEach({ currentPlaylistSong in
-                                                currentPlaylistSongs.append(currentPlaylistSong as! PlaylistSong)
-                                            })
-                                            
-                                            if !currentPlaylistSongs.isEmpty {
-                                                playlistSongIds.subtract(currentPlaylistSongs.filter { $0.song != nil }.map { $0.song!.jellyfinId! })
-                                            }
-                                                                        
-                                            newSongs = playlistItems.items!.filter { playlistSongIds.contains($0.id!)}
-                                        } else {
-                                        newSongs = playlistItems.items!
+                                        var currentPlaylistSongs : [PlaylistSong] = []
+                                        
+                                        playlist.songs!.forEach({ currentPlaylistSong in
+                                            currentPlaylistSongs.append(currentPlaylistSong as! PlaylistSong)
+                                        })
+                                        
+                                        if !currentPlaylistSongs.isEmpty {
+                                            playlistSongIds.subtract(currentPlaylistSongs.filter { $0.jellyfinId != nil }.map { $0.jellyfinId! })
                                         }
-                                    } catch {
-                                        print("\(error)")
+                                                                    
+                                        newSongs = playlistItems.items!.filter { playlistSongIds.contains($0.id!)}
+                                    } else {
+                                        newSongs = playlistItems.items!
                                     }
                                     
                                     print("Adding \(newSongs.count) songs to playlist \(playlist.name!)")
@@ -848,7 +853,12 @@ class NetworkingManager : ObservableObject {
                         
                         playlistSongs.append(playlistSong)
                     } else {
-                        playlistSongs.append(self.context.object(with: self.retrievePlaylistSongFromCore(playlistSongId: playlistItem.playlistItemId!)!) as! PlaylistSong)
+                        
+                        let playlistSong = self.context.object(with: self.retrievePlaylistSongFromCore(playlistSongId: playlistItem.playlistItemId!)!) as! PlaylistSong
+                        
+                        playlistSong.indexNumber = Int16(index)
+                        
+                        playlistSongs.insert(playlistSong, at: index)
                     }
                     
                     index += 1
@@ -1047,9 +1057,10 @@ class NetworkingManager : ObservableObject {
     }
     
     private func saveContext() {
+        
         do {
             try self.privateContext.save()
-            context.perform {
+            self.context.perform {
                 do {
                     try self.context.save()
                 } catch {
@@ -1094,7 +1105,7 @@ class NetworkingManager : ObservableObject {
         header.append("Device=\"\(deviceName)\", ")
         header.append("DeviceId=\"\(UIDevice.current.identifierForVendor!)\", ")
         header.append("Version=\"\(appVersion)\", ")
-        header.append("Token=\"\(user!.authToken!)\"")
+        header.append("Token=\"\(accessToken)\"")
         
         JellyfinAPI.customHeaders["X-Emby-Authorization"] = header
     }

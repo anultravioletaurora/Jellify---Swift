@@ -11,6 +11,8 @@ import SwiftUI
 class LibrarySelectionService: JellyfinService {
     
     static let shared = LibrarySelectionService()
+    
+    let networkingManager = NetworkingManager.shared
                     
     @Published
     var selected : Bool = false
@@ -29,10 +31,8 @@ class LibrarySelectionService: JellyfinService {
     func retrieveLibraries(complete: @escaping (ResultSet<LibraryResult>) -> Void) {
         
         print(JellyfinService.users)
-        
-        print("Retrieving libraries, access token is: \(self.accessToken)")
-        
-        self.get(url: "/Users/\(self.userId)/Items", params: [:], completion: { data in
+                
+        self.get(url: "/Users/\(networkingManager.userId)/Items", params: [:], completion: { data in
                                
 //            let json = try? JSONSerialization.jsonObject(with: data, options: [])
                         

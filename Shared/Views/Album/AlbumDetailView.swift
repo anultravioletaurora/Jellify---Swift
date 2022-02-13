@@ -37,7 +37,7 @@ struct AlbumDetailView: View {
         
         self.fetchRequest = FetchRequest(
             entity: Song.entity(),
-            sortDescriptors: [NSSortDescriptor(key: "indexNumber", ascending: true)],
+            sortDescriptors: [NSSortDescriptor(key: #keyPath(Song.indexNumber), ascending: true), NSSortDescriptor(key: #keyPath(Song.diskNumber), ascending: true), ],
             predicate: NSPredicate(format: "(album == %@)", album)
         )
     }
@@ -111,6 +111,8 @@ struct AlbumDetailView: View {
                 .sheet(isPresented: $showPlaylistSheet, content: {
                     PlaylistSelectionSheet(song: $selectedSong, showPlaylistSheet: $showPlaylistSheet)
                 })
+                
+                PlayerViewOffset()
             }
 
         .listStyle(PlainListStyle())

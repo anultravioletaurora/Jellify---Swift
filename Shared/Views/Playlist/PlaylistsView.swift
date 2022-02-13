@@ -56,9 +56,12 @@ struct PlaylistsView: View {
                             }
                         })
                             .listRowSeparator(playlists.last! == playlist ? .hidden : .visible)
+                        
+                        if playlists.last == playlist {
+                            PlayerViewOffset()
+                        }
                     }
                     .listStyle(PlainListStyle())
-                    .padding(.bottom, 66)
                     .searchable(text: $searchBar.search, prompt: "Search playlists")
                     .disableAutocorrection(true)
                     .onReceive(searchBar.$search.debounce(for: .seconds(1), scheduler: DispatchQueue.main))

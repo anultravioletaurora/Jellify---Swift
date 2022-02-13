@@ -54,12 +54,13 @@ struct ArtistDetailView: View {
 
                 ForEach(albums) { album in
                     AlbumRow(album: album, artist: artist)
-                        .padding(.bottom, albums.last! == album ? 65 : 0)
                         .listRowSeparator(albums.last! == album ? .hidden : .visible)
-
                 }
+                
+                PlayerViewOffset()
             }
             .listStyle(PlainListStyle())
+            
 //        .searchable(text: $search, prompt: "Search \(artist.name ?? "Unknown Artist") albums")
 //        .onChange(of: search, perform: { newSearch in
 //            albums.nsPredicate = newSearch.isEmpty ? nil : NSPredicate(format: "%K contains[c] %@", #keyPath(Album.name), newSearch)
