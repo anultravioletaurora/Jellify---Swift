@@ -56,8 +56,6 @@ struct ArtistDetailView: View {
                     AlbumRow(album: album, artist: artist)
                         .listRowSeparator(albums.last! == album ? .hidden : .visible)
                 }
-                
-                PlayerViewOffset()
             }
             .listStyle(PlainListStyle())
             

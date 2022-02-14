@@ -79,10 +79,10 @@
 		04D4B60E27135FA50089CFC3 /* ArtistResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04D4B60C27135FA50089CFC3 /* ArtistResult.swift */; };
 		04DCB7E827B71575005355C0 /* SongRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DCB7E727B71575005355C0 /* SongRow.swift */; };
 		04DCB7EC27B8632C005355C0 /* SongsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DCB7EB27B8632C005355C0 /* SongsListView.swift */; };
-		04DCB7EE27B989CF005355C0 /* PlayerViewOffset.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DCB7ED27B989CF005355C0 /* PlayerViewOffset.swift */; };
 		04DCB7F027B990A4005355C0 /* AlbumsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DCB7EF27B990A4005355C0 /* AlbumsView.swift */; };
 		04DCB7F227B9A532005355C0 /* LazyNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DCB7F127B9A532005355C0 /* LazyNavigationView.swift */; };
 		04DCB7F427BA0192005355C0 /* RefreshRateHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DCB7F327BA0192005355C0 /* RefreshRateHelper.swift */; };
+		04DCB7F627BA10A0005355C0 /* PlayerQueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DCB7F527BA10A0005355C0 /* PlayerQueueView.swift */; };
 		04E1071A270CD307002CACB0 /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E10719270CD307002CACB0 /* Tests_iOS.swift */; };
 		04E1071C270CD307002CACB0 /* Tests_iOSLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E1071B270CD307002CACB0 /* Tests_iOSLaunchTests.swift */; };
 		04E10726270CD307002CACB0 /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E10725270CD307002CACB0 /* Tests_macOS.swift */; };
@@ -119,6 +119,9 @@
 		04FBD83927A635F200E780F3 /* SongHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FBD83827A635F200E780F3 /* SongHelper.swift */; };
 		04FBD83B27A721A900E780F3 /* PlaylistThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FBD83A27A721A900E780F3 /* PlaylistThumbnail.swift */; };
 		04FBD83D27A7253E00E780F3 /* ArtistImage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FBD83C27A7253E00E780F3 /* ArtistImage.swift */; };
+		04FE474927BA815E00BDEDFF /* LNPopupUI-Static in Frameworks */ = {isa = PBXBuildFile; productRef = 04FE474827BA815E00BDEDFF /* LNPopupUI-Static */; };
+		04FE474B27BA91BA00BDEDFF /* NowPlayingThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FE474A27BA91BA00BDEDFF /* NowPlayingThumbnail.swift */; };
+		04FE474D27BAA05C00BDEDFF /* ScrubberBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FE474C27BAA05C00BDEDFF /* ScrubberBarView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -181,10 +184,10 @@
 		04D4B60C27135FA50089CFC3 /* ArtistResult.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistResult.swift; sourceTree = "<group>"; };
 		04DCB7E727B71575005355C0 /* SongRow.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongRow.swift; sourceTree = "<group>"; };
 		04DCB7EB27B8632C005355C0 /* SongsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongsListView.swift; sourceTree = "<group>"; };
-		04DCB7ED27B989CF005355C0 /* PlayerViewOffset.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerViewOffset.swift; sourceTree = "<group>"; };
 		04DCB7EF27B990A4005355C0 /* AlbumsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsView.swift; sourceTree = "<group>"; };
 		04DCB7F127B9A532005355C0 /* LazyNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyNavigationView.swift; sourceTree = "<group>"; };
 		04DCB7F327BA0192005355C0 /* RefreshRateHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshRateHelper.swift; sourceTree = "<group>"; };
+		04DCB7F527BA10A0005355C0 /* PlayerQueueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerQueueView.swift; sourceTree = "<group>"; };
 		04E10701270CD304002CACB0 /* JellifyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JellifyApp.swift; sourceTree = "<group>"; };
 		04E10702270CD304002CACB0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		04E10703270CD307002CACB0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -213,6 +216,8 @@
 		04FBD83827A635F200E780F3 /* SongHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongHelper.swift; sourceTree = "<group>"; };
 		04FBD83A27A721A900E780F3 /* PlaylistThumbnail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistThumbnail.swift; sourceTree = "<group>"; };
 		04FBD83C27A7253E00E780F3 /* ArtistImage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistImage.swift; sourceTree = "<group>"; };
+		04FE474A27BA91BA00BDEDFF /* NowPlayingThumbnail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingThumbnail.swift; sourceTree = "<group>"; };
+		04FE474C27BAA05C00BDEDFF /* ScrubberBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrubberBarView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -221,6 +226,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				041D3E79271DABF1002185CF /* JellyfinAPI in Frameworks */,
+				04FE474927BA815E00BDEDFF /* LNPopupUI-Static in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -256,6 +262,8 @@
 				041D3E7A2722E93E002185CF /* PlayerSheetView.swift */,
 				04848BD727264EE80072A81E /* VolumeSlider.swift */,
 				04848BDD272653610072A81E /* VolumeExtension.swift */,
+				04DCB7F527BA10A0005355C0 /* PlayerQueueView.swift */,
+				04FE474C27BAA05C00BDEDFF /* ScrubberBarView.swift */,
 			);
 			path = Player;
 			sourceTree = "<group>";
@@ -299,6 +307,7 @@
 				04848BDA272650050072A81E /* AlbumBackdropImage.swift */,
 				04FBD83A27A721A900E780F3 /* PlaylistThumbnail.swift */,
 				04FBD83C27A7253E00E780F3 /* ArtistImage.swift */,
+				04FE474A27BA91BA00BDEDFF /* NowPlayingThumbnail.swift */,
 			);
 			path = Images;
 			sourceTree = "<group>";
@@ -346,6 +355,13 @@
 			path = Song;
 			sourceTree = "<group>";
 		};
+		04DCB7FA27BA7E06005355C0 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		04E106FB270CD304002CACB0 = {
 			isa = PBXGroup;
 			children = (
@@ -356,6 +372,7 @@
 				04E10718270CD307002CACB0 /* Tests iOS */,
 				04E10724270CD307002CACB0 /* Tests macOS */,
 				04E10709270CD307002CACB0 /* Products */,
+				04DCB7FA27BA7E06005355C0 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -433,7 +450,6 @@
 				041D3E74271CAF89002185CF /* BackgroundCleanerView.swift */,
 				0442A25027B3115700003F0C /* ToolbarView.swift */,
 				049AE64627B69635006813DE /* AirPlayView.swift */,
-				04DCB7ED27B989CF005355C0 /* PlayerViewOffset.swift */,
 				04DCB7F127B9A532005355C0 /* LazyNavigationView.swift */,
 			);
 			path = Views;
@@ -514,6 +530,7 @@
 			name = "Jellify (iOS)";
 			packageProductDependencies = (
 				041D3E78271DABF1002185CF /* JellyfinAPI */,
+				04FE474827BA815E00BDEDFF /* LNPopupUI-Static */,
 			);
 			productName = "FinTune (iOS)";
 			productReference = 04E10708270CD307002CACB0 /* Jellify.app */;
@@ -609,6 +626,7 @@
 			mainGroup = 04E106FB270CD304002CACB0;
 			packageReferences = (
 				041D3E77271DABF1002185CF /* XCRemoteSwiftPackageReference "jellyfin-sdk-swift" */,
+				04FE474727BA815E00BDEDFF /* XCRemoteSwiftPackageReference "LNPopupUI" */,
 			);
 			productRefGroup = 04E10709270CD307002CACB0 /* Products */;
 			projectDirPath = "";
@@ -671,10 +689,12 @@
 				04CBCDE327196308003E9BE9 /* PlaylistDetailView.swift in Sources */,
 				04FBD83D27A7253E00E780F3 /* ArtistImage.swift in Sources */,
 				04848BDE272653620072A81E /* VolumeExtension.swift in Sources */,
+				04DCB7F627BA10A0005355C0 /* PlayerQueueView.swift in Sources */,
 				04E2DE23270E4A48007ABE38 /* BlurView.swift in Sources */,
 				04848BCC2725AAFE0072A81E /* AlbumThumbnail.swift in Sources */,
 				04E2806A27B13D06009082B1 /* NetworkingManager.swift in Sources */,
 				04848BCA2725AA610072A81E /* ItemThumbnail.swift in Sources */,
+				04FE474B27BA91BA00BDEDFF /* NowPlayingThumbnail.swift in Sources */,
 				04E1072B270CD307002CACB0 /* ContentView.swift in Sources */,
 				04D4B60327135DD50089CFC3 /* LoginResult.swift in Sources */,
 				04848BE427271D810072A81E /* ArtistRow.swift in Sources */,
@@ -702,6 +722,7 @@
 				04D4B5F92712246D0089CFC3 /* Login.swift in Sources */,
 				04CBCDD12715B700003E9BE9 /* Player.swift in Sources */,
 				04D4B5FC271232B90089CFC3 /* UserResponse.swift in Sources */,
+				04FE474D27BAA05C00BDEDFF /* ScrubberBarView.swift in Sources */,
 				0442A25427B3F52900003F0C /* ImageExtensions.swift in Sources */,
 				04E2806E27B1B307009082B1 /* ArrayExtensions.swift in Sources */,
 				04CBCDB927139AA1003E9BE9 /* UserDataResult.swift in Sources */,
@@ -719,7 +740,6 @@
 				04D4B60D27135FA50089CFC3 /* ArtistResult.swift in Sources */,
 				0442A25127B3115700003F0C /* ToolbarView.swift in Sources */,
 				041D3E69271A90F0002185CF /* ProgressBarView.swift in Sources */,
-				04DCB7EE27B989CF005355C0 /* PlayerViewOffset.swift in Sources */,
 				04DCB7EC27B8632C005355C0 /* SongsListView.swift in Sources */,
 				04FBD83B27A721A900E780F3 /* PlaylistThumbnail.swift in Sources */,
 				04848BE1272653BF0072A81E /* VolumeObserver.swift in Sources */,
@@ -1207,6 +1227,14 @@
 				kind = branch;
 			};
 		};
+		04FE474727BA815E00BDEDFF /* XCRemoteSwiftPackageReference "LNPopupUI" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/LeoNatan/LNPopupUI";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1214,6 +1242,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 041D3E77271DABF1002185CF /* XCRemoteSwiftPackageReference "jellyfin-sdk-swift" */;
 			productName = JellyfinAPI;
+		};
+		04FE474827BA815E00BDEDFF /* LNPopupUI-Static */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 04FE474727BA815E00BDEDFF /* XCRemoteSwiftPackageReference "LNPopupUI" */;
+			productName = "LNPopupUI-Static";
 		};
 /* End XCSwiftPackageProductDependency section */
 

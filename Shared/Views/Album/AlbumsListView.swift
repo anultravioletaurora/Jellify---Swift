@@ -67,10 +67,6 @@ struct AlbumsListView: View {
                     print("Last album of total: \(albums.count)")
                 }
             }
-            
-            if albums.last! == album {
-                PlayerViewOffset()
-            }
         }
         .searchable(text: $searchBar.search, prompt: "Search albums")
         .disableAutocorrection(true)

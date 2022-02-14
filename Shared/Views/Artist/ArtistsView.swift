@@ -42,10 +42,6 @@ struct ArtistsView: View {
             List(artists) { artist in
                 ArtistRow(artist: artist)
                     .listRowSeparator(artists.last! == artist ? .hidden : .visible)
-                
-                if artists.last! == artist {
-                    PlayerViewOffset()
-                }
             }
             .searchable(text: $searchBar.search, prompt: "Search artists")
             .disableAutocorrection(true)

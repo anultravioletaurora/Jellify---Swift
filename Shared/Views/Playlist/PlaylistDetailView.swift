@@ -95,10 +95,6 @@ struct PlaylistDetailView: View {
                 .padding(.horizontal, 10)
                 .padding(.vertical, 5)
                 .buttonStyle(PlainButtonStyle())
-
-            if playlistSong == playlistSongs.last! {
-                PlayerViewOffset()
-            }
         }
         .listStyle(PlainListStyle())
         .navigationTitle(playlist.name ?? "Unknown Playlist")

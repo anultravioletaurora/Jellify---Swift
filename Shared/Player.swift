@@ -93,7 +93,7 @@ class Player: ObservableObject {
 
     static let shared = Player()
     let session = AVAudioSession.sharedInstance()
-    
+        
     public enum PlayMode {
         case random, ordered
         
@@ -145,7 +145,7 @@ class Player: ObservableObject {
                 player?.preventsDisplaySleepDuringVideoPlayback = false
                 currentSong = songs[songIndex]
                 setupBackgroundPlay()
-            }
+            }            
         }
     }
     
@@ -202,6 +202,8 @@ class Player: ObservableObject {
         }
     }
     @Published public var color: Color = .purple
+    
+    // TODO: FIX THIS
     @Published public var playmode = PlayMode.ordered {
         didSet{
                 // order or shuffle the songs
@@ -225,7 +227,7 @@ class Player: ObservableObject {
     @Published public var timeElasped = "0:00"
     @Published public var timeRemaining = "0:00"
     @Published public var playProgress: Float = 0
-    @Published public var playProgressAhead: Float = 0
+    @Published public var playProgressAhead: Double = 0.0
     @Published public var trigger: Bool = false
     @Published public var seeking: Bool = false {
         didSet{
@@ -543,7 +545,7 @@ class Player: ObservableObject {
                 timeTimer?.invalidate()
                 timeTimer = nil
             }
-            timeTimer = Timer.scheduledTimer(withTimeInterval: Globals.playTimeInterval,
+            timeTimer = Timer.scheduledTimer(withTimeInterval: 0.1,
                                              repeats: true,
                                              block:
                 { [weak self] timer in
@@ -585,7 +587,7 @@ class Player: ObservableObject {
             
             if(self.player != nil && self.player!.status == AVPlayer.Status.readyToPlay && self.player!.currentItem!.status == AVPlayerItem.Status.readyToPlay) {
                 self.playProgress = Float(progress)
-                self.playProgressAhead = Float(progress)
+                self.playProgressAhead = progress
             }else{
                 self.playProgress = 0
                 self.playProgressAhead = 0
@@ -598,7 +600,7 @@ class Player: ObservableObject {
         if let duration = player?.currentItem?.duration.seconds {
             let playTimeSecs = Double(duration * progress)
             self.player?.seek(to: CMTime(seconds: playTimeSecs, preferredTimescale: 1), completionHandler: { _ in
-                self.playProgressAhead = Float(progress)
+                self.playProgressAhead = progress
                 self.seeking = false
                 self.trigger = true
             })
@@ -609,7 +611,7 @@ class Player: ObservableObject {
     
     private func refreshPlayingInfo() {
         if !seeking, let duration = player?.currentItem?.duration.seconds,
-            let playTime = player?.currentItem?.currentTime().seconds, !duration.isNaN, !playTime.isNaN {
+           let playTime = player?.currentItem?.currentTime().seconds, !duration.isNaN, !playTime.isNaN {
                 let durationSecs = Int(duration)
                 let durationSeconds = Int(durationSecs % 3600 ) % 60
                 let durationMinutes = Int(durationSecs % 3600) / 60
@@ -630,7 +632,8 @@ class Player: ObservableObject {
                 
                 if(self.player != nil && self.player!.status == AVPlayer.Status.readyToPlay && self.player!.currentItem!.status == AVPlayerItem.Status.readyToPlay) {
                     self.playProgress = Float(playTime) / Float(duration)
-                    self.playProgressAhead = Float(playTime + Globals.playTimeInterval) / Float(duration)
+                    self.playProgressAhead = (playTime + Globals.playTimeInterval) / duration
+                    
                 }else{
                     self.playProgress = 0
                     self.playProgressAhead = 0

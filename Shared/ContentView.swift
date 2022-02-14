@@ -15,8 +15,11 @@ struct ContentView: View {
     @ObservedObject
     var librarySelectionService = LibrarySelectionService.shared
     
-    @StateObject
+    @ObservedObject
     var networkingManager = NetworkingManager.shared
+    
+    @ObservedObject
+    var player = Player.shared
     
     init() {
         

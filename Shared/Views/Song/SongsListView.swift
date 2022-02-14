@@ -73,10 +73,6 @@ struct SongsListView: View {
                         print("New Limit: \(self.limit)")
                     }
                 }
-            
-            if song == songs.last! {
-                PlayerViewOffset()
-            }
         }
         .animation(nil, value: UUID())
         .sheet(isPresented: $showPlaylistSheet, content: {

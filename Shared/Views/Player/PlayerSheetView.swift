@@ -12,139 +12,190 @@ struct PlayerSheetView: View {
         
     @ObservedObject
     var player = Player.shared
-    
-    var height = UIScreen.main.bounds.height / 2.5
-    
-    @Environment(\.colorScheme)
-    var colorScheme: ColorScheme
-    
-    @Binding
-    var showMediaPlayer : Bool
-    
+                
     @State
     private var airPlayView = AirPlayView()
-        
+    
+    @State
+    private var viewingQueue = false
+    
+    var height = UIScreen.main.bounds.height / 2.5
+
+    @Environment(\.colorScheme)
+    var colorScheme: ColorScheme
+
     var body: some View {
 
-        NavigationView {
             VStack(alignment: .center) {
-                
-                Button(action: {
-                    showMediaPlayer.toggle()
-                }, label: {
-                    Capsule()
-                        .fill(Color.primary)
-                        .frame(width: 40, height: 5)
-                        .opacity(0.6)
-                        .padding(.all, 10)
-                })
+                    
+                if viewingQueue {
+                    List(player.songs.suffix(from: player.songIndex)) { song in
+                        HStack {
+                                                        
+                            if player.currentSong != nil && song == player.currentSong! {
+                                ZStack {
+                                    
+                                    AlbumThumbnail(album: song.song.album!)
+                                        .brightness(colorScheme == .dark ? -0.3 : 0.3)
+                                    
+                                    Image(systemName: "speaker.wave.3")
+                                        .font(.title)
+                                }
+                            } else {
+                                AlbumThumbnail(album: song.song.album!)
+                            }
+                            
+                            VStack(alignment: .leading) {
+                                Text(song.song.name!)
 
-                // Album Artwork
-                if player.currentSong!.song.album != nil {
-                    AlbumPlayingImage(album: player.currentSong!.song.album!)
+                                if song.song.artists!.count ?? 0 > 1 {
+                                    Text((song.song.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: ", "))
+                                        .font(.headline)
+                                } else {
+                                    Text(song.song.album!.albumArtistName! ?? "")
+                                        .font(Font.subheadline)
+                                        .transition(.opacity)
+                                }
 
-                }
-                
+                            }
+                        }
+                        .listRowBackground(Color.clear)
+                        .onTapGesture(perform: {
+                            player.next(song: song)
+                        })
+                    }
+                    .frame(width: height, height: height)
+                    .background(Color.clear)
+                    .listStyle(PlainListStyle())
+                    .animation(Animation.easeInOut)
+                    .padding(.top, 30)
+                } else {
+                    // Album Artwork
+                    if player.currentSong?.song.album != nil {
+                        AlbumPlayingImage(album: player.currentSong!.song.album!)
+                            .padding(.top, 30)
+                            .animation(Animation.easeInOut)
+                    } else {
+                        Image("placeholder")
+                            .resizable()
+                        
+                    }
+                    
                     // Song name text
                     Text(player.currentSong?.song.name ?? "Nothing Playing")
                         .font(.title3)
                         .bold()
 
-                if player.currentSong!.song.artists!.count > 1 {
+                if player.currentSong?.song.artists!.count ?? 0 > 1 {
                     Text((player.currentSong!.song.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: ", "))
                         .font(.body)
                 } else {
-                    Text(player.currentSong!.song.album!.albumArtistName!)
+                    Text(player.currentSong?.song.album!.albumArtistName! ?? "")
                         .font(.body)
                         .transition(.opacity)
                 }
-                    // Artist(s) name(s) text
 
                     // Album name text
                     Text(player.currentSong?.song.album?.name ?? "Unknown Album")
                         .font(.body)
                         .transition(.opacity)
                         .foregroundColor(.accentColor)
-                        
-                    ProgressBarView()
-                        .padding(.all)
 
-                    HStack {
-                        // Skip track
-                        Button(action: {
-                            player.previous()
-                        }) {
-                            Image(systemName: "backward.fill")
-                                .font(.largeTitle)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .padding(.horizontal, 30)
-
-                        // Play / Pause music
-                        Button(action: {
-                            player.isPlaying = !player.isPlaying
-                        }) {
-                            if player.isPlaying {
-                                Image(systemName: "pause.fill")
-                                    .font(.system(size: 50))
-                            } else {
-                                Image(systemName: "play.fill")
-                                    .font(.system(size: 50))
-                            }
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .frame(width: 45, height: 45, alignment: .center)
-                        .padding(.horizontal, 30)
-
-                        // Skip track
-                        Button(action: {
-                            player.next()
-                        }) {
-                            Image(systemName: "forward.fill")
-                                .font(.largeTitle)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        .padding(.horizontal, 30)
+                }
+                                        
+                ScrubberBarView()
+//                    ProgressBarView()
+//                        .padding(.all)
+                
+                HStack {
+                    // Skip track
+                    Button(action: {
+                        player.previous()
+                    }) {
+                        Image(systemName: "backward.fill")
+                            .font(.largeTitle)
+                            .padding(25)
                     }
-                    .padding(.bottom, 80)
-                    .padding(.top, 20)
-                                
-                    HStack {
-                            
-                        Spacer()
+                    .buttonStyle(PlainButtonStyle())
+                    .padding(.horizontal, 30)
+
+                    // Play / Pause music
+                    Button(action: {
+                        player.isPlaying.toggle()
+                    }) {
+                        if player.isPlaying {
+                            Image(systemName: "pause.fill")
+                                .font(.system(size: 50))
+                                .padding(25)
+                        } else {
+                            Image(systemName: "play.fill")
+                                .font(.system(size: 50))
+                                .padding(25)
+                        }
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .frame(width: 45, height: 45, alignment: .center)
+                    .padding(.horizontal, 30)
+
+                    // Skip track
+                    Button(action: {
+                        player.next()
+                    }) {
+                        Image(systemName: "forward.fill")
+                            .font(.largeTitle)
+                            .padding(25)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                    .padding(.horizontal, 30)
+                }
+                
+//                Spacer()
+//                VolumeSlider()
+//                
                         
-                        NavigationLink(destination: {
-                            Text("Queue")
-                        }, label: {
-                            Image(systemName: "list.number")
+                HStack {
+                        
+                    Spacer()
+                    
+                    Button(action: {
+                        withAnimation {
+                            viewingQueue.toggle()
+                        }
+                    }, label: {
+                        Image(systemName: "list.number")
+                            .font(.title)
+                            .foregroundColor(viewingQueue ? .accentColor : .primary)
+                            .padding(25)
+                    })
+                    
+                    Spacer()
+                    
+                    Button(action: {
+                        player.repeatMode.toggle()
+                    }, label: {
+                        
+                        switch player.repeatMode {
+                        case .reapeatAll:
+                            Image(systemName: "repeat")
                                 .font(.title)
-                        })
-                        
-                        Spacer()
-                        
-                        Button(action: {
-                            player.repeatMode.toggle()
-                        }, label: {
-                            
-                            switch player.repeatMode {
-                            case .reapeatAll:
-                                Image(systemName: "repeat")
-                                    .font(.title)
-                                    .foregroundColor(.accentColor)
-                            case .repeatOne:
-                                Image(systemName: "repeat.1")
-                                    .font(.title)
-                                    .foregroundColor(.accentColor)
-                            case .none:
-                                Image(systemName: "repeat")
-                                    .font(.title)
-                            }
-                        })
-                            .buttonStyle(PlainButtonStyle())
-                        
-                        Spacer()
-                        
-                        // Dismiss player sheet button
+                                .foregroundColor(.accentColor)
+                                .padding(25)
+                        case .repeatOne:
+                            Image(systemName: "repeat.1")
+                                .font(.title)
+                                .foregroundColor(.accentColor)
+                                .padding(25)
+                        case .none:
+                            Image(systemName: "repeat")
+                                .font(.title)
+                                .padding(25)
+                        }
+                    })
+                        .buttonStyle(PlainButtonStyle())
+                    
+                    Spacer()
+                    
+                    // Dismiss player sheet button
 //                        Button(action: {
 //                            showMediaPlayer.toggle()
 //                        }, label: {
@@ -154,42 +205,74 @@ struct PlayerSheetView: View {
 //                        .buttonStyle(PlainButtonStyle())
 //
 //                        Spacer()
-                        
-                        Button(action: {
-                            player.playmode.toggle()
-                        }, label: {
-                            Image(systemName: "shuffle")
-                                .font(.title)
-                                .foregroundColor(player.playmode == .random ? .accentColor : .primary)
-                        })
-                            .buttonStyle(PlainButtonStyle())
-                        
-                        Spacer()
-
-                        Button(action: {
-                            airPlayView.showAirPlayMenu()
-                        }) {
-                            Image(systemName: "airplayaudio")
-                                .font(.title)
-                                .foregroundColor(player.player!.isExternalPlaybackActive ? .accentColor : .primary)
-                        }
-                        .buttonStyle(PlainButtonStyle())
-                        
-                        Spacer()
-                    }
-                }
-                .offset(y: -65)
-            
-                // Blurred album artwork background
-                .background(content: {
                     
-                    if player.currentSong!.song.album!.artwork != nil {
-                        AlbumBackdropImage(album: player.currentSong!.song.album!)
+                    Button(action: {
+                        player.playmode.toggle()
+                    }, label: {
+                        Image(systemName: "shuffle")
+                            .font(.title)
+                            .foregroundColor(player.playmode == .random ? .accentColor : .primary)
+                            .padding(25)
+                    })
+                        .buttonStyle(PlainButtonStyle())
+                    
+                    Spacer()
+
+                    Button(action: {
+                        airPlayView.showAirPlayMenu()
+                    }) {
+                        Image(systemName: "airplayaudio")
+                            .font(.title)
+                            .foregroundColor(player.player?.isExternalPlaybackActive ?? false ? .accentColor : .primary)
+                            .padding(25)
                     }
-                })
+                    .buttonStyle(PlainButtonStyle())
+                    
+                    Spacer()
+                }
+                .padding(.top, 60)
             }
-        .navigationViewStyle(.stack)
-        }
+            // Blurred album artwork background
+            .background(content: {
+                
+                if player.currentSong?.song.album!.artwork != nil {
+                    AlbumBackdropImage(album: player.currentSong!.song.album!)
+                }
+            })
+            .popupTitle(player.currentSong?.song.name ?? "Nothing Playing", subtitle: player.currentSong?.song.album!.albumArtistName ?? "Unknown Artist")
+            .popupImage(player.currentSong != nil ? Image(data: player.currentSong!.song.album!.artwork).resizable() :  Image("placeholder").resizable())
+            .popupBarItems({
+                HStack {
+                    // Play / Pause music
+                    Button(action: {
+                        player.isPlaying.toggle()
+                    }) {
+                        if player.isPlaying {
+                            Image(systemName: "pause.fill")
+                                .font(.largeTitle)
+                                .padding(25)
+                        } else {
+                            Image(systemName: "play.fill")
+
+                                .font(.largeTitle)
+                                .frame(width: 30, height: 30)
+                                .padding(25)
+                        }
+                    }
+                    .padding(.trailing, 15)
+                    .buttonStyle(PlainButtonStyle())
+
+                    // Skip track
+                    Button(action: {
+                        player.next()
+                    }) {
+                        Image(systemName: "forward.fill")
+                            .font(.largeTitle)
+                    }
+                    .buttonStyle(PlainButtonStyle())
+                }
+            })
+            }
     }
     
     func getWrappedArtists(artists: NSSet?) -> String {

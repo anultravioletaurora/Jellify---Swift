@@ -18,6 +18,24 @@
           "revision": "f315671ced976a7ec75ce6a1f37e00b4880cbf4b",
           "version": null
         }
+      },
+      {
+        "package": "LNPopupController",
+        "repositoryURL": "https://github.com/LeoNatan/LNPopupController.git",
+        "state": {
+          "branch": null,
+          "revision": "e8d646a44a8569d23c7418f1de39de2e58cb90da",
+          "version": "2.13.3"
+        }
+      },
+      {
+        "package": "LNPopupUI",
+        "repositoryURL": "https://github.com/LeoNatan/LNPopupUI",
+        "state": {
+          "branch": "master",
+          "revision": "6da0a931c3942f609339e75586a0ad1b767f4043",
+          "version": null
+        }
       }
     ]
   },

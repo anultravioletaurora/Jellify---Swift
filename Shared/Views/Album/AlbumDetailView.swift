@@ -111,9 +111,7 @@ struct AlbumDetailView: View {
                 .sheet(isPresented: $showPlaylistSheet, content: {
                     PlaylistSelectionSheet(song: $selectedSong, showPlaylistSheet: $showPlaylistSheet)
                 })
-                
-                PlayerViewOffset()
-            }
+        }
 
         .listStyle(PlainListStyle())
         .navigationTitle(album.name ?? "Unknown Album")

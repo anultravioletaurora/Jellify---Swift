@@ -28,6 +28,8 @@ struct PlayerView<Content: View>: View {
         
     @State
     var offset : CGFloat = 0
+    
+    
                 
     @ViewBuilder
     var body: some View {
@@ -112,7 +114,7 @@ struct PlayerView<Content: View>: View {
         }
         // Fullscreen player sheet
         .sheet(isPresented: $showMediaPlayer, onDismiss: {}, content: {
-            PlayerSheetView(showMediaPlayer: $showMediaPlayer)
+            PlayerSheetView()
         })
     }
     

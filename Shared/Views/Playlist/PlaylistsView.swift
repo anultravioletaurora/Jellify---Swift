@@ -56,10 +56,6 @@ struct PlaylistsView: View {
                             }
                         })
                             .listRowSeparator(playlists.last! == playlist ? .hidden : .visible)
-                        
-                        if playlists.last == playlist {
-                            PlayerViewOffset()
-                        }
                     }
                     .listStyle(PlainListStyle())
                     .searchable(text: $searchBar.search, prompt: "Search playlists")
