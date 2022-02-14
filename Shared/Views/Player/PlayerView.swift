@@ -7,7 +7,6 @@
 
 import SwiftUI
 import MediaPlayer
-import Marquee
 
 struct PlayerView<Content: View>: View {
         
@@ -63,12 +62,9 @@ struct PlayerView<Content: View>: View {
 
                             }
                                           
-                            Marquee {
                                 Text(player.currentSong?.song.name ?? "Nothing Playing")
                                     .bold()
                                     .foregroundColor(player.currentSong == nil ? .gray : nil)
-                            }.marqueeWhenNotFit(true)
-                                .marqueeDuration(10.0)
                         }
                         .transition(.opacity)
                     }

@@ -21,6 +21,8 @@ struct ProgressBarView: View {
     @State private var canAnimate: Bool = false
     @State private var appeared: Bool = false
     
+    private let refreshRateHelper: RefreshRateHelper = RefreshRateHelper.shared
+    
     @Environment(\.colorScheme)
     var colorScheme: ColorScheme
  
@@ -76,6 +78,8 @@ struct ProgressBarView: View {
                         }
                         .gesture(DragGesture()
                                     .onChanged { gesture in
+                            
+                            refreshRateHelper.preferredFrameRateRange(.init(minimum: 80, maximum: 120, __preferred: 120))
                                         if !player.seeking{
                                             player.seeking = true
                                             seekStart = prog
@@ -90,6 +94,8 @@ struct ProgressBarView: View {
                                     .onEnded { gesture in
                                         let realProgress = (prog/(geometry.size.width - seekSize))
                                         player.seek(progress: Double(realProgress))
+                            
+                            refreshRateHelper.preferredFrameRateRange(.default)
                                     }
                         )
                     }
