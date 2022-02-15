@@ -18,6 +18,9 @@ struct ArtistsView: View {
     
     @Environment(\.managedObjectContext)
     var managedObjectContext
+    
+    @ObservedObject
+    var networkingManager = NetworkingManager.shared
         
     @StateObject
     var searchBar = SearchBarViewModel()
@@ -60,12 +63,18 @@ struct ArtistsView: View {
             .navigationTitle("Artists")
             .toolbar(content: {
                 ToolbarItem(content: {
-                    Button(action: {
-                        print("syncing library")
-                    }, label: {
-                        Image(systemName: "arrow.triangle.2.circlepath")
-                    })
-                        .buttonStyle(PlainButtonStyle())
+                    
+                    if networkingManager.loadingPhase != nil {
+                        ProgressView()
+                    } else {
+                        Button(action: {
+                            print("syncing library")
+                            networkingManager.syncLibrary()
+                        }, label: {
+                            Image(systemName: "arrow.triangle.2.circlepath")
+                        })
+                            .buttonStyle(PlainButtonStyle())
+                    }
 
                 })
             })

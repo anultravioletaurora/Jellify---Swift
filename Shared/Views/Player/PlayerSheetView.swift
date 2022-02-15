@@ -160,7 +160,7 @@ struct PlayerSheetView: View {
                 }
                 
 //                Spacer()
-//                VolumeSlider()
+                VolumeSlider()
 //                
                         
                 HStack {

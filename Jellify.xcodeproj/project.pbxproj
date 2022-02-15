@@ -28,6 +28,7 @@
 		0442A26B27B3F95900003F0C /* LibrarySelectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0442A26927B3F95900003F0C /* LibrarySelectionService.swift */; };
 		0462B3BD27BBCFEE009066CD /* ArtistModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0462B3BC27BBCFEE009066CD /* ArtistModel.swift */; };
 		0462B3BE27BBCFEE009066CD /* ArtistModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0462B3BC27BBCFEE009066CD /* ArtistModel.swift */; };
+		047F493027BBF4920076B45E /* SwiftAudioPlayer in Frameworks */ = {isa = PBXBuildFile; productRef = 047F492F27BBF4920076B45E /* SwiftAudioPlayer */; };
 		04848BC82725A9FE0072A81E /* PlaylistItemThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04848BC72725A9FE0072A81E /* PlaylistItemThumbnail.swift */; };
 		04848BCA2725AA610072A81E /* ItemThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04848BC92725AA610072A81E /* ItemThumbnail.swift */; };
 		04848BCC2725AAFE0072A81E /* AlbumThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04848BCB2725AAFE0072A81E /* AlbumThumbnail.swift */; };
@@ -230,6 +231,7 @@
 			files = (
 				041D3E79271DABF1002185CF /* JellyfinAPI in Frameworks */,
 				04FE474927BA815E00BDEDFF /* LNPopupUI-Static in Frameworks */,
+				047F493027BBF4920076B45E /* SwiftAudioPlayer in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -535,6 +537,7 @@
 			packageProductDependencies = (
 				041D3E78271DABF1002185CF /* JellyfinAPI */,
 				04FE474827BA815E00BDEDFF /* LNPopupUI-Static */,
+				047F492F27BBF4920076B45E /* SwiftAudioPlayer */,
 			);
 			productName = "FinTune (iOS)";
 			productReference = 04E10708270CD307002CACB0 /* Jellify.app */;
@@ -631,6 +634,7 @@
 			packageReferences = (
 				041D3E77271DABF1002185CF /* XCRemoteSwiftPackageReference "jellyfin-sdk-swift" */,
 				04FE474727BA815E00BDEDFF /* XCRemoteSwiftPackageReference "LNPopupUI" */,
+				047F492E27BBF4920076B45E /* XCRemoteSwiftPackageReference "SwiftAudioPlayer" */,
 			);
 			productRefGroup = 04E10709270CD307002CACB0 /* Products */;
 			projectDirPath = "";
@@ -1233,6 +1237,14 @@
 				kind = branch;
 			};
 		};
+		047F492E27BBF4920076B45E /* XCRemoteSwiftPackageReference "SwiftAudioPlayer" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tanhakabir/SwiftAudioPlayer";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 7.0.0;
+			};
+		};
 		04FE474727BA815E00BDEDFF /* XCRemoteSwiftPackageReference "LNPopupUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/LeoNatan/LNPopupUI";
@@ -1248,6 +1260,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 041D3E77271DABF1002185CF /* XCRemoteSwiftPackageReference "jellyfin-sdk-swift" */;
 			productName = JellyfinAPI;
+		};
+		047F492F27BBF4920076B45E /* SwiftAudioPlayer */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 047F492E27BBF4920076B45E /* XCRemoteSwiftPackageReference "SwiftAudioPlayer" */;
+			productName = SwiftAudioPlayer;
 		};
 		04FE474827BA815E00BDEDFF /* LNPopupUI-Static */ = {
 			isa = XCSwiftPackageProductDependency;

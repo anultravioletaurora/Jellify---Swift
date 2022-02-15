@@ -690,10 +690,12 @@ class NetworkingManager : ObservableObject {
     }
     
     private func loadPlaylists(complete: @escaping () -> Void) -> Void {
+        
         ItemsAPI.getItemsByUserId(userId: self.userId, maxOfficialRating: nil, hasThemeSong: nil, hasThemeVideo: nil, hasSubtitles: nil, hasSpecialFeature: nil, hasTrailer: nil, adjacentTo: nil, parentIndexNumber: nil, hasParentalRating: nil, isHd: nil, is4K: nil, locationTypes: nil, excludeLocationTypes: nil, isMissing: nil, isUnaired: nil, minCommunityRating: nil, minCriticRating: nil, minPremiereDate: nil, minDateLastSaved: nil, minDateLastSavedForUser: nil, maxPremiereDate: nil, hasOverview: nil, hasImdbId: nil, hasTmdbId: nil, hasTvdbId: nil, excludeItemIds: nil, startIndex: nil, limit: nil, recursive: true, searchTerm: nil, sortOrder: nil, parentId: self.playlistId, fields: nil, excludeItemTypes: nil, includeItemTypes: ["Playlist"], filters: nil, isFavorite: nil, mediaTypes: nil, imageTypes: nil, sortBy: ["SortName"], isPlayed: nil, genres: nil, officialRatings: nil, tags: nil, years: nil, enableUserData: true, imageTypeLimit: nil, enableImageTypes: nil, person: nil, personIds: nil, personTypes: nil, studios: nil, artists: nil, excludeArtistIds: nil, artistIds: nil, albumArtistIds: nil, contributingArtistIds: nil, albums: nil, albumIds: nil, ids: nil, videoTypes: nil, minOfficialRating: nil, isLocked: nil, isPlaceHolder: nil, hasOfficialRating: nil, collapseBoxSetItems: nil, minWidth: nil, minHeight: nil, maxWidth: nil, maxHeight: nil, is3D: nil, seriesStatus: nil, nameStartsWithOrGreater: nil, nameStartsWith: nil, nameLessThan: nil, studioIds: nil, genreIds: nil, enableTotalRecordCount: nil, enableImages: nil, apiResponseQueue: processingQueue)
             .sink(receiveCompletion: { completion in
                 print("Playlist retrieval: \(completion)")
             }, receiveValue: { response in
+                
                 if response.items != nil {
                     
                     var loadingStatus : [Bool] = []
@@ -781,7 +783,7 @@ class NetworkingManager : ObservableObject {
                                             playlistSongIds.subtract(currentPlaylistSongs.filter { $0.jellyfinId != nil }.map { $0.jellyfinId! })
                                         }
                                                                     
-                                        newSongs = playlistItems.items!.filter { playlistSongIds.contains($0.id!)}
+                                        newSongs = playlistItems.items!.filter { playlistSongIds.contains($0.playlistItemId!)}
                                     } else {
                                         newSongs = playlistItems.items!
                                     }
