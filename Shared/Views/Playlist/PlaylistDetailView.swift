@@ -57,10 +57,15 @@ struct PlaylistDetailView: View {
 //                                Text(playlistSong.song?.album?.name! ?? "Unknown Album")
 //                                    .font(.subheadline)
                                 
-                                if playlistSong.song!.artists!.count > 1 {
+                                if playlistSong.song!.artists!.count > 2 {
                                 Text((playlistSong.song!.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: ", "))
                                     .font(.subheadline)
                                     .opacity(0.6)
+                                } else if playlistSong.song!.artists!.count > 1 {
+                                    Text((playlistSong.song!.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: " & "))
+                                        .font(.subheadline)
+                                        .opacity(0.6)
+
                                 } else {
                                     Text(playlistSong.song!.album!.albumArtistName!)
                                         .font(.subheadline)

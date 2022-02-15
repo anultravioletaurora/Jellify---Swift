@@ -201,7 +201,6 @@ class Player: ObservableObject {
             MPNowPlayingInfoCenter.default().playbackState = isPlaying ? .playing : .paused
         }
     }
-    @Published public var color: Color = .purple
     
     // TODO: FIX THIS
     @Published public var playmode = PlayMode.ordered {
@@ -239,7 +238,7 @@ class Player: ObservableObject {
     
     public var player: AVQueuePlayer?
     private var timeTimer: Timer?
-    @Published public var animationTimer = Timer.publish(every: 9, on: .main, in: .common).autoconnect()
+//    @Published public var animationTimer = Timer.publish(every: 9, on: .main, in: .common).autoconnect()
     init() {
         let nc = NotificationCenter.default
         nc.addObserver(forName: .AVPlayerItemDidPlayToEndTime,

@@ -20,7 +20,7 @@ struct ContentView: View {
     
     @ObservedObject
     var player = Player.shared
-    
+        
     init() {
         
         // Because of reasons I don't know, this is needed so that the tab bar doesn't
@@ -70,6 +70,7 @@ struct ContentView: View {
                     }
                 }
             })
+
             .onAppear(perform: {
                 
                 networkingManager.openSession()

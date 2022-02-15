@@ -16,6 +16,9 @@ struct PlayerSheetView: View {
     @State
     private var airPlayView = AirPlayView()
     
+    @Binding
+    var miniplayerExpanded : Bool
+    
     @State
     private var viewingQueue = false
     
@@ -29,6 +32,11 @@ struct PlayerSheetView: View {
             VStack(alignment: .center) {
                     
                 if viewingQueue {
+                    
+                    Text("Now Playing")
+                        .font(Font.headline)
+                        .padding(.top, 30)
+                    
                     List(player.songs.suffix(from: player.songIndex)) { song in
                         HStack {
                                                         
@@ -68,7 +76,6 @@ struct PlayerSheetView: View {
                     .background(Color.clear)
                     .listStyle(PlainListStyle())
                     .animation(Animation.easeInOut)
-                    .padding(.top, 30)
                 } else {
                     // Album Artwork
                     if player.currentSong?.song.album != nil {
@@ -78,6 +85,9 @@ struct PlayerSheetView: View {
                     } else {
                         Image("placeholder")
                             .resizable()
+                            .frame(width: height, height: height)
+                            .cornerRadius(10)
+                            .padding(.top, 30)
                         
                     }
                     
@@ -96,7 +106,7 @@ struct PlayerSheetView: View {
                 }
 
                     // Album name text
-                    Text(player.currentSong?.song.album?.name ?? "Unknown Album")
+                    Text(player.currentSong?.song.album?.name ?? "")
                         .font(.body)
                         .transition(.opacity)
                         .foregroundColor(.accentColor)
@@ -232,6 +242,9 @@ struct PlayerSheetView: View {
                 }
                 .padding(.top, 60)
             }
+            .onChange(of: self.miniplayerExpanded, perform: { _ in
+                self.viewingQueue = false
+            })
             // Blurred album artwork background
             .background(content: {
                 
@@ -239,7 +252,8 @@ struct PlayerSheetView: View {
                     AlbumBackdropImage(album: player.currentSong!.song.album!)
                 }
             })
-            .popupTitle(player.currentSong?.song.name ?? "Nothing Playing", subtitle: player.currentSong?.song.album!.albumArtistName ?? "Unknown Artist")
+            .popupProgress(player.playProgress)
+            .popupTitle(player.currentSong?.song.name ?? "Nothing Playing", subtitle: player.currentSong?.song.album!.albumArtistName ?? nil)
             .popupImage(player.currentSong != nil ? Image(data: player.currentSong!.song.album!.artwork).resizable() :  Image("placeholder").resizable())
             .popupBarItems({
                 HStack {
@@ -256,10 +270,9 @@ struct PlayerSheetView: View {
 
                                 .font(.largeTitle)
                                 .frame(width: 30, height: 30)
-                                .padding(25)
+                                .padding(.trailing, 15)
                         }
                     }
-                    .padding(.trailing, 15)
                     .buttonStyle(PlainButtonStyle())
 
                     // Skip track
@@ -272,7 +285,7 @@ struct PlayerSheetView: View {
                     .buttonStyle(PlainButtonStyle())
                 }
             })
-            }
+        }
     }
     
     func getWrappedArtists(artists: NSSet?) -> String {

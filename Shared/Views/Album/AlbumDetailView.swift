@@ -108,6 +108,7 @@ struct AlbumDetailView: View {
                 ForEach(songs) { song in
                     SongRow(song: song, selectedSong: $selectedSong, songs: Array(songs), showPlaylistSheet: $showPlaylistSheet, type: .album)
                 }
+                
                 .sheet(isPresented: $showPlaylistSheet, content: {
                     PlaylistSelectionSheet(song: $selectedSong, showPlaylistSheet: $showPlaylistSheet)
                 })

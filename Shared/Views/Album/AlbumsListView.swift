@@ -68,6 +68,7 @@ struct AlbumsListView: View {
                 }
             }
         }
+        .id(UUID())
         .searchable(text: $searchBar.search, prompt: "Search albums")
         .disableAutocorrection(true)
         .onReceive(searchBar.$search.debounce(for: .seconds(0.5), scheduler: DispatchQueue.main))
@@ -76,7 +77,7 @@ struct AlbumsListView: View {
                 albums.nsPredicate = nil
                 return
             }
-            albums.nsPredicate = searchBar.search.isEmpty ? nil : NSPredicate(format: "%K contains[c] %@", #keyPath(Album.name), searchBar.search.trimmingCharacters(in: .whitespaces))
+            albums.nsPredicate = searchBar.search.isEmpty ? nil : NSPredicate(format: "%K beginswith[c] %@", #keyPath(Album.name), searchBar.search.trimmingCharacters(in: .whitespaces))
         }
 
         .listStyle(PlainListStyle())

@@ -113,9 +113,9 @@ struct PlayerView<Content: View>: View {
             }
         }
         // Fullscreen player sheet
-        .sheet(isPresented: $showMediaPlayer, onDismiss: {}, content: {
-            PlayerSheetView()
-        })
+//        .sheet(isPresented: $showMediaPlayer, onDismiss: {}, content: {
+//            PlayerSheetView(miniplayerExpanded: mini)
+//        })
     }
     
     func getWrappedArtists(artists: NSSet?) -> String {

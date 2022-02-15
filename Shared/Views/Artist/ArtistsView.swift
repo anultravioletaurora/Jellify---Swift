@@ -35,7 +35,6 @@ struct ArtistsView: View {
     
     var body: some View {
         NavigationView {
-
                                 
             // Artists List
             // TODO: Turn this into a sectioned list with alphabetical seperators
@@ -43,19 +42,19 @@ struct ArtistsView: View {
                 ArtistRow(artist: artist)
                     .listRowSeparator(artists.last! == artist ? .hidden : .visible)
             }
+            .id(UUID())
+            .animation(nil, value: UUID())
             .searchable(text: $searchBar.search, prompt: "Search artists")
             .disableAutocorrection(true)
             .onReceive(
-                        
-                searchBar.$search.debounce(for: .seconds(1), scheduler: DispatchQueue.main)
+                searchBar.$search.debounce(for: .seconds(0.7), scheduler: DispatchQueue.main)
             ) {
-                artists.nsPredicate = NSPredicate(format: "%K contains %@", #keyPath(Artist.name), UUID().uuidString)
- 
                 guard !$0.isEmpty else {
                     artists.nsPredicate = nil
                     return
                 }
-                artists.nsPredicate = searchBar.search.isEmpty ? nil : NSPredicate(format: "%K contains[c] %@", #keyPath(Artist.name), searchBar.search.trimmingCharacters(in: .whitespaces))
+                
+                artists.nsPredicate = searchBar.search.isEmpty ? nil : NSPredicate(format: "%K beginswith[c] %@", #keyPath(Artist.name), searchBar.search.trimmingCharacters(in: .whitespaces))
             }
             .listStyle(PlainListStyle())
             .navigationTitle("Artists")

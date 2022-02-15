@@ -26,6 +26,8 @@
 		0442A26827B3F94000003F0C /* AuthenticationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0442A26627B3F94000003F0C /* AuthenticationService.swift */; };
 		0442A26A27B3F95900003F0C /* LibrarySelectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0442A26927B3F95900003F0C /* LibrarySelectionService.swift */; };
 		0442A26B27B3F95900003F0C /* LibrarySelectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0442A26927B3F95900003F0C /* LibrarySelectionService.swift */; };
+		0462B3BD27BBCFEE009066CD /* ArtistModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0462B3BC27BBCFEE009066CD /* ArtistModel.swift */; };
+		0462B3BE27BBCFEE009066CD /* ArtistModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0462B3BC27BBCFEE009066CD /* ArtistModel.swift */; };
 		04848BC82725A9FE0072A81E /* PlaylistItemThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04848BC72725A9FE0072A81E /* PlaylistItemThumbnail.swift */; };
 		04848BCA2725AA610072A81E /* ItemThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04848BC92725AA610072A81E /* ItemThumbnail.swift */; };
 		04848BCC2725AAFE0072A81E /* AlbumThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04848BCB2725AAFE0072A81E /* AlbumThumbnail.swift */; };
@@ -151,6 +153,7 @@
 		0442A26027B3F8FA00003F0C /* JellyfinService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JellyfinService.swift; sourceTree = "<group>"; };
 		0442A26627B3F94000003F0C /* AuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationService.swift; sourceTree = "<group>"; };
 		0442A26927B3F95900003F0C /* LibrarySelectionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySelectionService.swift; sourceTree = "<group>"; };
+		0462B3BC27BBCFEE009066CD /* ArtistModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistModel.swift; sourceTree = "<group>"; };
 		04848BC72725A9FE0072A81E /* PlaylistItemThumbnail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistItemThumbnail.swift; sourceTree = "<group>"; };
 		04848BC92725AA610072A81E /* ItemThumbnail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemThumbnail.swift; sourceTree = "<group>"; };
 		04848BCB2725AAFE0072A81E /* AlbumThumbnail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumThumbnail.swift; sourceTree = "<group>"; };
@@ -394,6 +397,7 @@
 				04CBCDDB27169BBA003E9BE9 /* CoreData.xcdatamodeld */,
 				04CBCDDF27169CF9003E9BE9 /* PersistenceController.swift */,
 				04848BE0272653BF0072A81E /* VolumeObserver.swift */,
+				0462B3BC27BBCFEE009066CD /* ArtistModel.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -700,6 +704,7 @@
 				04848BE427271D810072A81E /* ArtistRow.swift in Sources */,
 				04DCB7E827B71575005355C0 /* SongRow.swift in Sources */,
 				04CBCDC82713D1F0003E9BE9 /* LibraryResult.swift in Sources */,
+				0462B3BD27BBCFEE009066CD /* ArtistModel.swift in Sources */,
 				04D4B60627135DE50089CFC3 /* UserResult.swift in Sources */,
 				04FBD83927A635F200E780F3 /* SongHelper.swift in Sources */,
 				041D3E7B2722E93F002185CF /* PlayerSheetView.swift in Sources */,
@@ -772,6 +777,7 @@
 				04E2DE1D270E48D9007ABE38 /* TabBarView.swift in Sources */,
 				0442A26B27B3F95900003F0C /* LibrarySelectionService.swift in Sources */,
 				04CBCDC92713D1F0003E9BE9 /* LibraryResult.swift in Sources */,
+				0462B3BE27BBCFEE009066CD /* ArtistModel.swift in Sources */,
 				04D4B60727135DE50089CFC3 /* UserResult.swift in Sources */,
 				04CBCDE427196308003E9BE9 /* PlaylistDetailView.swift in Sources */,
 				0442A25527B3F52900003F0C /* ImageExtensions.swift in Sources */,
@@ -968,7 +974,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.3;
+				MARKETING_VERSION = 0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jackcaulifield.Jellify;
 				PRODUCT_NAME = Jellify;
 				SDKROOT = iphoneos;
@@ -1003,7 +1009,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.3;
+				MARKETING_VERSION = 0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jackcaulifield.Jellify;
 				PRODUCT_NAME = Jellify;
 				SDKROOT = iphoneos;

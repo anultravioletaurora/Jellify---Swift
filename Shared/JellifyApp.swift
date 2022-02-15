@@ -18,6 +18,9 @@ struct JellifyApp: App {
     let persistenceController = PersistenceController.shared
     
     let networkingManager = NetworkingManager.shared
+    
+    @StateObject
+    var player = Player.shared
             
 //    /**
 //     Watches the scene phase of the app, so we can perform a save when the user
@@ -30,6 +33,7 @@ struct JellifyApp: App {
         WindowGroup {
                 ContentView()
                 .environment(\.managedObjectContext, networkingManager.context)
+                .environmentObject(player)
         }
         .onChange(of: scenePhase) { _ in
             persistenceController.save()

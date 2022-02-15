@@ -30,6 +30,7 @@ struct SongRow: View {
                         Text(String(song.indexNumber))
                             .font(.subheadline)
                             .padding(.trailing, 5)
+                            .opacity(0.6)
                     }).frame(width: 40)
                 } else {
                     
@@ -40,10 +41,13 @@ struct SongRow: View {
                                         
                 VStack(alignment: .leading, spacing: 10) {
                     Text(song.name ?? "Unknown Song")
-                        .padding(.leading, 5)
                                      
-                    if song.artists!.count > 1 {
+                    if song.artists!.count > 2 {
                         Text((song.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: ", "))
+                            .font(.subheadline)
+                            .opacity(0.6)
+                    } else if song.artists!.count > 1 {
+                        Text((song.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: " & "))
                             .font(.subheadline)
                             .opacity(0.6)
                     }

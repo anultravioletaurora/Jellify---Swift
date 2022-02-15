@@ -74,10 +74,10 @@ struct SongsListView: View {
                     }
                 }
         }
-        .animation(nil, value: UUID())
         .sheet(isPresented: $showPlaylistSheet, content: {
             PlaylistSelectionSheet(song: $selectedSong, showPlaylistSheet: $showPlaylistSheet)
         })
+        .id(UUID())
         .searchable(text: $searchBar.search, prompt: "Search songs")
         .disableAutocorrection(true)
         .onReceive(searchBar.$search.debounce(for: .seconds(0.5), scheduler: RunLoop.main))
