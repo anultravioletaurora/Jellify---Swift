@@ -12,14 +12,6 @@ import AVFoundation
 import MediaPlayer
 import JellyfinAPI
 
-public class Globals{
-    public static let playTimeInterval: Double = 0.1
-    public static let componentOpacity: Double = 0.7
-    public static let colorLow: Color = Color(Color.RGBColorSpace.displayP3, white: (0.35), opacity: 1)
-    public static let colorMed: Color = Color(Color.RGBColorSpace.displayP3, white: (0.7), opacity: 1)
-    public static let colorFull: Color = Color(Color.RGBColorSpace.displayP3, white: (1), opacity: 1)
-}
-
 open class AVPlayerItemId: AVPlayerItem, Identifiable{
     public let id = UUID().uuidString
     public var initialOrder: Int

@@ -722,6 +722,9 @@ class NetworkingManager : ObservableObject {
                                 print("Playlist song retrieval for playlist \(playlist.name): \(complete)")
                             }, receiveValue: { playlistItems in
                                 if playlistItems.items != nil {
+                                    
+                                    print("Adding \(playlistItems.items!.count) songs to playlist \(playlist.name!)")
+                                    
                                     playlistItems.items!.forEach({ playlistItem in
                                         let playlistSong = PlaylistSong(context: privateContext)
                                         
@@ -742,7 +745,7 @@ class NetworkingManager : ObservableObject {
                                 
                                 loadingStatus.append(true)
                                 
-                                if loadingStatus.count == response.items!.count {
+                                if playlistResult == response.items!.last {
                                     print("Playlist import complete")
                                     self.saveContext()
                                     complete()

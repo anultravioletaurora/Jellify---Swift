@@ -26,6 +26,9 @@ struct AlbumsListView: View {
     var limit: Int
     
     let PAGE_SIZE : Int = 1000
+    
+    @State
+    var listId = UUID()
 
     init(limit: Binding<Int>) {
         
@@ -68,11 +71,13 @@ struct AlbumsListView: View {
                 }
             }
         }
-        .id(UUID())
+        .id(listId)
         .searchable(text: $searchBar.search, prompt: "Search albums")
         .disableAutocorrection(true)
-        .onReceive(searchBar.$search.debounce(for: .seconds(0.5), scheduler: DispatchQueue.main))
+        .onReceive(searchBar.$search.debounce(for: .seconds(Globals.debounceDuration), scheduler: DispatchQueue.main))
         {
+            listId = UUID()
+            
             guard !$0.isEmpty else {
                 albums.nsPredicate = nil
                 return

@@ -33,6 +33,9 @@ struct SongsListView: View {
     let searchQueue : DispatchQueue = DispatchQueue.global(qos: .userInitiated)
     
     let INITIAL_PAGE_SIZE : Int = 1000
+    
+    @State
+    var listId = UUID()
 
     init(limit: Binding<Int>) {
         
@@ -77,13 +80,13 @@ struct SongsListView: View {
         .sheet(isPresented: $showPlaylistSheet, content: {
             PlaylistSelectionSheet(song: $selectedSong, showPlaylistSheet: $showPlaylistSheet)
         })
-        .id(UUID())
+        .id(listId)
         .searchable(text: $searchBar.search, prompt: "Search songs")
         .disableAutocorrection(true)
-        .onReceive(searchBar.$search.debounce(for: .seconds(0.5), scheduler: RunLoop.main))
+        .onReceive(searchBar.$search.debounce(for: .seconds(Globals.debounceDuration), scheduler: RunLoop.main))
         {
-            print("Searching with \(searchBar.search)")
-                        
+            listId = UUID()
+            
             guard !$0.isEmpty else {
                 songs.nsPredicate = nil
                 return

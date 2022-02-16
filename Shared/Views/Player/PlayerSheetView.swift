@@ -264,7 +264,8 @@ struct PlayerSheetView: View {
                         if player.isPlaying {
                             Image(systemName: "pause.fill")
                                 .font(.largeTitle)
-                                .padding(25)
+                                .frame(width: 30, height: 30)
+                                .padding(.trailing, 15)
                         } else {
                             Image(systemName: "play.fill")
 
