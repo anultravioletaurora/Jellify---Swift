@@ -608,7 +608,11 @@ class NetworkingManager : ObservableObject {
                                         
                                         song.jellyfinId = songResult.id!
                                         song.name = songResult.name!
-                                        song.indexNumber = Int16(songResult.indexNumber!)
+                                        
+                                        // Check that index number exists so we can unwrap it's value safely
+                                        if songResult.indexNumber != nil {
+                                            song.indexNumber = Int16(songResult.indexNumber!)
+                                        }
                                         
                                         var album : Album?
                                         
