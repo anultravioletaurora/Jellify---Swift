@@ -252,7 +252,42 @@ class Player: ObservableObject {
                            name: AVAudioSession.interruptionNotification,
                            object: player?.currentItem)
         
+        nc.addObserver(self,
+                       selector: #selector(handleRouteChange),
+                       name: AVAudioSession.routeChangeNotification,
+                       object: nil)
+        
         self.setupRemoteCommands()
+    }
+
+    @objc func handleRouteChange(notification: Notification) {
+        guard let userInfo = notification.userInfo,
+            let reasonValue = userInfo[AVAudioSessionRouteChangeReasonKey] as? UInt,
+            let reason = AVAudioSession.RouteChangeReason(rawValue: reasonValue) else {
+                return
+        }
+        
+        // Switch over the route change reason.
+        switch reason {
+
+        case .newDeviceAvailable: // New device found, continue playback
+            let session = AVAudioSession.sharedInstance()
+            hasHeadphones(in: session.currentRoute)
+        
+        case .oldDeviceUnavailable: // Old device removed, stop playback
+            if let previousRoute =
+                userInfo[AVAudioSessionRouteChangePreviousRouteKey] as? AVAudioSessionRouteDescription {
+                self.isPlaying = false
+            }
+        
+        default: ()
+            self.isPlaying = false
+        }
+    }
+
+    func hasHeadphones(in routeDescription: AVAudioSessionRouteDescription) -> Bool {
+        // Filter the outputs to only those with a port type of headphones.
+        return !routeDescription.outputs.filter({$0.portType == .headphones}).isEmpty
     }
     
     @objc func handleInterruption(notification: Notification) {
@@ -601,6 +636,7 @@ class Player: ObservableObject {
     }
     
     private func refreshPlayingInfo() {
+        
         if !seeking, let duration = player?.currentItem?.duration.seconds,
            let playTime = player?.currentItem?.currentTime().seconds, !duration.isNaN, !playTime.isNaN {
                 let durationSecs = Int(duration)

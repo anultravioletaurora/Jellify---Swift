@@ -1,15 +1,19 @@
 //
 //  VolumeObserver.swift
-//  FinTune
+//  Jellify
 //
-//  Created by Jack Caulfield on 10/24/21.
+//  Created by Jack Caulfield on 2/16/22.
 //
 
 import Foundation
 import MediaPlayer
 
-final class VolumeObserver: ObservableObject {
+class VolumeObserver: ObservableObject {
 
+    static let shared = VolumeObserver()
+    
+    let volumeView = MPVolumeView(frame: .zero)
+    
     @Published var volume: Float = AVAudioSession.sharedInstance().outputVolume
 
     // Audio session object
@@ -20,8 +24,8 @@ final class VolumeObserver: ObservableObject {
 
     func subscribe() {
         do {
-            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.playback)
-            try session.setActive(true, options: [])
+            try AVAudioSession.sharedInstance().setCategory(AVAudioSession.Category.ambient)
+            try session.setActive(true, options: .notifyOthersOnDeactivation)
         } catch {
             print("cannot activate session")
         }
@@ -35,6 +39,10 @@ final class VolumeObserver: ObservableObject {
 
     func unsubscribe() {
         self.progressObserver.invalidate()
+    }
+    
+    func setVolume(volume : Float) -> Void {
+        volumeView.setVolume(volume)
     }
 
     init() {
