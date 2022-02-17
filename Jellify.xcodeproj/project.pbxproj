@@ -88,6 +88,12 @@
 		04DCB7F227B9A532005355C0 /* LazyNavigationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DCB7F127B9A532005355C0 /* LazyNavigationView.swift */; };
 		04DCB7F427BA0192005355C0 /* RefreshRateHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DCB7F327BA0192005355C0 /* RefreshRateHelper.swift */; };
 		04DCB7F627BA10A0005355C0 /* PlayerQueueView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DCB7F527BA10A0005355C0 /* PlayerQueueView.swift */; };
+		04DD578F27BE94BF0030D25C /* ArtistsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DD578E27BE94BF0030D25C /* ArtistsListView.swift */; };
+		04DD579027BE94BF0030D25C /* ArtistsListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DD578E27BE94BF0030D25C /* ArtistsListView.swift */; };
+		04DD579227BE95E80030D25C /* ArtistsGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DD579127BE95E80030D25C /* ArtistsGalleryView.swift */; };
+		04DD579327BE95E80030D25C /* ArtistsGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DD579127BE95E80030D25C /* ArtistsGalleryView.swift */; };
+		04DD579527BE96B50030D25C /* SyncLibraryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DD579427BE96B50030D25C /* SyncLibraryButton.swift */; };
+		04DD579627BE96B50030D25C /* SyncLibraryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DD579427BE96B50030D25C /* SyncLibraryButton.swift */; };
 		04E1071A270CD307002CACB0 /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E10719270CD307002CACB0 /* Tests_iOS.swift */; };
 		04E1071C270CD307002CACB0 /* Tests_iOSLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E1071B270CD307002CACB0 /* Tests_iOSLaunchTests.swift */; };
 		04E10726270CD307002CACB0 /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E10725270CD307002CACB0 /* Tests_macOS.swift */; };
@@ -195,6 +201,9 @@
 		04DCB7F127B9A532005355C0 /* LazyNavigationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LazyNavigationView.swift; sourceTree = "<group>"; };
 		04DCB7F327BA0192005355C0 /* RefreshRateHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshRateHelper.swift; sourceTree = "<group>"; };
 		04DCB7F527BA10A0005355C0 /* PlayerQueueView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerQueueView.swift; sourceTree = "<group>"; };
+		04DD578E27BE94BF0030D25C /* ArtistsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistsListView.swift; sourceTree = "<group>"; };
+		04DD579127BE95E80030D25C /* ArtistsGalleryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistsGalleryView.swift; sourceTree = "<group>"; };
+		04DD579427BE96B50030D25C /* SyncLibraryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncLibraryButton.swift; sourceTree = "<group>"; };
 		04E10701270CD304002CACB0 /* JellifyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JellifyApp.swift; sourceTree = "<group>"; };
 		04E10702270CD304002CACB0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		04E10703270CD307002CACB0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -469,6 +478,7 @@
 				0442A25027B3115700003F0C /* ToolbarView.swift */,
 				049AE64627B69635006813DE /* AirPlayView.swift */,
 				04DCB7F127B9A532005355C0 /* LazyNavigationView.swift */,
+				04DD579427BE96B50030D25C /* SyncLibraryButton.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -506,6 +516,8 @@
 				04E1074D270CD6ED002CACB0 /* ArtistsView.swift */,
 				04848BE327271D810072A81E /* ArtistRow.swift */,
 				04848BE627271F760072A81E /* AlbumRow.swift */,
+				04DD578E27BE94BF0030D25C /* ArtistsListView.swift */,
+				04DD579127BE95E80030D25C /* ArtistsGalleryView.swift */,
 			);
 			path = Artist;
 			sourceTree = "<group>";
@@ -733,6 +745,7 @@
 				04DCB7F227B9A532005355C0 /* LazyNavigationView.swift in Sources */,
 				0442A26127B3F8FA00003F0C /* JellyfinService.swift in Sources */,
 				04848BDB272650050072A81E /* AlbumBackdropImage.swift in Sources */,
+				04DD578F27BE94BF0030D25C /* ArtistsListView.swift in Sources */,
 				04E1074B270CD6E6002CACB0 /* AlbumsListView.swift in Sources */,
 				041D3E6D271AC0D7002185CF /* CacheAsyncImage.swift in Sources */,
 				04D4B5F32710E9D30089CFC3 /* LoginView.swift in Sources */,
@@ -747,6 +760,7 @@
 				0442A25427B3F52900003F0C /* ImageExtensions.swift in Sources */,
 				04E2806E27B1B307009082B1 /* ArrayExtensions.swift in Sources */,
 				04CBCDB927139AA1003E9BE9 /* UserDataResult.swift in Sources */,
+				04DD579527BE96B50030D25C /* SyncLibraryButton.swift in Sources */,
 				04CBCDE027169CF9003E9BE9 /* PersistenceController.swift in Sources */,
 				04CBCDDD27169BBA003E9BE9 /* CoreData.xcdatamodeld in Sources */,
 				04848BC82725A9FE0072A81E /* PlaylistItemThumbnail.swift in Sources */,
@@ -759,6 +773,7 @@
 				04E10729270CD307002CACB0 /* JellifyApp.swift in Sources */,
 				04D4B5EF2710BF0D0089CFC3 /* AlbumDetailView.swift in Sources */,
 				047D147F27BD1B5B00EE1878 /* Globals.swift in Sources */,
+				04DD579227BE95E80030D25C /* ArtistsGalleryView.swift in Sources */,
 				047D148227BD272200EE1878 /* VolumeObserver.swift in Sources */,
 				04D4B60D27135FA50089CFC3 /* ArtistResult.swift in Sources */,
 				0442A25127B3115700003F0C /* ToolbarView.swift in Sources */,
@@ -801,6 +816,7 @@
 				04848BE527271D810072A81E /* ArtistRow.swift in Sources */,
 				04D4B5FD271232B90089CFC3 /* UserResponse.swift in Sources */,
 				04CBCDD22715B700003E9BE9 /* Player.swift in Sources */,
+				04DD579627BE96B50030D25C /* SyncLibraryButton.swift in Sources */,
 				04CBCDB7271371C8003E9BE9 /* ResultSet.swift in Sources */,
 				04CBCDDE27169BBA003E9BE9 /* CoreData.xcdatamodeld in Sources */,
 				047D148327BD272200EE1878 /* VolumeObserver.swift in Sources */,
@@ -811,8 +827,10 @@
 				041D3E6E271AC0D7002185CF /* CacheAsyncImage.swift in Sources */,
 				04D4B5FA2712246D0089CFC3 /* Login.swift in Sources */,
 				04CBCDE127169CF9003E9BE9 /* PersistenceController.swift in Sources */,
+				04DD579027BE94BF0030D25C /* ArtistsListView.swift in Sources */,
 				041D3E7C2722E940002185CF /* PlayerSheetView.swift in Sources */,
 				04D4B5F42710E9D30089CFC3 /* LoginView.swift in Sources */,
+				04DD579327BE95E80030D25C /* ArtistsGalleryView.swift in Sources */,
 				04848BDF272653620072A81E /* VolumeExtension.swift in Sources */,
 				04E1072A270CD307002CACB0 /* JellifyApp.swift in Sources */,
 				041D3E6A271A90F0002185CF /* ProgressBarView.swift in Sources */,

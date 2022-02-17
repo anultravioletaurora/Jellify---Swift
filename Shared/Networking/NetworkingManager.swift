@@ -257,7 +257,7 @@ class NetworkingManager : ObservableObject {
             }, receiveValue: { response in
 
                 print("Playlist removal response: \(response)")
-                self.privateContext.delete(playlistSong)
+                self.context.delete(playlistSong)
                 
                 self.saveContext()
             })
@@ -434,11 +434,23 @@ class NetworkingManager : ObservableObject {
                     
                     self.loadPlaylists(complete: {
 
-                        DispatchQueue.main.sync {
-                            print("Loading complete!")
-                            self.loadingPhase = nil
-                            self.libraryIsPopulated = true
-                        }
+                        let playlists = self.retrieveAllPlaylistsFromCore()
+                        
+                        playlists.forEach({ playlist in
+                            self.loadPlaylistItems(playlist: playlist, complete: { playlistSongs in
+                                
+//                                playlist.songs = NSSet(array: playlistSongs)
+                                
+                                if playlist == playlists.last! {
+                                    DispatchQueue.main.sync {
+                                        print("Loading complete!")
+                                        self.loadingPhase = nil
+                                        self.libraryIsPopulated = true
+                                    }
+                                }
+                            })
+                        })
+                        
                     })
                 }, startIndex: nil)
             })
@@ -701,9 +713,7 @@ class NetworkingManager : ObservableObject {
             }, receiveValue: { response in
                 
                 if response.items != nil {
-                    
-                    var loadingStatus : [Bool] = []
-                                     
+                                                         
                     DispatchQueue.concurrentPerform(iterations: response.items!.count, execute: { index in
                         
                         let playlistResult = response.items![index]
@@ -721,111 +731,16 @@ class NetworkingManager : ObservableObject {
                             playlist.jellyfinId = playlistResult.id!
                             playlist.name = playlistResult.name!
                             
-                            PlaylistsAPI.getPlaylistItems(playlistId: playlistResult.id!, userId: self.userId, apiResponseQueue: self.processingQueue)
-                            .sink(receiveCompletion: { complete in
-                                print("Playlist song retrieval for playlist \(playlist.name): \(complete)")
-                            }, receiveValue: { playlistItems in
-                                if playlistItems.items != nil {
-                                    
-                                    print("Adding \(playlistItems.items!.count) songs to playlist \(playlist.name!)")
-                                    
-                                    playlistItems.items!.forEach({ playlistItem in
-                                        let playlistSong = PlaylistSong(context: privateContext)
-                                        
-                                        playlistSong.jellyfinId = playlistItem.playlistItemId
-                                        
-                                        playlistSong.playlist = playlist
-                                        playlistSong.indexNumber = Int16(playlistItems.items!.firstIndex(of: playlistItem) ?? 0)
-                                        
-                                        let song: Song = privateContext.object(with: self.retrieveSongFromCore(songId: playlistItem.id!)!) as! Song
-                                        playlistSong.song = song
-                                        song.addToPlaylists(playlistSong)
-                                        
-                                        playlist.addToSongs(playlistSong)
-                                    })
-                                }
-                                
-                                try! privateContext.save()
-                                
-                                loadingStatus.append(true)
-                                
-                                if playlistResult == response.items!.last {
-                                    print("Playlist import complete")
-                                    self.saveContext()
-                                    complete()
-                                } else {
-                                    print("Preparing for next new playlist")
-                                }
-                            })
-                            .store(in: &self.cancellables)
-                        } else {
-                            let playlist = privateContext.object(with: self.retrievePlaylistFromCore(playlistId: playlistResult.id!)!) as! Playlist
                             
-                            print("Fetching songs in \(playlist.name!)")
-                                                                                    
-                            PlaylistsAPI.getPlaylistItems(playlistId: playlistResult.id!, userId: self.userId, apiResponseQueue: self.processingQueue)
-                            .sink(receiveCompletion: { complete in
-                                print("Playlist song retrieval for playlist \(playlist.name): \(complete)")
-                            }, receiveValue: { playlistItems in
-                                
-//                                print(playlistItems.items!.map { $0.id! })
-                                
-                                if playlistItems.items != nil {
-                                                                    
-                                    var playlistSongIds = Set(playlistItems.items!.map { $0.playlistItemId! })
-                                    
-                                    var newSongs : [BaseItemDto]
-                                                                            
-                                    print(playlist.songs!.count)
-                                    
-                                    if playlist.songs != nil {
-                                        
-                                        var currentPlaylistSongs : [PlaylistSong] = []
-                                        
-                                        playlist.songs!.forEach({ currentPlaylistSong in
-                                            currentPlaylistSongs.append(currentPlaylistSong as! PlaylistSong)
-                                        })
-                                        
-                                        if !currentPlaylistSongs.isEmpty {
-                                            playlistSongIds.subtract(currentPlaylistSongs.filter { $0.jellyfinId != nil }.map { $0.jellyfinId! })
-                                        }
-                                                                    
-                                        newSongs = playlistItems.items!.filter { playlistSongIds.contains($0.playlistItemId!)}
-                                    } else {
-                                        newSongs = playlistItems.items!
-                                    }
-                                    
-                                    print("Adding \(newSongs.count) songs to playlist \(playlist.name!)")
-
-                                    newSongs.forEach({ playlistItem in
-                                        
-                                        let playlistSong = PlaylistSong(context: privateContext)
-                                        
-                                        playlistSong.jellyfinId = playlistItem.playlistItemId
-                                        playlistSong.indexNumber = Int16(playlistItems.items!.firstIndex(of: playlistItem) ?? 0)
-                                        
-                                        playlistSong.playlist = playlist
-                                        playlistSong.song = privateContext.object(with: self.retrieveSongFromCore(songId: playlistItem.id!)!) as? Song
-                                        
-                                        try! privateContext.save()
-                                    })
-                                } else {
-                                    print("Not doing shit to playlist \(playlist.name!)")
-                                }
-    
-                                loadingStatus.append(true)
-                                
-                                if loadingStatus.count == response.items!.count {
-                                    
-                                    try! privateContext.save()
-                                    print("Playlist import complete")
-                                    self.saveContext()
-                                    complete()
-                                } else {
-                                    print("Preparing for next playlist")
-                                }
-                            })
-                            .store(in: &self.cancellables)
+                            try! privateContext.save()
+                        }
+                        
+                        if playlistResult == response.items!.last {
+                            print("Playlist import complete")
+                            self.saveContext()
+                            complete()
+                        } else {
+                            print("Preparing for next new playlist")
                         }
                     })
                 } else {
@@ -874,6 +789,8 @@ class NetworkingManager : ObservableObject {
                 })
                 
                 complete(playlistSongs)
+            } else {
+                complete([])
             }
         })
         .store(in: &self.cancellables)
@@ -1037,13 +954,29 @@ class NetworkingManager : ObservableObject {
         }
     }
     
+    private func retrieveAllPlaylistsFromCore() -> [Playlist] {
+        let fetchRequest = Playlist.fetchRequest()
+        
+        do {
+            return try self.privateContext.fetch(fetchRequest)
+        } catch let error as NSError {
+            print("Error retrieving all playlists from CoreData: \(error)")
+            
+            return []
+        }
+    }
+    
     private func retrievePlaylistSongFromCore(playlistSongId: String) -> NSManagedObjectID? {
         let fetchRequest = PlaylistSong.fetchRequest()
         
         fetchRequest.predicate = NSPredicate(format: "jellyfinId == %@", playlistSongId)
         
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        
+        privateContext.parent = self.context
+        
         do {
-            return try self.context.fetch(fetchRequest).first?.objectID
+            return try privateContext.fetch(fetchRequest).first?.objectID
         } catch let error as NSError {
             print("Error retrieving playlist song from CoreData: \(error)")
             

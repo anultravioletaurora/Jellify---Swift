@@ -17,6 +17,13 @@ struct SongsView: View {
             
             SongsListView(limit: $limit)
             .navigationTitle("Songs")
+            .toolbar(content: {
+                ToolbarItem(content: {
+                    
+                    SyncLibraryButton()
+
+                })
+            })
         }
     }
 }

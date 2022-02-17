@@ -10,27 +10,18 @@ import Combine
 
 struct ArtistsView: View {
         
+    
     var artists: FetchedResults<Artist>{
         fetchRequest.wrappedValue
     }
     
     var fetchRequest: FetchRequest<Artist>
-    
-    @Environment(\.managedObjectContext)
-    var managedObjectContext
-    
+        
     @ObservedObject
     var networkingManager = NetworkingManager.shared
-        
-    @StateObject
-    var searchBar = SearchBarViewModel()
-        
-    @FocusState
-    var isSearchFocused : Bool
     
-    // ID for the list, this will get regenerated when the user searches so that we generate a new list, this is because there are rerendering issues with searching on large lists where list items overlap with the navigation header
     @State
-    var listId = UUID()
+    var galleryView : Bool = UserDefaults.standard.bool(forKey: "artistGalleryView")
     
     init() {
                 
@@ -42,48 +33,36 @@ struct ArtistsView: View {
     
     var body: some View {
         NavigationView {
-                                
-            // Artists List
-            // TODO: Turn this into a sectioned list with alphabetical seperators
-            List(artists) { artist in
-                ArtistRow(artist: artist)
-                    .listRowSeparator(artists.last! == artist ? .hidden : .visible)
+                       
+            VStack {
+                if galleryView {
+                    ArtistsGalleryView(artists: artists)
+                } else {
+                    ArtistsListView(artists: artists)
+                }
             }
-            .id(listId)
-            .animation(nil, value: UUID())
-            .searchable(text: $searchBar.search, prompt: "Search artists")
-            .disableAutocorrection(true)
-            .onReceive(
-                searchBar.$search.debounce(for: .seconds(Globals.debounceDuration), scheduler: RunLoop.main)
-            ) {
-                listId = UUID()
-                
-                guard !$0.isEmpty else {
-                    artists.nsPredicate = nil
-                    return
+            .navigationTitle("Artists")
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        withAnimation {
+                            galleryView.toggle()
+                            UserDefaults.standard.set(self.galleryView, forKey: "artistGalleryView")
+                        }
+                    }, label: {
+                        if galleryView {
+                            Image(systemName: "list.bullet")
+                        } else {
+                            Image(systemName: "circle.grid.2x2")
+                        }
+                    })
                 }
                 
-                artists.nsPredicate = searchBar.search.isEmpty ? nil : NSPredicate(format: "%K beginswith[c] %@", #keyPath(Artist.name), searchBar.search.trimmingCharacters(in: .whitespaces))
-            }
-            .listStyle(PlainListStyle())
-            .navigationTitle("Artists")
-            .toolbar(content: {
-                ToolbarItem(content: {
+                ToolbarItem(placement: .navigationBarTrailing) {
                     
-                    if networkingManager.loadingPhase != nil {
-                        ProgressView()
-                    } else {
-                        Button(action: {
-                            print("syncing library")
-                            networkingManager.syncLibrary()
-                        }, label: {
-                            Image(systemName: "arrow.triangle.2.circlepath")
-                        })
-                            .buttonStyle(PlainButtonStyle())
-                    }
-
-                })
-            })
+                    SyncLibraryButton()
+                }
+            }
         }
     }
 }

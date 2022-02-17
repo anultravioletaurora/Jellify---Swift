@@ -69,16 +69,13 @@ struct PlaylistsView: View {
                         playlists.nsPredicate = searchBar.search.isEmpty ? nil : NSPredicate(format: "%K contains[c] %@", #keyPath(Playlist.name), searchBar.search.trimmingCharacters(in: .whitespaces))
                     }
                     .navigationTitle("Playlists")
-//                    .refreshable {
-//                        self.forceFetchPlaylists()
-//                    }
-//                    .overlay(
-//                        PlayerView()
-//                    )
+                    .toolbar(content: {
+                        ToolbarItem(content: {
+                            
+                            SyncLibraryButton()
+
+                        })
+                    })
         }
-//        .onAppear(perform: {
-//            
-//            self.fetchPlaylists()
-//            })
     }
 }

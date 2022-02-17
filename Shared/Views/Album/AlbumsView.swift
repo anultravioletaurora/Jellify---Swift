@@ -17,12 +17,8 @@ struct AlbumsView: View {
                 .navigationTitle("Albums")
                 .toolbar(content: {
                     ToolbarItem(content: {
-                        Button(action: {
-                            print("syncing library")
-                        }, label: {
-                            Image(systemName: "arrow.triangle.2.circlepath")
-                        })
-                            .buttonStyle(PlainButtonStyle())
+                        
+                        SyncLibraryButton()
 
                     })
                 })
