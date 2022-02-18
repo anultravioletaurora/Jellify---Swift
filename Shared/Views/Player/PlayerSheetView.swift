@@ -228,7 +228,7 @@ struct PlayerViewBody : View {
                 }) {
                     Image(systemName: "backward.fill")
                         .font(.largeTitle)
-                        .padding(25)
+                        .padding(.leading, 25)
                 }
                 .buttonStyle(PlainButtonStyle())
                 .padding(.horizontal, 30)
@@ -257,7 +257,7 @@ struct PlayerViewBody : View {
                 }) {
                     Image(systemName: "forward.fill")
                         .font(.largeTitle)
-                        .padding(25)
+                        .padding(.trailing, 25)
                 }
                 .buttonStyle(PlainButtonStyle())
                 .padding(.horizontal, 30)

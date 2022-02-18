@@ -1,20 +1,17 @@
 //
-//  AlbumsView.swift
-//  FinTune
+//  AlbumsGalleryView.swift
+//  Jellify (iOS)
 //
-//  Created by Jack Caulfield on 10/5/21.
+//  Created by Jack Caulfield on 2/18/22.
 //
 
 import SwiftUI
 import CoreData
 
-struct AlbumsListView: View {
+struct AlbumsGalleryView: View {
     
-    @Environment(\.managedObjectContext)
-    var managedObjectContext
-        
     var fetchRequest: FetchRequest<Album>
-    
+
     var albums: FetchedResults<Album>{
         fetchRequest.wrappedValue
     }
@@ -22,12 +19,11 @@ struct AlbumsListView: View {
     @StateObject
     var searchBar = SearchBarViewModel()
     
+    var columns : [GridItem] = Array(repeating: .init(.flexible()), count: 3)
+    
     @Binding
     var limit: Int
-        
-    @State
-    var listId = UUID()
-
+    
     init(limit: Binding<Int>) {
         
         self._limit = limit
@@ -47,42 +43,51 @@ struct AlbumsListView: View {
     }
     
     var body: some View {
-    
-        List(albums) { album in
-            NavigationLink(destination: LazyNavigationView(AlbumDetailView(album: album))) {
-                HStack {
-                    AlbumThumbnail(album: album)
-                    
-                    Text(album.name ?? "Unknown Album")
-                }
-            }
-            .onAppear {
-                if album == albums.last! && albums.count >= limit {
-                    print("Last album of total: \(albums.count), increasing limit")
-                    
-                    self.limit += Globals.FETCH_PAGE_SIZE
-                    
-                    print("New limit: \(self.limit)")
+        ScrollView {
+            LazyVGrid(columns: columns) {
+                ForEach(albums) { album in
+                    AlbumGalleryItem(album: album)
+                        .onAppear {
+                            if album == albums.last! && albums.count >= limit {
+                                print("Last album of total: \(albums.count), increasing limit")
+                                
+                                self.limit += Globals.FETCH_PAGE_SIZE
+                                
+                                print("New limit: \(self.limit)")
 
-                } else if album == albums.last! {
-                    print("Last album of total: \(albums.count)")
+                            } else if album == albums.last! {
+                                print("Last album of total: \(albums.count)")
+                            }
+                        }
                 }
             }
         }
-        .id(listId)
         .searchable(text: $searchBar.search, prompt: "Search albums")
         .disableAutocorrection(true)
         .onReceive(searchBar.$search.debounce(for: .seconds(Globals.debounceDuration), scheduler: DispatchQueue.main))
         {
-            listId = UUID()
-            
             guard !$0.isEmpty else {
                 albums.nsPredicate = nil
                 return
             }
             albums.nsPredicate = searchBar.search.isEmpty ? nil : NSPredicate(format: "%K beginswith[c] %@", #keyPath(Album.name), searchBar.search.trimmingCharacters(in: .whitespaces))
         }
+    }
+}
 
-        .listStyle(PlainListStyle())
+struct AlbumGalleryItem: View {
+    @ObservedObject
+    var album : FetchedResults<Album>.Element
+    
+    var body: some View {
+        NavigationLink(destination: LazyNavigationView(AlbumDetailView(album: album)), label: {
+            VStack {
+                AlbumImage(album: album, height: 100)
+                
+                Text(album.name ?? "Unknown Album")
+                    .font(.subheadline)
+                    .foregroundColor(.primary)
+            }
+        })
     }
 }

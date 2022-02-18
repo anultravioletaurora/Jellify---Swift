@@ -94,6 +94,7 @@
 		04DD579327BE95E80030D25C /* ArtistsGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DD579127BE95E80030D25C /* ArtistsGalleryView.swift */; };
 		04DD579527BE96B50030D25C /* SyncLibraryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DD579427BE96B50030D25C /* SyncLibraryButton.swift */; };
 		04DD579627BE96B50030D25C /* SyncLibraryButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DD579427BE96B50030D25C /* SyncLibraryButton.swift */; };
+		04DD579827C00D390030D25C /* AlbumsGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DD579727C00D390030D25C /* AlbumsGalleryView.swift */; };
 		04E1071A270CD307002CACB0 /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E10719270CD307002CACB0 /* Tests_iOS.swift */; };
 		04E1071C270CD307002CACB0 /* Tests_iOSLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E1071B270CD307002CACB0 /* Tests_iOSLaunchTests.swift */; };
 		04E10726270CD307002CACB0 /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E10725270CD307002CACB0 /* Tests_macOS.swift */; };
@@ -204,6 +205,7 @@
 		04DD578E27BE94BF0030D25C /* ArtistsListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistsListView.swift; sourceTree = "<group>"; };
 		04DD579127BE95E80030D25C /* ArtistsGalleryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistsGalleryView.swift; sourceTree = "<group>"; };
 		04DD579427BE96B50030D25C /* SyncLibraryButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SyncLibraryButton.swift; sourceTree = "<group>"; };
+		04DD579727C00D390030D25C /* AlbumsGalleryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsGalleryView.swift; sourceTree = "<group>"; };
 		04E10701270CD304002CACB0 /* JellifyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JellifyApp.swift; sourceTree = "<group>"; };
 		04E10702270CD304002CACB0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		04E10703270CD307002CACB0 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -528,6 +530,7 @@
 				04E1074A270CD6E6002CACB0 /* AlbumsListView.swift */,
 				04D4B5EE2710BF0D0089CFC3 /* AlbumDetailView.swift */,
 				04DCB7EF27B990A4005355C0 /* AlbumsView.swift */,
+				04DD579727C00D390030D25C /* AlbumsGalleryView.swift */,
 			);
 			path = Album;
 			sourceTree = "<group>";
@@ -712,6 +715,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				04DD579827C00D390030D25C /* AlbumsGalleryView.swift in Sources */,
 				04E10754270CD6FA002CACB0 /* SettingsView.swift in Sources */,
 				04E10751270CD6F3002CACB0 /* PlaylistsView.swift in Sources */,
 				04848BE727271F760072A81E /* AlbumRow.swift in Sources */,

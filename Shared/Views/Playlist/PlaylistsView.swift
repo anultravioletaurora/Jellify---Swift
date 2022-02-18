@@ -57,6 +57,11 @@ struct PlaylistsView: View {
                         })
                             .listRowSeparator(playlists.last! == playlist ? .hidden : .visible)
                     }
+            // This overlay prevents list content from appearing behind the tab view when dismissing the player
+            .overlay(content: {
+                BlurView()
+                    .offset(y: UIScreen.main.bounds.height - 150)
+            })
                     .listStyle(PlainListStyle())
                     .searchable(text: $searchBar.search, prompt: "Search playlists")
                     .disableAutocorrection(true)

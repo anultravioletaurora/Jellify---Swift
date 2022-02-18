@@ -192,6 +192,12 @@ class NetworkingManager : ObservableObject {
     public func addToPlaylist(playlist: Playlist, song: Song, complete: @escaping () -> Void) -> Void {
         
         print("Adding \(song.name!) to playlist \(playlist.name!)")
+        
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        
+        privateContext.parent = self.context
+        
+        let privatePlaylist = privateContext.object(with: self.retrievePlaylistFromCore(playlistId: playlist.jellyfinId!)!) as! Playlist
 
         PlaylistsAPI.addToPlaylist(playlistId: playlist.jellyfinId!, ids: [song.jellyfinId!], userId: self.userId, apiResponseQueue: JellyfinAPI.apiResponseQueue)
             .sink(receiveCompletion: { completion in
@@ -201,12 +207,12 @@ class NetworkingManager : ObservableObject {
                 
                 if playlist.songs != nil {
                     
-                    playlist.songs!.forEach({ playlistSong in
-                        self.context.delete(playlistSong as! NSManagedObject)
+                    privatePlaylist.songs!.forEach({ playlistSong in
+                        privateContext.delete(playlistSong as! NSManagedObject)
                     })
                     
                 }
-                self.loadPlaylistItems(playlist: playlist, complete: { playlistItems in
+                self.loadPlaylistItems(playlist: playlist, context: privateContext, complete: { playlistItems in
                     print("Playlist addition and refresh")
                     complete()
                 })
@@ -228,12 +234,16 @@ class NetworkingManager : ObservableObject {
                 print("Creating playlist receive completion: \(completion)")
             }, receiveValue: { response in
                 
-                let newPlaylist = Playlist(context: self.context)
+                let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+                
+                privateContext.parent = self.context
+                
+                let newPlaylist = Playlist(context: privateContext)
                 
                 newPlaylist.jellyfinId = response.id
                 newPlaylist.name = name
                                 
-                self.loadPlaylistItems(playlist: newPlaylist, complete: { playlistSongs in
+                self.loadPlaylistItems(playlist: newPlaylist, context: privateContext, complete: { playlistSongs in
                     
                     playlistSongs.forEach({ playlistSong in
                         newPlaylist.addToSongs(playlistSong)
@@ -273,16 +283,26 @@ class NetworkingManager : ObservableObject {
     }
 
     public func loadAlbumArtwork(album: Album) -> Void {
-        ImageAPI.getItemImage(itemId: album.jellyfinId!, imageType: .primary)
+                
+        ImageAPI.getItemImage(itemId: album.jellyfinId!, imageType: .primary, apiResponseQueue: processingQueue)
             .sink(receiveCompletion: { completion in
                 print("Image receive completion: \(completion)")
             }, receiveValue: { url in
                       
                 do {
-                    album.artwork = try Data(contentsOf: url)
-                    album.thumbnail = try Data(contentsOf: url)
+                    let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
                     
-                    // self.saveContext()
+                    privateContext.parent = self.privateContext
+
+                    let privateAlbum : Album = privateContext.object(with: self.retrieveAlbumFromCore(albumId: album.jellyfinId!)!) as! Album
+
+                    privateAlbum.artwork = try Data(contentsOf: url)
+                    privateAlbum.thumbnail = try Data(contentsOf: url)
+                    
+                    // This causes a recursive save call error
+                    try privateContext.save()
+                    
+                    self.saveContext()
                 } catch {
                     print("Error setting artwork for album: \(album.name!)")
                 }                
@@ -335,7 +355,7 @@ class NetworkingManager : ObservableObject {
         dto.username = userId
         dto.pw = password
         
-        UserAPI.authenticateUserByName(authenticateUserByName: dto, apiResponseQueue: DispatchQueue.main)
+        UserAPI.authenticateUserByName(authenticateUserByName: dto, apiResponseQueue: processingQueue)
             .sink(receiveCompletion: { complete in
                 print("Login completion: \(complete)")
             }, receiveValue: { response in
@@ -369,6 +389,10 @@ class NetworkingManager : ObservableObject {
                     Player.shared.songs.removeAll()
                 }
                 
+                self.cancellables.forEach({ cancellable in
+                    cancellable.cancel()
+                })
+                
                 self.deleteAllOfEntity(entityName: "User")
                 self.deleteAllOfEntity(entityName: "Album")
                 self.deleteAllOfEntity(entityName: "Song")
@@ -381,10 +405,10 @@ class NetworkingManager : ObservableObject {
                 self._accessToken = ""
                 self._playlistId = ""
                 self._libraryId = ""
+                                
+                self.userIsLoggedIn = false
                 
                 self.saveContext()
-                
-                self.userIsLoggedIn = false
             })
             .store(in: &self.cancellables)
     }
@@ -437,12 +461,33 @@ class NetworkingManager : ObservableObject {
                         let playlists = self.retrieveAllPlaylistsFromCore()
                         
                         playlists.forEach({ playlist in
-                            self.loadPlaylistItems(playlist: playlist, complete: { playlistSongs in
+                            
+                            let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+                            
+                            privateContext.parent = self.context
+                            
+                            let privatePlaylist = privateContext.object(with: self.retrievePlaylistFromCore(playlistId: playlist.jellyfinId!)!) as! Playlist
+                            
+                            self.loadPlaylistItems(playlist: privatePlaylist, context: privateContext, complete: { playlistSongs in
                                 
-//                                playlist.songs = NSSet(array: playlistSongs)
+                                playlistSongs.forEach({ playlistSong in
+                                    privatePlaylist.addToSongs(playlistSong)
+                                })
                                 
-                                if playlist == playlists.last! {
+                                do {
+                                    try privateContext.save()
+                                    
+                                    if playlist == playlists.last! {
+                                        DispatchQueue.main.sync {
+                                            self.saveContext()
+                                            print("Loading complete!")
+                                            self.loadingPhase = nil
+                                            self.libraryIsPopulated = true
+                                        }
+                                    }
+                                } catch {
                                     DispatchQueue.main.sync {
+                                        self.saveContext()
                                         print("Loading complete!")
                                         self.loadingPhase = nil
                                         self.libraryIsPopulated = true
@@ -473,7 +518,7 @@ class NetworkingManager : ObservableObject {
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
 
         do {
-            try context.execute(deleteRequest)
+            try self.privateContext.execute(deleteRequest)
         } catch let error as NSError {
             // TODO: handle the error
             print(error)
@@ -750,7 +795,7 @@ class NetworkingManager : ObservableObject {
             .store(in: &self.cancellables)
     }
     
-    private func loadPlaylistItems(playlist: Playlist, complete: @escaping ([PlaylistSong]) -> Void) -> Void {
+    private func loadPlaylistItems(playlist: Playlist, context: NSManagedObjectContext, complete: @escaping ([PlaylistSong]) -> Void) -> Void {
         PlaylistsAPI.getPlaylistItems(playlistId: playlist.jellyfinId!, userId: self.userId, apiResponseQueue: self.processingQueue)
         .sink(receiveCompletion: { complete in
             print("Playlist song retrieval for playlist \(playlist.name): \(complete)")
@@ -764,21 +809,21 @@ class NetworkingManager : ObservableObject {
                 playlistItems.items!.forEach({ playlistItem in
                     
                     if (self.retrievePlaylistSongFromCore(playlistSongId: playlistItem.playlistItemId!) == nil) {
-                        let playlistSong = PlaylistSong(context: self.context)
+                        let playlistSong = PlaylistSong(context: context)
                         
                         playlistSong.jellyfinId = playlistItem.playlistItemId
                         
                         playlistSong.playlist = playlist
                         playlistSong.indexNumber = Int16(index)
                         
-                        let song: Song = self.context.object(with: self.retrieveSongFromCore(songId: playlistItem.id!)!) as! Song
+                        let song: Song = context.object(with: self.retrieveSongFromCore(songId: playlistItem.id!)!) as! Song
                         playlistSong.song = song
                         song.addToPlaylists(playlistSong)
                         
                         playlistSongs.append(playlistSong)
                     } else {
                         
-                        let playlistSong = self.context.object(with: self.retrievePlaylistSongFromCore(playlistSongId: playlistItem.playlistItemId!)!) as! PlaylistSong
+                        let playlistSong = context.object(with: self.retrievePlaylistSongFromCore(playlistSongId: playlistItem.playlistItemId!)!) as! PlaylistSong
                         
                         playlistSong.indexNumber = Int16(index)
                         
@@ -787,7 +832,7 @@ class NetworkingManager : ObservableObject {
                     
                     index += 1
                 })
-                
+                                
                 complete(playlistSongs)
             } else {
                 complete([])
@@ -1000,17 +1045,19 @@ class NetworkingManager : ObservableObject {
     
     private func saveContext() {
         
-        do {
-            try self.privateContext.save()
-            self.context.perform {
-                do {
-                    try self.context.save()
-                } catch {
-                    fatalError("Failure to save main context: \(error)")
+        self.privateContext.performAndWait {
+            do {
+                try self.privateContext.save()
+                self.context.perform {
+                    do {
+                        try self.context.save()
+                    } catch {
+                        fatalError("Failure to save main context: \(error)")
+                    }
                 }
+            } catch {
+                fatalError("Error saving private context: \(error)")
             }
-        } catch {
-            fatalError("Error saving private context: \(error)")
         }
     }
             

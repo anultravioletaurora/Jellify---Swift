@@ -62,7 +62,8 @@ open class AVPlayerItemId: AVPlayerItem, Identifiable{
             URLQueryItem(name: "api_key", value: AVPlayerItemId.networkingManager.accessToken),
             URLQueryItem(name: "StartTimeTicks", value: "0"),
             URLQueryItem(name: "EnableRedirection", value: "true"),
-            URLQueryItem(name: "EnableRemoteMedia", value: "true")
+            URLQueryItem(name: "EnableRemoteMedia", value: "true"),
+            URLQueryItem(name: "PlaySessionId", value: sessionId)
         ]
         
         print(streamEndpointComponents.url!)

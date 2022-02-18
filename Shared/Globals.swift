@@ -10,5 +10,7 @@ import Foundation
 public class Globals{
     public static let playTimeInterval: Double = 0.1
     public static let componentOpacity: Double = 0.6
-    public static let debounceDuration: Double = 0.7
+    public static let debounceDuration: Double = 0.5
+    
+    public static let FETCH_PAGE_SIZE : Int = 500
 }

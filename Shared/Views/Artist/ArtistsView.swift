@@ -41,6 +41,12 @@ struct ArtistsView: View {
                     ArtistsListView(artists: artists)
                 }
             }
+            
+            // This overlay prevents list content from appearing behind the tab view when dismissing the player
+            .overlay(content: {
+                BlurView()
+                    .offset(y: UIScreen.main.bounds.height - 150)
+            })
             .navigationTitle("Artists")
             .toolbar {
                 ToolbarItem(placement: .navigationBarLeading) {

@@ -14,24 +14,13 @@ struct ArtistsGalleryView: View {
     @StateObject
     var searchBar = SearchBarViewModel()
     
-    @State
     var columns : [GridItem] = Array(repeating: .init(.flexible()), count: 3)
 
     var body: some View {
         ScrollView {
             LazyVGrid(columns: columns) {
-                ForEach(artists) { artist in
-                    
-                    NavigationLink(destination: ArtistDetailView(artist), label: {
-                        VStack {
-                            ArtistImage(artist: artist)
-                            
-                            Text(artist.name ?? "Unknown Artist")
-                                .font(.subheadline)
-                                .foregroundColor(.primary)
-                        }
-                        .frame(height: 150)
-                    })
+                ForEach(artists, id: \.jellyfinId) { artist in
+                    ArtistGalleryItem(artist: artist)
                 }
             }
         }
@@ -47,5 +36,23 @@ struct ArtistsGalleryView: View {
             
             artists.nsPredicate = searchBar.search.isEmpty ? nil : NSPredicate(format: "%K beginswith[c] %@", #keyPath(Artist.name), searchBar.search.trimmingCharacters(in: .whitespaces))
         }
+    }
+}
+
+struct ArtistGalleryItem: View {
+    @ObservedObject
+    var artist : FetchedResults<Artist>.Element
+    
+    var body: some View {
+        NavigationLink(destination: ArtistDetailView(artist), label: {
+            VStack {
+                ArtistImage(artist: artist)
+                
+                Text(artist.name ?? "Unknown Artist")
+                    .font(.subheadline)
+                    .foregroundColor(.primary)
+            }
+            .frame(height: 150)
+        })
     }
 }
