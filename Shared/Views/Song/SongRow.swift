@@ -123,6 +123,8 @@ struct SongRow: View {
                     
                     Text("Remove Download")
                 })
+            } else if song.downloading {
+                ProgressView()
             } else {
                 Button(action: {
                     downloadManager.download(song: song)

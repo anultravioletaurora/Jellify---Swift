@@ -34,7 +34,10 @@ public class DownloadManager {
             if item.localUrl == nil {
                 item.download { (progressPercentage) in
                     withAnimation{
-                        // song.progress = CGFloat(progressPercentage)
+//                         song.progress = CGFloat(progressPercentage)
+                        song.downloading = true
+                        song.downloaded = false
+                        try? self.networkingManager.context.save()
                     }
                 }
                 .finish { (relativePath) in

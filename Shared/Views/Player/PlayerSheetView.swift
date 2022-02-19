@@ -16,7 +16,7 @@ struct PlayerSheetView: View {
                 
     @State
     private var airPlayView = AirPlayView()
-    
+        
     @Binding
     var miniplayerExpanded : Bool
     
@@ -127,6 +127,13 @@ struct PlayerViewBody : View {
     @Environment(\.colorScheme)
     var colorScheme: ColorScheme
 
+    var downloadManager : DownloadManager = DownloadManager.shared
+    
+    @State
+    var showPlaylistSheet = false
+    
+    @State
+    var selectedSong : Song?
     
     var body : some View {
         
@@ -151,25 +158,35 @@ struct PlayerViewBody : View {
                         
                     }
 
-                    // Song name text
-                    Text(player.currentSong?.song.name ?? "Nothing Playing")
-                        .font(.title3)
-                        .bold()
+                    HStack {
+                        VStack(alignment: .leading) {
+                            // Song name text
+                            Text(player.currentSong?.song.name ?? "Nothing Playing")
+                                .font(.title2)
+                                .bold()
 
-                    if player.currentSong?.song.artists!.count ?? 0 > 1 {
-                        Text((player.currentSong!.song.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: ", "))
-                            .font(.body)
-                    } else {
-                        Text(player.currentSong?.song.album!.albumArtistName! ?? "")
-                            .font(.body)
-                            .transition(.opacity)
+                            if player.currentSong?.song.artists!.count ?? 0 > 1 {
+                                Text((player.currentSong!.song.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: ", "))
+                                    .font(.body)
+                            } else {
+                                Text(player.currentSong?.song.album!.albumArtistName! ?? "")
+                                    .font(.headline)
+                                    .transition(.opacity)
+                            }
+
+                            // Album name text
+                            Text(player.currentSong?.song.album?.name ?? "")
+                                .font(.headline)
+                                .transition(.opacity)
+                                .foregroundColor(.accentColor)
+                        }
+                        
+                        Spacer()
+                        
+                        if player.currentSong != nil {
+                            PlayerSongMenu(showPlaylistSheet: $showPlaylistSheet, selectedSong: $selectedSong)
+                        }
                     }
-
-                    // Album name text
-                    Text(player.currentSong?.song.album?.name ?? "")
-                        .font(.body)
-                        .transition(.opacity)
-                        .foregroundColor(.accentColor)
                 }
                 .frame(width: height)
             }
@@ -236,6 +253,13 @@ struct PlayerViewBody : View {
 //                .padding(.horizontal, 30)
 //                Spacer()
             
+//            HStack {
+//                Spacer()
+//                
+//                RoundedRectangle(cornerRadius: 25, style: .continuous)
+//
+//                Spacer()
+//            }
                     
             HStack {
                     
@@ -315,6 +339,9 @@ struct PlayerViewBody : View {
                 Spacer()
             }
             .padding(.top, 60)
+            .sheet(isPresented: $showPlaylistSheet, content: {
+                PlaylistSelectionSheet(song: $selectedSong, showPlaylistSheet: $showPlaylistSheet)
+            })
         }
     }
 }
