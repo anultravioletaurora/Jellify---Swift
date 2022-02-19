@@ -11,6 +11,7 @@ import Combine
 import AVFoundation
 import MediaPlayer
 import JellyfinAPI
+import HLSion
 
 open class AVPlayerItemId: AVPlayerItem, Identifiable{
     public let id = UUID().uuidString
@@ -403,16 +404,15 @@ class Player: ObservableObject {
     
     private func toPlayerItem(_ song : Song, order: Int) -> AVPlayerItemId{
         // See if the item is marked as downloaded
-//        if song.downloaded{
-//            let hlsion = HLSion(url: song.downloadUrl, name: song.id!)
-//            if let localUrl = hlsion.localUrl{
-//                let localAsset = AVURLAsset(url: localUrl)
-//                return AVPlayerItemId(song: song, localAsset: localAsset, order: order)
-//
-//            }
-//            song.downloaded = false
-//            //TODO save this change
-//        }
+        if song.downloaded {
+            let hlsion = HLSion(url: song.downloadUrl!, name: song.jellyfinId!)
+            if let localUrl = hlsion.localUrl{
+                let localAsset = AVURLAsset(url: localUrl)
+                return AVPlayerItemId(song: song, localAsset: localAsset, order: order)
+
+            }
+            song.downloaded = false
+        }
         //Fallback to streaming or cache if we reach here
         return AVPlayerItemId(song: song, order: order)
     }

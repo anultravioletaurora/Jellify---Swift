@@ -41,6 +41,9 @@
     </entity>
     <entity name="Song" representedClassName="Song" syncable="YES" codeGenerationType="class">
         <attribute name="diskNumber" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="downloaded" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="downloading" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <attribute name="downloadUrl" optional="YES" attributeType="URI"/>
         <attribute name="indexNumber" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="jellyfinId" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
@@ -68,7 +71,7 @@
         <element name="Genre" positionX="0" positionY="126" width="128" height="88"/>
         <element name="Playlist" positionX="0" positionY="126" width="128" height="89"/>
         <element name="PlaylistSong" positionX="-252" positionY="27" width="128" height="89"/>
-        <element name="Song" positionX="-437.8984375" positionY="131.203125" width="128" height="149"/>
+        <element name="Song" positionX="-437.8984375" positionY="131.203125" width="128" height="194"/>
         <element name="User" positionX="-243.81640625" positionY="156.03515625" width="128" height="133"/>
         <element name="UserData" positionX="-68.51171875" positionY="-130.66796875" width="128" height="74"/>
     </elements>

@@ -36,11 +36,11 @@ struct PlayerSheetView: View {
         VStack {
             
             if horizontalSizeClass == .compact {
-                VStack(alignment: .center) {
+                VStack {
                     PlayerViewBody(viewingQueue: $viewingQueue, miniplayerExpanded: $miniplayerExpanded)
                 }
             } else {
-                HStack(alignment: .center) {
+                HStack {
                     PlayerViewBody(viewingQueue: $viewingQueue, miniplayerExpanded: $miniplayerExpanded)
                 }
                 .padding(.horizontal, 30)
@@ -132,71 +132,30 @@ struct PlayerViewBody : View {
         
         VStack {
             if viewingQueue {
-                
-                Text("Now Playing")
-                    .font(Font.headline)
-                    .padding(.top, 30)
-                
-                List(player.songs.suffix(from: player.songIndex)) { song in
-                    HStack {
-                                                    
-                        if player.currentSong != nil && song == player.currentSong! {
-                            ZStack {
-                                
-                                AlbumThumbnail(album: song.song.album!)
-                                    .brightness(colorScheme == .dark ? -0.3 : 0.3)
-                                
-                                Image(systemName: "speaker.wave.3")
-                                    .font(.title)
-                            }
-                        } else {
-                            AlbumThumbnail(album: song.song.album!)
-                        }
-                        
-                        VStack(alignment: .leading) {
-                            Text(song.song.name!)
-
-                            if song.song.artists!.count ?? 0 > 1 {
-                                Text((song.song.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: ", "))
-                                    .font(.headline)
-                            } else {
-                                Text(song.song.album!.albumArtistName! ?? "")
-                                    .font(Font.subheadline)
-                                    .transition(.opacity)
-                            }
-
-                        }
-                    }
-                    .listRowBackground(Color.clear)
-                    .onTapGesture(perform: {
-                        player.next(song: song)
-                    })
-                }
-                .frame(width: height, height: height + 20)
-                .background(Color.clear)
-                .listStyle(PlainListStyle())
-                .animation(Animation.easeInOut)
+                PlayerQueueView()
             } else {
-                // Album Artwork
-                if player.currentSong?.song.album != nil {
-                    AlbumPlayingImage(album: player.currentSong!.song.album!)
-                        .padding(.top, 30)
-                        .animation(Animation.easeInOut)
-                } else {
-                    Image("placeholder")
-                        .resizable()
-                        .frame(width: height, height: height)
-                        .cornerRadius(10)
-                        .padding(.top, 30)
-                    
-                }
                 
-                // Song name text
-                Text(player.currentSong?.song.name ?? "Nothing Playing")
-                    .font(.title3)
-                    .bold()
+                VStack(alignment: .leading) {
 
-                VStack {
+                    // Album Artwork
+                    if player.currentSong?.song.album != nil {
+                        AlbumPlayingImage(album: player.currentSong!.song.album!)
+                            .padding(.top, 30)
+                            .animation(Animation.easeInOut)
+                    } else {
+                        Image("placeholder")
+                            .resizable()
+                            .frame(width: height, height: height)
+                            .cornerRadius(10)
+                            .padding(.top, 30)
+                        
+                    }
+
+                    // Song name text
+                    Text(player.currentSong?.song.name ?? "Nothing Playing")
+                        .font(.title3)
+                        .bold()
+
                     if player.currentSong?.song.artists!.count ?? 0 > 1 {
                         Text((player.currentSong!.song.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: ", "))
                             .font(.body)
@@ -206,21 +165,23 @@ struct PlayerViewBody : View {
                             .transition(.opacity)
                     }
 
-                        // Album name text
-                        Text(player.currentSong?.song.album?.name ?? "")
-                            .font(.body)
-                            .transition(.opacity)
-                            .foregroundColor(.accentColor)
-                    }
-                .frame(width: height)
+                    // Album name text
+                    Text(player.currentSong?.song.album?.name ?? "")
+                        .font(.body)
+                        .transition(.opacity)
+                        .foregroundColor(.accentColor)
                 }
+                .frame(width: height)
+            }
         }
                
         VStack {
+            
             ScrubberBarView()
+                .padding(.bottom, 25)
 //                    ProgressBarView()
 //                        .padding(.all)
-            
+                        
             HStack {
                 // Skip track
                 Button(action: {

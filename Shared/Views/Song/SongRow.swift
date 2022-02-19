@@ -2,6 +2,7 @@ import SwiftUI
 
 struct SongRow: View {
     
+    @ObservedObject
     var song: Song
     
     @Binding
@@ -15,16 +16,14 @@ struct SongRow: View {
     @ObservedObject
     var player : Player = Player.shared
     
+    var downloadManager : DownloadManager = DownloadManager.shared
+    
     var type : SongRowType
     
     var body: some View {
         Button(action: {
-            print("Playing \(song.name ?? "Unknown Song")")
-            
-            Player.shared.loadSongs(Array(songs), songId: song.jellyfinId!)
-            Player.shared.isPlaying = true
-                            
-            print("Playing!")
+            player.loadSongs(Array(songs), songId: song.jellyfinId!)
+            player.isPlaying = true
         }, label: {
             HStack(alignment: .center, content: {
                 
@@ -61,6 +60,12 @@ struct SongRow: View {
                 }
                 
                 Spacer()
+                
+                if song.downloaded {
+                    Image(systemName: "arrow.down.circle.fill")
+                        .foregroundColor(.accentColor)
+                        .animation(Animation.easeInOut)
+                }
             })
         })
         .padding(.horizontal, 10)
@@ -88,13 +93,47 @@ struct SongRow: View {
             .tint(.blue)
         }
         .contextMenu {
-            Button("Play Next", action: playNext)
-            Button("Add to Playlist", action: {
+            Button(action: {
+                player.appendSongsNext([song])
+            }, label: {
+                HStack {
+                    Image(systemName: "text.insert")
+
+                    Text("Play Next")
+                }
+            })
+            Button(action: {
                 
                 selectedSong = song
                 
                 showPlaylistSheet.toggle()
+            }, label: {
+                HStack {
+                    Image(systemName: "text.badge.plus")
+                    
+                    Text("Add to Playlist")
+                }
             })
+            
+            if song.downloaded {
+                Button(action: {
+                    downloadManager.deleteDownload(song: song)
+                }, label: {
+                    Image(systemName: "trash.circle")
+                    
+                    Text("Remove Download")
+                })
+            } else {
+                Button(action: {
+                    downloadManager.download(song: song)
+                }, label: {
+                    HStack {
+                        Image(systemName: "arrow.down.circle")
+                        
+                        Text("Download")
+                    }
+                })
+            }
         }
     }
     
