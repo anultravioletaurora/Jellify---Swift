@@ -164,6 +164,20 @@ class Player: ObservableObject {
     @Published public var currentSong: AVPlayerItemId?
     {
         didSet {
+            var dto = PlaybackProgressInfo()
+            
+            dto.playSessionId = self.currentSong?.playSessionId
+            dto.itemId = self.currentSong?.song.jellyfinId!
+            dto.isPaused = !self.isPlaying
+            
+            PlaystateAPI.reportPlaybackProgress(playbackProgressInfo: dto, apiResponseQueue: AVPlayerItemId.networkingManager.processingQueue)
+                .sink(receiveCompletion: { complete in
+                    
+                }, receiveValue: {
+                    
+                })
+                .store(in: &AVPlayerItemId.networkingManager.cancellables)
+
             duration =  currentSong?.song.runTime ?? "0:00"
             timeElasped = "0:00"
         }
@@ -189,7 +203,41 @@ class Player: ObservableObject {
                 setupBackgroundPlay()
             }
             
-            isPlaying ? player?.play() : player?.pause()
+            if isPlaying {
+                player?.play()
+                
+                var dto = PlaybackStartInfo()
+                
+                dto.playSessionId = self.currentSong?.playSessionId
+                dto.itemId = self.currentSong?.song.jellyfinId
+                dto.isPaused = false
+                
+                PlaystateAPI.reportPlaybackStart(playbackStartInfo: dto, apiResponseQueue: AVPlayerItemId.networkingManager.processingQueue)
+                    .sink(receiveCompletion: { complete in
+                        
+                    }, receiveValue: {
+                        
+                    })
+                    .store(in: &AVPlayerItemId.networkingManager.cancellables)
+                
+            } else {
+                player?.pause()
+                
+                var dto = PlaybackProgressInfo()
+                
+                dto.playSessionId = self.currentSong?.playSessionId
+                dto.itemId = self.currentSong?.song.jellyfinId!
+                dto.isPaused = true
+                
+                PlaystateAPI.reportPlaybackProgress(playbackProgressInfo: dto, apiResponseQueue: AVPlayerItemId.networkingManager.processingQueue)
+                    .sink(receiveCompletion: { complete in
+                        
+                    }, receiveValue: {
+                        
+                    })
+                    .store(in: &AVPlayerItemId.networkingManager.cancellables)
+            }
+            
             setupPlayTimer()
             MPNowPlayingInfoCenter.default().playbackState = isPlaying ? .playing : .paused
         }

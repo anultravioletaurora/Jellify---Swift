@@ -19,9 +19,13 @@ struct PlaylistDetailView: View {
     }
     
     let networkingManager : NetworkingManager = NetworkingManager.shared
-
+    
     @State
-    var songs : [Song] = []
+    var selectedSong: Song?
+    
+    @State
+    var showPlaylistSheet: Bool = false
+
     
     init(playlist: Playlist) {
         self.playlist = playlist
@@ -46,39 +50,8 @@ struct PlaylistDetailView: View {
                                     
                     print("Playing!")
                 }, label: {
-                    HStack(alignment: .center, content: {
-                                                
-                        AlbumThumbnail(album: playlistSong.song!.album!)
-                                                           
-                        VStack(alignment: .leading, spacing: 10) {
-                            Text(playlistSong.song?.name! ?? "Unknown Song")
-                            
-                            HStack {
-//                                Text(playlistSong.song?.album?.name! ?? "Unknown Album")
-//                                    .font(.subheadline)
-                                
-                                if playlistSong.song!.artists!.count > 2 {
-                                Text((playlistSong.song!.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: ", "))
-                                    .font(.subheadline)
-                                    .opacity(0.6)
-                                } else if playlistSong.song!.artists!.count > 1 {
-                                    Text((playlistSong.song!.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: " & "))
-                                        .font(.subheadline)
-                                        .opacity(0.6)
-
-                                } else {
-                                    Text(playlistSong.song!.album!.albumArtistName!)
-                                        .font(.subheadline)
-                                        .opacity(0.6)
-
-                                }
-
-                            }
-                        }
-                        .padding(.leading, 5)
                         
-                        Spacer()
-                    })
+                    SongRow(song: playlistSong.song!, selectedSong: $selectedSong, songs: playlistSongs.map { $0.song! }, showPlaylistSheet: $showPlaylistSheet, type: .songs)
                 })
                 .onAppear(perform: {
                     if playlistSong.song!.album != nil && playlistSong.song!.album!.thumbnail == nil {
@@ -97,8 +70,6 @@ struct PlaylistDetailView: View {
                     .tint(.red)
 
                 })
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
                 .buttonStyle(PlainButtonStyle())
         }
         // This overlay prevents list content from appearing behind the tab view when dismissing the player

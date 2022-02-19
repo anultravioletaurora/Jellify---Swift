@@ -12,9 +12,12 @@ struct SongRow: View {
     @Binding
     var showPlaylistSheet: Bool
     
+    @ObservedObject
+    var player : Player = Player.shared
+    
     var type : SongRowType
     
-    var body: some View{
+    var body: some View {
         Button(action: {
             print("Playing \(song.name ?? "Unknown Song")")
             
@@ -50,6 +53,10 @@ struct SongRow: View {
                         Text((song.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: " & "))
                             .font(.subheadline)
                             .opacity(0.6)
+                    } else if type == .songs {
+                        Text(song.album!.albumArtistName!)
+                            .font(.subheadline)
+                            .opacity(0.6)
                     }
                 }
                 
@@ -57,7 +64,6 @@ struct SongRow: View {
             })
         })
         .padding(.horizontal, 10)
-        .padding(.vertical, 5)
         .buttonStyle(PlainButtonStyle())
         .swipeActions {
             Button(action: {
@@ -81,6 +87,19 @@ struct SongRow: View {
             }
             .tint(.blue)
         }
+        .contextMenu {
+            Button("Play Next", action: playNext)
+            Button("Add to Playlist", action: {
+                
+                selectedSong = song
+                
+                showPlaylistSheet.toggle()
+            })
+        }
+    }
+    
+    private func playNext() {
+        player.appendSongsNext([song])
     }
 }
 

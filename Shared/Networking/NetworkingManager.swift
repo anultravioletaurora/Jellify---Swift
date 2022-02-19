@@ -1071,12 +1071,13 @@ class NetworkingManager : ObservableObject {
         
         let deviceId = UIDevice.current.identifierForVendor!.uuidString
         
-        let header = "MediaBrowser Client=\"\(appName ?? "JellyTuner")\", Device=\"\(deviceName)\", DeviceId=\"\(deviceId)\", Version=\"\(appVersion)\""
+        let header = "MediaBrowser Client=\"\(appName ?? "Jellify")\", Device=\"\(deviceName)\", DeviceId=\"\(deviceId)\", Version=\"\(appVersion)\""
         
         JellyfinAPI.customHeaders["X-Emby-Authorization"] = header
     }
     
     private func setCustomHeaders() -> Void {
+        let appName = Bundle.main.infoDictionary?["CFBundleName"] as? String
         let appVersion = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as! String
         var deviceName = UIDevice.current.name
         deviceName = deviceName.folding(options: .diacriticInsensitive, locale: .current)
@@ -1090,7 +1091,7 @@ class NetworkingManager : ObservableObject {
         #endif
         
         var header = "MediaBrowser "
-        header.append("Client=\"JellyTuner\", ")
+        header.append("Client=\"\(appName ?? "Jellify")\", ")
         header.append("Device=\"\(deviceName)\", ")
         header.append("DeviceId=\"\(UIDevice.current.identifierForVendor!)\", ")
         header.append("Version=\"\(appVersion)\", ")
