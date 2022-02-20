@@ -75,6 +75,9 @@ struct ContentView: View {
                 
                 networkingManager.openSession()
                 
+                // Start up any downloads that haven't completed
+                networkingManager.processDownloadQueue()
+                
                 // Sync library on app startup
                 networkingManager.syncLibrary()
             })

@@ -42,13 +42,13 @@ struct ArtistRow: View {
                 }
             }
         }
-        .swipeActions {
-            Button(action: {
-                print("Artist Swiped")
-            }) {
-                Image(systemName: "heart")
-            }
-            .tint(.purple)
-        }
+//        .swipeActions {
+//            Button(action: {
+//                print("Artist Swiped")
+//            }) {
+//                Image(systemName: "heart")
+//            }
+//            .tint(.purple)
+//        }
     }
 }

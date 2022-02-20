@@ -42,20 +42,13 @@ struct SongRow: View {
                 }
                                         
                 VStack(alignment: .leading, spacing: 10) {
+                    
                     Text(song.name ?? "Unknown Song")
                                      
-                    if song.artists!.count > 2 {
-                        Text((song.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: ", "))
+                    if (type == .songs || (type == .album && song.artists?.count ?? 0 > 1)) {
+                        Text(Builders.artistName(song: song))
                             .font(.subheadline)
-                            .opacity(0.6)
-                    } else if song.artists!.count > 1 {
-                        Text((song.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: " & "))
-                            .font(.subheadline)
-                            .opacity(0.6)
-                    } else if type == .songs {
-                        Text(song.album?.albumArtistName! ?? "")
-                            .font(.subheadline)
-                            .opacity(0.6)
+                            .opacity(Globals.componentOpacity)
                     }
                 }
                 

@@ -18,6 +18,11 @@ public class DownloadManager {
     
     public func downloadSong(song: Song) {
         let seshId = "\(Double.random(in: 0..<1496213367201))".replacingOccurrences(of: ".", with: "")
+        
+        song.downloading = true
+        DispatchQueue.main.async {
+            try! self.networkingManager.context.save()
+        }
 
         SAPlayer.Downloader.downloadAudio(withRemoteUrl: AVPlayerItemId.getStream(songId: song.jellyfinId!, sessionId: seshId), completion: { url, error in
             
@@ -37,11 +42,16 @@ public class DownloadManager {
     }
     
     public func deleteSongDownload(song: Song) {
-        SAPlayer.Downloader.deleteDownloaded(withSavedUrl: song.downloadUrl!)
-        
-        song.downloadUrl = nil
-        song.downloaded = false
-        song.downloading = false
-        try! networkingManager.context.save()
+        if let url = song.downloadUrl {
+            SAPlayer.Downloader.deleteDownloaded(withSavedUrl: url)
+            
+            song.downloadUrl = nil
+            song.downloaded = false
+            song.downloading = false
+            
+            DispatchQueue.main.async {
+                try! self.networkingManager.context.save()
+            }
+        }
     }
 }

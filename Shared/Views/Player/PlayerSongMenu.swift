@@ -68,6 +68,7 @@ struct PlayerSongMenu: View {
             Image(systemName: "ellipsis.circle")
                 .font(.largeTitle)
         })
+            .buttonStyle(PlainButtonStyle())
 
     }
 }

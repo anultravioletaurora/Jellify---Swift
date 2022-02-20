@@ -51,7 +51,7 @@ struct AlbumsGalleryView: View {
                             if album == albums.last! && albums.count >= limit {
                                 print("Last album of total: \(albums.count), increasing limit")
                                 
-                                self.limit += Globals.FETCH_PAGE_SIZE
+                                self.limit += Globals.VIEW_FETCH_PAGE_SIZE
                                 
                                 print("New limit: \(self.limit)")
 

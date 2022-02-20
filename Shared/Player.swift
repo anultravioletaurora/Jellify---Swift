@@ -11,7 +11,6 @@ import Combine
 import AVFoundation
 import MediaPlayer
 import JellyfinAPI
-import HLSion
 import SwiftAudioPlayer
 
 open class AVPlayerItemId: AVPlayerItem, Identifiable{
@@ -35,7 +34,7 @@ open class AVPlayerItemId: AVPlayerItem, Identifiable{
         self.playSessionId = seshId
         self.song = song
         self.initialOrder = order
-//
+
         let headers: [String: String] = [ "X-Emby-Token": AVPlayerItemId.networkingManager.accessToken ]
         let assetItem = AVURLAsset(url: AVPlayerItemId.getStream(songId: song.jellyfinId!, sessionId: seshId), options: [
             "AVURLAssetHTTPHeaderFieldsKey": headers,
@@ -132,6 +131,9 @@ class Player: ObservableObject {
                     }
                 }else{
                     player?.removeAllItems()
+
+                    
+                    
                     player = AVQueuePlayer(items: Array(songs[songIndex...].map{ self.toPlayerItem($0.song, order: $0.initialOrder) }))
                 }
                 currentSong = songs[songIndex]

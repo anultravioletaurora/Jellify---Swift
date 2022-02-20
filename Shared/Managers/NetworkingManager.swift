@@ -10,6 +10,7 @@ import JellyfinAPI
 import CoreData
 import Combine
 import UIKit
+import SwiftAudioPlayer
 
 class NetworkingManager : ObservableObject {
     
@@ -31,7 +32,7 @@ class NetworkingManager : ObservableObject {
             switch loadingPhase {
             case .artists:
                 loadArtists(complete: {
-                    
+
                 })
                 
                 case .albums:
@@ -53,11 +54,25 @@ class NetworkingManager : ObservableObject {
                             let privatePlaylist = privateContext.object(with: self.retrievePlaylistFromCore(playlistId: playlist.jellyfinId!)!) as! Playlist
 
                             self.loadPlaylistItems(playlist: privatePlaylist, context: privateContext, complete: { playlistSongs in
-
-                                playlistSongs.forEach({ playlistSong in
-                                    privatePlaylist.addToSongs(playlistSong)
-                                })
-
+                                
+                                // If this playlist already has songs in it, then we'll make sure no dupes get added
+                                if let existingSongs = privatePlaylist.songs?.allObjects as? [PlaylistSong] {
+                                    
+                                    let existingSongIds = existingSongs.map { $0.jellyfinId! }
+                                    
+                                    let newSongs = playlistSongs.filter { !existingSongIds.contains($0.jellyfinId!) }
+                                    
+                                    newSongs.forEach({ playlistSong in
+                                        privatePlaylist.addToSongs(playlistSong)
+                                    })
+                                }
+                                // Else we'll toss everything into this playlist
+                                else {
+                                    playlistSongs.forEach({ playlistSong in
+                                        privatePlaylist.addToSongs(playlistSong)
+                                    })
+                                }
+                                
                                 do {
                                     try privateContext.save()
 
@@ -242,11 +257,20 @@ class NetworkingManager : ObservableObject {
                     
                     privatePlaylist.songs!.forEach({ playlistSong in
                         privateContext.delete(playlistSong as! NSManagedObject)
+                        try! privateContext.save()
                     })
                     
                 }
-                self.loadPlaylistItems(playlist: playlist, context: privateContext, complete: { playlistItems in
+                self.loadPlaylistItems(playlist: privatePlaylist, context: privateContext, complete: { playlistSongs in
                     print("Playlist addition and refresh")
+                    
+                    playlistSongs.forEach({ playlistSong in
+                        privatePlaylist.addToSongs(playlistSong)
+                    })
+                    
+                    try! privateContext.save()
+                    
+                    self.saveContext()
                     complete()
                 })
             })
@@ -282,12 +306,35 @@ class NetworkingManager : ObservableObject {
                         newPlaylist.addToSongs(playlistSong)
                     })
                     
+                    try! privateContext.save()
+                    
                     self.saveContext()
                     
                     complete()
                 })
             })
             .store(in: &self.cancellables)
+    }
+    
+    public func deletePlaylist(playlist: Playlist) -> Void {
+        print("Deleting playlist \(playlist.name!)")
+        
+        LibraryAPI.deleteItem(itemId: playlist.jellyfinId!, apiResponseQueue: processingQueue)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished :
+                    
+                    self.deletePlaylists(playlistsToDelete: [playlist])
+                    
+                    self.saveContext()
+                case .failure:
+                    print("Error deleting playlist: \(completion)")
+                }
+
+            }, receiveValue: { response in
+                
+            })
+            .store(in: &cancellables)
     }
     
     public func deleteFromPlaylist(playlist: Playlist, playlistSong: PlaylistSong) -> Void {
@@ -449,7 +496,7 @@ class NetworkingManager : ObservableObject {
     }
     
     public func openSession() -> Void {
-                
+                        
         SessionAPI.getSessions(controllableByUserId: self.userId, deviceId: UIDevice.current.identifierForVendor!.uuidString, apiResponseQueue: self.processingQueue)
             .sink(receiveCompletion: { complete in
                 print("Session started: \(complete)")
@@ -457,6 +504,13 @@ class NetworkingManager : ObservableObject {
                 print("Started session for user successfully")
             })
             .store(in: &self.cancellables)
+    }
+    
+    public func processDownloadQueue() -> Void {
+        
+        self.retrieveSongsToDownload().forEach({ song in
+            DownloadManager.shared.downloadSong(song: song)
+        })
     }
 
     public func syncLibrary() -> Void {
@@ -555,7 +609,7 @@ class NetworkingManager : ObservableObject {
         saveContext()
     }
     
-    private func deleteAllOfEntity(entityName: String)-> Void{
+    private func deleteAllOfEntity(entityName: String) -> Void {
         let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: entityName)
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
 
@@ -565,6 +619,21 @@ class NetworkingManager : ObservableObject {
             // TODO: handle the error
             print(error)
         }
+    }
+    
+    private func deletePlaylists(playlistsToDelete: [Playlist]) -> Void {
+        playlistsToDelete.forEach({ playlist in
+            
+            if let playlistSongs = playlist.songs?.allObjects as? [PlaylistSong] {
+
+                playlistSongs.forEach({ playlistSong in
+                    self.privateContext.delete(self.privateContext.object(with: self.retrievePlaylistSongFromCore(playlistSongId: playlistSong.jellyfinId!)!))
+                })
+            }
+                        
+            self.privateContext.delete(self.privateContext.object(with: self.retrievePlaylistFromCore(playlistId: playlist.jellyfinId!)!))
+            self.saveContext()
+        })
     }
 
     
@@ -696,7 +765,7 @@ class NetworkingManager : ObservableObject {
         }
         
     private func loadSongs(complete: @escaping () -> Void, startIndex: Int?) -> Void {
-            ItemsAPI.getItemsByUserId(userId: self.userId, maxOfficialRating: nil, hasThemeSong: nil, hasThemeVideo: nil, hasSubtitles: nil, hasSpecialFeature: nil, hasTrailer: nil, adjacentTo: nil, parentIndexNumber: nil, hasParentalRating: nil, isHd: nil, is4K: nil, locationTypes: nil, excludeLocationTypes: nil, isMissing: nil, isUnaired: nil, minCommunityRating: nil, minCriticRating: nil, minPremiereDate: nil, minDateLastSaved: nil, minDateLastSavedForUser: nil, maxPremiereDate: nil, hasOverview: nil, hasImdbId: nil, hasTmdbId: nil, hasTvdbId: nil, excludeItemIds: nil, startIndex: startIndex, limit: 10000, recursive: true, searchTerm: nil, sortOrder: nil, parentId: nil, fields: nil, excludeItemTypes: nil, includeItemTypes: ["Audio"], filters: nil, isFavorite: nil, mediaTypes: nil, imageTypes: nil, sortBy: nil, isPlayed: nil, genres: nil, officialRatings: nil, tags: nil, years: nil, enableUserData: true, imageTypeLimit: nil, enableImageTypes: nil, person: nil, personIds: nil, personTypes: nil, studios: nil, artists: nil, excludeArtistIds: nil, artistIds: nil, albumArtistIds: nil, contributingArtistIds: nil, albums: nil, albumIds: nil, ids: nil, videoTypes: nil, minOfficialRating: nil, isLocked: nil, isPlaceHolder: nil, hasOfficialRating: nil, collapseBoxSetItems: nil, minWidth: nil, minHeight: nil, maxWidth: nil, maxHeight: nil, is3D: nil, seriesStatus: nil, nameStartsWithOrGreater: nil, nameStartsWith: nil, nameLessThan: nil, studioIds: nil, genreIds: nil, enableTotalRecordCount: nil, enableImages: false, apiResponseQueue: processingQueue)
+        ItemsAPI.getItemsByUserId(userId: self.userId, maxOfficialRating: nil, hasThemeSong: nil, hasThemeVideo: nil, hasSubtitles: nil, hasSpecialFeature: nil, hasTrailer: nil, adjacentTo: nil, parentIndexNumber: nil, hasParentalRating: nil, isHd: nil, is4K: nil, locationTypes: nil, excludeLocationTypes: nil, isMissing: nil, isUnaired: nil, minCommunityRating: nil, minCriticRating: nil, minPremiereDate: nil, minDateLastSaved: nil, minDateLastSavedForUser: nil, maxPremiereDate: nil, hasOverview: nil, hasImdbId: nil, hasTmdbId: nil, hasTvdbId: nil, excludeItemIds: nil, startIndex: startIndex, limit: Globals.API_FETCH_PAGE_SIZE, recursive: true, searchTerm: nil, sortOrder: nil, parentId: nil, fields: nil, excludeItemTypes: nil, includeItemTypes: ["Audio"], filters: nil, isFavorite: nil, mediaTypes: nil, imageTypes: nil, sortBy: nil, isPlayed: nil, genres: nil, officialRatings: nil, tags: nil, years: nil, enableUserData: true, imageTypeLimit: nil, enableImageTypes: nil, person: nil, personIds: nil, personTypes: nil, studios: nil, artists: nil, excludeArtistIds: nil, artistIds: nil, albumArtistIds: nil, contributingArtistIds: nil, albums: nil, albumIds: nil, ids: nil, videoTypes: nil, minOfficialRating: nil, isLocked: nil, isPlaceHolder: nil, hasOfficialRating: nil, collapseBoxSetItems: nil, minWidth: nil, minHeight: nil, maxWidth: nil, maxHeight: nil, is3D: nil, seriesStatus: nil, nameStartsWithOrGreater: nil, nameStartsWith: nil, nameLessThan: nil, studioIds: nil, genreIds: nil, enableTotalRecordCount: nil, enableImages: false, apiResponseQueue: processingQueue)
                 .sink(receiveCompletion: { completion in
                     switch completion {
                     case .finished :
@@ -768,7 +837,7 @@ class NetworkingManager : ObservableObject {
                                     
                                     // If this response is less than the configured fetch amount, it means the server doesn't
                                     // have more to give and we should complete
-                                    if (response.items!.count < 10000) {
+                                    if (response.items!.count < Globals.API_FETCH_PAGE_SIZE) {
                                         self.saveContext()
                                         complete()
                                     }
@@ -776,7 +845,7 @@ class NetworkingManager : ObservableObject {
                                     // Else it means there may be more songs on the server, let's go again!
                                     else {
                                         
-                                        var index = 10000
+                                        var index = Globals.API_FETCH_PAGE_SIZE
                                         
                                         if startIndex != nil {
                                             index += startIndex!
@@ -795,7 +864,7 @@ class NetworkingManager : ObservableObject {
                                 
                             // If this response is less than the configured fetch amount, it means the server doesn't
                             // have more to give and we should complete
-                            if (response.items!.count < 10000) {
+                            if (response.items!.count < Globals.API_FETCH_PAGE_SIZE) {
                                 self.saveContext()
                                 complete()
                             }
@@ -803,7 +872,7 @@ class NetworkingManager : ObservableObject {
                             // Else it means there may be more songs on the server, let's go again!
                             else {
                                 
-                                var index = 10000
+                                var index = Globals.API_FETCH_PAGE_SIZE
                                 
                                 if startIndex != nil {
                                     index += startIndex!
@@ -832,7 +901,14 @@ class NetworkingManager : ObservableObject {
             }, receiveValue: { response in
                 
                 if response.items != nil {
-                                                         
+                    
+                    // Remove old items that don't exist on the server anymore
+                    let jellyfinPlaylistIds = response.items!.map { $0.id! }
+                    
+                    let playlistsToDelete = self.retrieveAllPlaylistsFromCore().filter { !jellyfinPlaylistIds.contains($0.jellyfinId!) }
+                    
+                    self.deletePlaylists(playlistsToDelete: playlistsToDelete)
+                    
                     DispatchQueue.concurrentPerform(iterations: response.items!.count, execute: { index in
                         
                         let playlistResult = response.items![index]
@@ -1054,6 +1130,21 @@ class NetworkingManager : ObservableObject {
             return try privateContext.fetch(fetchRequest)
         } catch let error as NSError {
             print("Error retrieving all songs from CoreData: \(error)")
+            
+            return []
+        }
+    }
+    
+    private func retrieveSongsToDownload() -> [Song] {
+        
+        let fetchRequest = Song.fetchRequest()
+        
+        fetchRequest.predicate = NSPredicate(format: "downloading == true")
+        
+        do {
+            return try self.privateContext.fetch(fetchRequest)
+        } catch let error as NSError {
+            print("Error retrieving songs currently downloading from CoreData: \(error)")
             
             return []
         }

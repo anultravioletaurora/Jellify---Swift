@@ -231,6 +231,7 @@ struct AlbumDetailView: View {
                 }, label: {
                     Text("Create")
                 })
+                .disabled(playlistName.isEmpty)
             }
         }
     }

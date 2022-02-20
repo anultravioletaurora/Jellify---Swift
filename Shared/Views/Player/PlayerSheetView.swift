@@ -163,16 +163,8 @@ struct PlayerViewBody : View {
                             // Song name text
                             Text(player.currentSong?.song.name ?? "Nothing Playing")
                                 .font(.title2)
-                                .bold()
 
-                            if player.currentSong?.song.artists!.count ?? 0 > 1 {
-                                Text((player.currentSong!.song.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: ", "))
-                                    .font(.body)
-                            } else {
-                                Text(player.currentSong?.song.album!.albumArtistName! ?? "")
-                                    .font(.headline)
-                                    .transition(.opacity)
-                            }
+                            Text(Builders.artistName(song: player.currentSong?.song ?? nil))
 
                             // Album name text
                             Text(player.currentSong?.song.album?.name ?? "")

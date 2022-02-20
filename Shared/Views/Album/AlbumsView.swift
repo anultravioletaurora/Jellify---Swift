@@ -10,7 +10,7 @@ import SwiftUI
 struct AlbumsView: View {
     
     @State
-    var limit = Globals.FETCH_PAGE_SIZE
+    var limit = Globals.VIEW_FETCH_PAGE_SIZE
     
     @State
     var galleryView : Bool = UserDefaults.standard.bool(forKey: "artistGalleryView")

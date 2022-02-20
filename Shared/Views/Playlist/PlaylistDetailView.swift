@@ -41,16 +41,11 @@ struct PlaylistDetailView: View {
         List(playlistSongs) { (playlistSong : PlaylistSong) in
                 
                 Button(action: {
-                    print("Playing \(playlistSong.song?.name ?? "Unknown Song") from \(playlistSong.song?.album?.name ?? "Unknown Album")")
-                    
                     Player.shared.loadSongs(playlistSongs.map { song in
                         return song.song!
                     }, songId: playlistSong.song!.jellyfinId!)
                     Player.shared.isPlaying = true
-                                    
-                    print("Playing!")
                 }, label: {
-                        
                     SongRow(song: playlistSong.song!, selectedSong: $selectedSong, songs: playlistSongs.map { $0.song! }, showPlaylistSheet: $showPlaylistSheet, type: .songs)
                 })
                 .onAppear(perform: {
@@ -72,6 +67,11 @@ struct PlaylistDetailView: View {
                 })
                 .buttonStyle(PlainButtonStyle())
         }
+        
+        // Give this list an ID, because if the user adds a song to this playlist and navigates back to this view,
+        // it'll cause a crash
+        .id(UUID())
+        
         // This overlay prevents list content from appearing behind the tab view when dismissing the player
         .overlay(content: {
             BlurView()
