@@ -97,7 +97,6 @@
 		04DD579827C00D390030D25C /* AlbumsGalleryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DD579727C00D390030D25C /* AlbumsGalleryView.swift */; };
 		04DE4C2A27C17B4B00666E9C /* DownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DE4C2927C17B4B00666E9C /* DownloadManager.swift */; };
 		04DE4C2B27C17B4B00666E9C /* DownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DE4C2927C17B4B00666E9C /* DownloadManager.swift */; };
-		04DE4C2E27C17BFB00666E9C /* HLSion in Frameworks */ = {isa = PBXBuildFile; productRef = 04DE4C2D27C17BFB00666E9C /* HLSion */; };
 		04DE4C3327C1A4A100666E9C /* PlayerSongMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DE4C3227C1A4A100666E9C /* PlayerSongMenu.swift */; };
 		04DE4C3427C1A4A100666E9C /* PlayerSongMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DE4C3227C1A4A100666E9C /* PlayerSongMenu.swift */; };
 		04E1071A270CD307002CACB0 /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E10719270CD307002CACB0 /* Tests_iOS.swift */; };
@@ -253,7 +252,6 @@
 				041D3E79271DABF1002185CF /* JellyfinAPI in Frameworks */,
 				04FE474927BA815E00BDEDFF /* LNPopupUI-Static in Frameworks */,
 				047F493027BBF4920076B45E /* SwiftAudioPlayer in Frameworks */,
-				04DE4C2E27C17BFB00666E9C /* HLSion in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -575,7 +573,6 @@
 				041D3E78271DABF1002185CF /* JellyfinAPI */,
 				04FE474827BA815E00BDEDFF /* LNPopupUI-Static */,
 				047F492F27BBF4920076B45E /* SwiftAudioPlayer */,
-				04DE4C2D27C17BFB00666E9C /* HLSion */,
 			);
 			productName = "FinTune (iOS)";
 			productReference = 04E10708270CD307002CACB0 /* Jellify.app */;
@@ -673,7 +670,6 @@
 				041D3E77271DABF1002185CF /* XCRemoteSwiftPackageReference "jellyfin-sdk-swift" */,
 				04FE474727BA815E00BDEDFF /* XCRemoteSwiftPackageReference "LNPopupUI" */,
 				047F492E27BBF4920076B45E /* XCRemoteSwiftPackageReference "SwiftAudioPlayer" */,
-				04DE4C2C27C17BFB00666E9C /* XCRemoteSwiftPackageReference "HLSion" */,
 			);
 			productRefGroup = 04E10709270CD307002CACB0 /* Products */;
 			projectDirPath = "";
@@ -1297,14 +1293,6 @@
 				minimumVersion = 7.0.0;
 			};
 		};
-		04DE4C2C27C17BFB00666E9C /* XCRemoteSwiftPackageReference "HLSion" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/r-plus/HLSion";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 		04FE474727BA815E00BDEDFF /* XCRemoteSwiftPackageReference "LNPopupUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/LeoNatan/LNPopupUI";
@@ -1325,11 +1313,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 047F492E27BBF4920076B45E /* XCRemoteSwiftPackageReference "SwiftAudioPlayer" */;
 			productName = SwiftAudioPlayer;
-		};
-		04DE4C2D27C17BFB00666E9C /* HLSion */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 04DE4C2C27C17BFB00666E9C /* XCRemoteSwiftPackageReference "HLSion" */;
-			productName = HLSion;
 		};
 		04FE474827BA815E00BDEDFF /* LNPopupUI-Static */ = {
 			isa = XCSwiftPackageProductDependency;

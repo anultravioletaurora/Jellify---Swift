@@ -35,7 +35,7 @@ struct PlayerSongMenu: View {
             
             if player.currentSong!.song.downloaded {
                 Button(action: {
-                    downloadManager.deleteDownload(song: player.currentSong!.song)
+                    downloadManager.deleteSongDownload(song: player.currentSong!.song)
                 }, label: {
                     Image(systemName: "trash.circle")
                     
@@ -54,7 +54,7 @@ struct PlayerSongMenu: View {
                 })
             } else {
                 Button(action: {
-                    downloadManager.download(song: player.currentSong!.song)
+                    downloadManager.downloadSong(song: player.currentSong!.song)
                 }, label: {
                     HStack {
                         Image(systemName: "arrow.down.circle")

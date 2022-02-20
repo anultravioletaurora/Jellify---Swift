@@ -53,7 +53,7 @@ struct SongRow: View {
                             .font(.subheadline)
                             .opacity(0.6)
                     } else if type == .songs {
-                        Text(song.album!.albumArtistName!)
+                        Text(song.album?.albumArtistName! ?? "")
                             .font(.subheadline)
                             .opacity(0.6)
                     }
@@ -65,6 +65,8 @@ struct SongRow: View {
                     Image(systemName: "arrow.down.circle.fill")
                         .foregroundColor(.accentColor)
                         .animation(Animation.easeInOut)
+                } else if song.downloading {
+                    ProgressView()
                 }
             })
         })
@@ -117,17 +119,22 @@ struct SongRow: View {
             
             if song.downloaded {
                 Button(action: {
-                    downloadManager.deleteDownload(song: song)
+                    downloadManager.deleteSongDownload(song: song)
                 }, label: {
                     Image(systemName: "trash.circle")
                     
                     Text("Remove Download")
                 })
             } else if song.downloading {
-                ProgressView()
+                
+                HStack {
+                    Text("Downloading")
+                    
+                    ProgressView()
+                }
             } else {
                 Button(action: {
-                    downloadManager.download(song: song)
+                    downloadManager.downloadSong(song: song)
                 }, label: {
                     HStack {
                         Image(systemName: "arrow.down.circle")

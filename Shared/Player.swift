@@ -12,6 +12,7 @@ import AVFoundation
 import MediaPlayer
 import JellyfinAPI
 import HLSion
+import SwiftAudioPlayer
 
 open class AVPlayerItemId: AVPlayerItem, Identifiable{
     public let id = UUID().uuidString
@@ -44,10 +45,10 @@ open class AVPlayerItemId: AVPlayerItem, Identifiable{
         super.init(asset: assetItem, automaticallyLoadedAssetKeys: nil)
     }
     
-    private static func getStream(songId: String, sessionId: String) -> URL{
+    public static func getStream(songId: String, sessionId: String) -> URL{
         let container = "opus,mp3,aac,m4a,flac,webma,webm,wav,ogg,mpa,wma"
         
-        let transcodingContainer = "flac"
+        let transcodingContainer = "m4a"
 
         var streamEndpointComponents = URLComponents()
         
@@ -405,13 +406,15 @@ class Player: ObservableObject {
     private func toPlayerItem(_ song : Song, order: Int) -> AVPlayerItemId{
         // See if the item is marked as downloaded
         if song.downloaded {
-            let hlsion = HLSion(url: song.downloadUrl!, name: song.jellyfinId!)
-            if let localUrl = hlsion.localUrl{
-                let localAsset = AVURLAsset(url: localUrl)
+            
+            if let localUrl = song.downloadUrl {
+            
+                let localAsset = AVURLAsset(url: song.downloadUrl!)
                 return AVPlayerItemId(song: song, localAsset: localAsset, order: order)
-
             }
+            
             song.downloaded = false
+            song.downloading = false
         }
         //Fallback to streaming or cache if we reach here
         return AVPlayerItemId(song: song, order: order)

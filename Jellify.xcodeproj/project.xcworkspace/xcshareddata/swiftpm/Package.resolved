@@ -11,15 +11,6 @@
         }
       },
       {
-        "package": "HLSion",
-        "repositoryURL": "https://github.com/r-plus/HLSion",
-        "state": {
-          "branch": "master",
-          "revision": "60f3473454cb70aea300be5c769f4cf69eaeefce",
-          "version": null
-        }
-      },
-      {
         "package": "JellyfinAPI",
         "repositoryURL": "https://github.com/jellyfin/jellyfin-sdk-swift",
         "state": {

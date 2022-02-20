@@ -41,13 +41,51 @@ class NetworkingManager : ObservableObject {
                     
             case .songs:
                 loadSongs(complete: {
-                    
+                    self.loadPlaylists(complete: {
+                        let playlists = self.retrieveAllPlaylistsFromCore()
+
+                        playlists.forEach({ playlist in
+
+                            let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+
+                            privateContext.parent = self.context
+
+                            let privatePlaylist = privateContext.object(with: self.retrievePlaylistFromCore(playlistId: playlist.jellyfinId!)!) as! Playlist
+
+                            self.loadPlaylistItems(playlist: privatePlaylist, context: privateContext, complete: { playlistSongs in
+
+                                playlistSongs.forEach({ playlistSong in
+                                    privatePlaylist.addToSongs(playlistSong)
+                                })
+
+                                do {
+                                    try privateContext.save()
+
+                                    if playlist == playlists.last! {
+                                        DispatchQueue.main.sync {
+                                            self.saveContext()
+                                            print("Loading complete!")
+                                            self.loadingPhase = nil
+                                            self.libraryIsPopulated = true
+                                        }
+                                    }
+                                } catch {
+                                    DispatchQueue.main.sync {
+                                        self.saveContext()
+                                        print("Loading complete!")
+                                        self.loadingPhase = nil
+                                        self.libraryIsPopulated = true
+                                    }
+                                }
+                            })
+                        })
+                    })
                 }, startIndex: 0)
                     
-            case .playlists:
-                loadPlaylists(complete: {
-                    
-                })
+//            case .playlists:
+//                loadPlaylists(complete: {
+//
+//                })
             default:
                 print("Sync finished")
             }
@@ -59,37 +97,6 @@ class NetworkingManager : ObservableObject {
     
     @Published
     var userIsLoggedIn = false
-    
-//
-//    static var accessToken = UserDefaults.standard.string(forKey: "AccessToken") {
-//        didSet {
-//            UserDefaults.standard.set(accessToken, forKey: "AccessToken")
-//        }
-//    }
-//
-//    static var userId = UserDefaults.standard.string(forKey: "UserId") {
-//        didSet {
-//            UserDefaults.standard.set(userId, forKey: "UserId")
-//        }
-//    }
-//
-//    static var libraryId = UserDefaults.standard.string(forKey: "LibraryId") {
-//        didSet {
-//            UserDefaults.standard.set(libraryId, forKey: "LibraryId")
-//        }
-//    }
-//
-//    static var playlistsId = UserDefaults.standard.string(forKey: "PlaylistsId") {
-//        didSet {
-//            UserDefaults.standard.set(playlistsId, forKey: "PlaylistsId")
-//        }
-//    }
-//
-//    static var quality: Double = UserDefaults.standard.double(forKey: "Quality") {
-//        didSet{
-//            UserDefaults.standard.set(quality, forKey: "Quality")
-//        }
-//    }
     
     init() {
         privateContext.parent = context
@@ -419,6 +426,8 @@ class NetworkingManager : ObservableObject {
                     cancellable.cancel()
                 })
                 
+                self.loadingPhase = nil
+                
                 self.deleteAllOfEntity(entityName: "User")
                 self.deleteAllOfEntity(entityName: "Album")
                 self.deleteAllOfEntity(entityName: "Song")
@@ -452,85 +461,87 @@ class NetworkingManager : ObservableObject {
 
     public func syncLibrary() -> Void {
                 
-        print("Loading Artists")
+        print("Starting Sync")
         
-        do {
-            self.loadingPhase = .artists
-            try loadArtists(complete: {
-                
-                DispatchQueue.main.sync {
-                    print("Artists Loaded")
-                    print("Loading Albums")
-                    
-                    self.loadingPhase = .albums
-                }
-                
-                self.loadAlbums(complete: {
-
-                    DispatchQueue.main.sync {
-                        print("Albums Loaded")
-                        print("Loading Songs")
-                        
-                        self.loadingPhase = .songs
-                    }
-                    
-                    self.loadSongs(complete: {
-
-                        DispatchQueue.main.sync {
-                            print("Songs Loaded")
-                            print("Loading Playlists")
-                            
-                            self.loadingPhase = .playlists
-                        }
-                        
-                        self.loadPlaylists(complete: {
-
-                            let playlists = self.retrieveAllPlaylistsFromCore()
-                            
-                            playlists.forEach({ playlist in
-                                
-                                let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-                                
-                                privateContext.parent = self.context
-                                
-                                let privatePlaylist = privateContext.object(with: self.retrievePlaylistFromCore(playlistId: playlist.jellyfinId!)!) as! Playlist
-                                
-                                self.loadPlaylistItems(playlist: privatePlaylist, context: privateContext, complete: { playlistSongs in
-                                    
-                                    playlistSongs.forEach({ playlistSong in
-                                        privatePlaylist.addToSongs(playlistSong)
-                                    })
-                                    
-                                    do {
-                                        try privateContext.save()
-                                        
-                                        if playlist == playlists.last! {
-                                            DispatchQueue.main.sync {
-                                                self.saveContext()
-                                                print("Loading complete!")
-                                                self.loadingPhase = nil
-                                                self.libraryIsPopulated = true
-                                            }
-                                        }
-                                    } catch {
-                                        DispatchQueue.main.sync {
-                                            self.saveContext()
-                                            print("Loading complete!")
-                                            self.loadingPhase = nil
-                                            self.libraryIsPopulated = true
-                                        }
-                                    }
-                                })
-                            })
-                            
-                        })
-                    }, startIndex: nil)
-                })
-            })
-        } catch {
-            print("Error syncing library")
-            self.loadingPhase = nil
-        }
+        self.loadingPhase = .artists
+        
+//        do {
+//            self.loadingPhase = .artists
+//            try loadArtists(complete: {
+//
+//                DispatchQueue.main.sync {
+//                    print("Artists Loaded")
+//                    print("Loading Albums")
+//
+//                    self.loadingPhase = .albums
+//                }
+//
+//                self.loadAlbums(complete: {
+//
+//                    DispatchQueue.main.sync {
+//                        print("Albums Loaded")
+//                        print("Loading Songs")
+//
+//                        self.loadingPhase = .songs
+//                    }
+//
+//                    self.loadSongs(complete: {
+//
+//                        DispatchQueue.main.sync {
+//                            print("Songs Loaded")
+//                            print("Loading Playlists")
+//
+//                            self.loadingPhase = .playlists
+//                        }
+//
+//                        self.loadPlaylists(complete: {
+//
+//                            let playlists = self.retrieveAllPlaylistsFromCore()
+//
+//                            playlists.forEach({ playlist in
+//
+//                                let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+//
+//                                privateContext.parent = self.context
+//
+//                                let privatePlaylist = privateContext.object(with: self.retrievePlaylistFromCore(playlistId: playlist.jellyfinId!)!) as! Playlist
+//
+//                                self.loadPlaylistItems(playlist: privatePlaylist, context: privateContext, complete: { playlistSongs in
+//
+//                                    playlistSongs.forEach({ playlistSong in
+//                                        privatePlaylist.addToSongs(playlistSong)
+//                                    })
+//
+//                                    do {
+//                                        try privateContext.save()
+//
+//                                        if playlist == playlists.last! {
+//                                            DispatchQueue.main.sync {
+//                                                self.saveContext()
+//                                                print("Loading complete!")
+//                                                self.loadingPhase = nil
+//                                                self.libraryIsPopulated = true
+//                                            }
+//                                        }
+//                                    } catch {
+//                                        DispatchQueue.main.sync {
+//                                            self.saveContext()
+//                                            print("Loading complete!")
+//                                            self.loadingPhase = nil
+//                                            self.libraryIsPopulated = true
+//                                        }
+//                                    }
+//                                })
+//                            })
+//
+//                        })
+//                    }, startIndex: nil)
+//                })
+//            })
+//        } catch {
+//            print("Error syncing library")
+//            self.loadingPhase = nil
+//        }
     }
     
     private func deleteAllEntities() -> Void {
@@ -612,7 +623,20 @@ class NetworkingManager : ObservableObject {
     private func loadAlbums(complete: @escaping () -> Void) -> Void {
         ItemsAPI.getItemsByUserId(userId: self.userId, maxOfficialRating: nil, hasThemeSong: nil, hasThemeVideo: nil, hasSubtitles: nil, hasSpecialFeature: nil, hasTrailer: nil, adjacentTo: nil, parentIndexNumber: nil, hasParentalRating: nil, isHd: nil, is4K: nil, locationTypes: nil, excludeLocationTypes: nil, isMissing: nil, isUnaired: nil, minCommunityRating: nil, minCriticRating: nil, minPremiereDate: nil, minDateLastSaved: nil, minDateLastSavedForUser: nil, maxPremiereDate: nil, hasOverview: nil, hasImdbId: nil, hasTmdbId: nil, hasTvdbId: nil, excludeItemIds: nil, startIndex: nil, limit: nil, recursive: true, searchTerm: nil, sortOrder: nil, parentId: nil, fields: nil, excludeItemTypes: nil, includeItemTypes: ["MusicAlbum"], filters: nil, isFavorite: nil, mediaTypes: nil, imageTypes: nil, sortBy: nil, isPlayed: nil, genres: nil, officialRatings: nil, tags: nil, years: nil, enableUserData: true, imageTypeLimit: nil, enableImageTypes: nil, person: nil, personIds: nil, personTypes: nil, studios: nil, artists: nil, excludeArtistIds: nil, artistIds: nil, albumArtistIds: nil, contributingArtistIds: nil, albums: nil, albumIds: nil, ids: nil, videoTypes: nil, minOfficialRating: nil, isLocked: nil, isPlaceHolder: nil, hasOfficialRating: nil, collapseBoxSetItems: nil, minWidth: nil, minHeight: nil, maxWidth: nil, maxHeight: nil, is3D: nil, seriesStatus: nil, nameStartsWithOrGreater: nil, nameStartsWith: nil, nameLessThan: nil, studioIds: nil, genreIds: nil, enableTotalRecordCount: nil, enableImages: nil, apiResponseQueue: processingQueue)
             .sink(receiveCompletion: { completion in
-                print(completion)
+                switch completion {
+                case .finished :
+                    
+                    DispatchQueue.main.sync {
+                        self.loadingPhase = .songs
+                    }
+                    self.saveContext()
+                case .failure:
+                    print("Error retrieving artists: \(completion)")
+                    
+                    DispatchQueue.main.sync {
+                        self.loadingPhase = nil
+                    }
+                }
             }, receiveValue: { response in
                 if response.items != nil {
                     
@@ -674,9 +698,17 @@ class NetworkingManager : ObservableObject {
     private func loadSongs(complete: @escaping () -> Void, startIndex: Int?) -> Void {
             ItemsAPI.getItemsByUserId(userId: self.userId, maxOfficialRating: nil, hasThemeSong: nil, hasThemeVideo: nil, hasSubtitles: nil, hasSpecialFeature: nil, hasTrailer: nil, adjacentTo: nil, parentIndexNumber: nil, hasParentalRating: nil, isHd: nil, is4K: nil, locationTypes: nil, excludeLocationTypes: nil, isMissing: nil, isUnaired: nil, minCommunityRating: nil, minCriticRating: nil, minPremiereDate: nil, minDateLastSaved: nil, minDateLastSavedForUser: nil, maxPremiereDate: nil, hasOverview: nil, hasImdbId: nil, hasTmdbId: nil, hasTvdbId: nil, excludeItemIds: nil, startIndex: startIndex, limit: 10000, recursive: true, searchTerm: nil, sortOrder: nil, parentId: nil, fields: nil, excludeItemTypes: nil, includeItemTypes: ["Audio"], filters: nil, isFavorite: nil, mediaTypes: nil, imageTypes: nil, sortBy: nil, isPlayed: nil, genres: nil, officialRatings: nil, tags: nil, years: nil, enableUserData: true, imageTypeLimit: nil, enableImageTypes: nil, person: nil, personIds: nil, personTypes: nil, studios: nil, artists: nil, excludeArtistIds: nil, artistIds: nil, albumArtistIds: nil, contributingArtistIds: nil, albums: nil, albumIds: nil, ids: nil, videoTypes: nil, minOfficialRating: nil, isLocked: nil, isPlaceHolder: nil, hasOfficialRating: nil, collapseBoxSetItems: nil, minWidth: nil, minHeight: nil, maxWidth: nil, maxHeight: nil, is3D: nil, seriesStatus: nil, nameStartsWithOrGreater: nil, nameStartsWith: nil, nameLessThan: nil, studioIds: nil, genreIds: nil, enableTotalRecordCount: nil, enableImages: false, apiResponseQueue: processingQueue)
                 .sink(receiveCompletion: { completion in
-                    print("Finished song call at index \(startIndex)")
-                    
-                    self.saveContext()
+                    switch completion {
+                    case .finished :
+                        
+                        self.saveContext()
+                    case .failure:
+                        print("Error retrieving artists: \(completion)")
+                        
+                        DispatchQueue.main.sync {
+                            self.loadingPhase = nil
+                        }
+                    }
                     
                 }, receiveValue: { response in
 
