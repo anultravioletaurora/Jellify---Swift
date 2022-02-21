@@ -63,20 +63,9 @@ struct TabBarView: View {
                 }
         }
         .popup(isBarPresented: $miniplayerPresented, isPopupOpen: $miniplayerExpanded, popupContent: {
-            PlayerSheetView(miniplayerExpanded: $miniplayerExpanded)
+            NowPlayingView(miniplayerExpanded: $miniplayerExpanded)
         })
         .popupBarProgressViewStyle(.top)
         .popupBarMarqueeScrollEnabled(true)
-        .popupBarContextMenu {
-            Button(action: {
-                print("yeet")
-            }) {
-                Text("Yeet")
-                Image(systemName: "globe")
-            }
-        }
-        .onAppear {
-            print("yeet")
-        }
     }
 }

@@ -38,8 +38,8 @@ struct PlaylistDetailView: View {
     }
     
     var body: some View {
-        List(playlistSongs) { (playlistSong : PlaylistSong) in
-                
+        List {
+            ForEach(playlistSongs) { playlistSong in
                 Button(action: {
                     Player.shared.loadSongs(playlistSongs.map { song in
                         return song.song!
@@ -66,12 +66,20 @@ struct PlaylistDetailView: View {
 
                 })
                 .buttonStyle(PlainButtonStyle())
+            }
+            .onMove { indexSet, index in
+                networkingManager.moveInPlaylist(playlist: playlist, indexSet: indexSet, newIndex: index)
+            }
         }
         
         // Give this list an ID, because if the user adds a song to this playlist and navigates back to this view,
         // it'll cause a crash
         .id(UUID())
         
+        .toolbar {
+            EditButton()
+        }
+                
         // This overlay prevents list content from appearing behind the tab view when dismissing the player
         .overlay(content: {
             BlurView()
@@ -80,6 +88,8 @@ struct PlaylistDetailView: View {
         .listStyle(PlainListStyle())
         .navigationTitle(playlist.name ?? "Unknown Playlist")
         .navigationBarTitleDisplayMode(.inline)
-
+        .sheet(isPresented: $showPlaylistSheet, content: {
+            PlaylistSelectionSheet(song: $selectedSong, showPlaylistSheet: $showPlaylistSheet)
+        })
     }
 }

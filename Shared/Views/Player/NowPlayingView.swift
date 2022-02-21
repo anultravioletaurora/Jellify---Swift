@@ -9,7 +9,7 @@ import SwiftUI
 import AVFAudio
 import MediaPlayer
 
-struct PlayerSheetView: View {
+struct NowPlayingView: View {
         
     @ObservedObject
     var player = Player.shared
@@ -148,7 +148,7 @@ struct PlayerViewBody : View {
                     if player.currentSong?.song.album != nil {
                         AlbumPlayingImage(album: player.currentSong!.song.album!)
                             .padding(.top, 30)
-                            .animation(Animation.easeInOut)
+                            .animation(.easeInOut)
                     } else {
                         Image("placeholder")
                             .resizable()

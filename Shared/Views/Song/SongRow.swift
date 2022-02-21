@@ -18,6 +18,9 @@ struct SongRow: View {
     
     var downloadManager : DownloadManager = DownloadManager.shared
     
+    @Environment(\.colorScheme)
+    var colorScheme: ColorScheme
+    
     var type : SongRowType
     
     var body: some View {
@@ -28,16 +31,34 @@ struct SongRow: View {
             HStack(alignment: .center, content: {
                 
                 if type == .album {
-                    VStack(alignment: .center, spacing: 10, content: {
-                        Text(String(song.indexNumber))
-                            .font(.subheadline)
-                            .padding(.trailing, 5)
-                            .opacity(0.6)
-                    }).frame(width: 40)
+                    
+                    if player.currentSong?.song == song {
+                        Image(systemName: "speaker.wave.3")
+                            .frame(width: 50)
+                    } else {
+                        VStack(alignment: .center, spacing: 10, content: {
+                            Text(String(song.indexNumber))
+                                .font(.subheadline)
+                                .padding(.trailing, 5)
+                                .opacity(Globals.componentOpacity)
+                        }).frame(width: 50)
+                    }
                 } else {
                     
                     if song.album != nil {
-                        AlbumThumbnail(album: song.album!)
+                        
+                        if player.currentSong?.song == song {
+                            ZStack {
+                                
+                                AlbumThumbnail(album: song.album!)
+                                    .brightness(colorScheme == .dark ? -0.3 : 0.3)
+                                
+                                Image(systemName: "speaker.wave.3")
+                                    .font(.title)
+                            }
+                        } else {
+                            AlbumThumbnail(album: song.album!)
+                        }
                     }
                 }
                                         

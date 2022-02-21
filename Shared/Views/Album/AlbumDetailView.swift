@@ -195,7 +195,7 @@ struct AlbumDetailView: View {
                             
                             Text("\(String(playlist.songs?.count ?? 0)) songs")
                                 .font(.body)
-                                .opacity(0.6)
+                                .opacity(Globals.componentOpacity)
                         }
                     })
                         .padding(.vertical, 5)

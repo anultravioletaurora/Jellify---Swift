@@ -19,6 +19,8 @@ class NetworkingManager : ObservableObject {
     var cancellables = Set<AnyCancellable>()
     
     let processingQueue = DispatchQueue(label: "JellifyProcessingQueue", attributes: .concurrent)
+    
+    let imageQueue = DispatchQueue(label: "JellifyImageQueue")
         
     let context : NSManagedObjectContext = PersistenceController.shared.container.viewContext
         
@@ -55,16 +57,23 @@ class NetworkingManager : ObservableObject {
 
                             self.loadPlaylistItems(playlist: privatePlaylist, context: privateContext, complete: { playlistSongs in
                                 
-                                // If this playlist already has songs in it, then we'll make sure no dupes get added
-                                if let existingSongs = privatePlaylist.songs?.allObjects as? [PlaylistSong] {
-                                    
-                                    let existingSongIds = existingSongs.map { $0.jellyfinId! }
-                                    
-                                    let newSongs = playlistSongs.filter { !existingSongIds.contains($0.jellyfinId!) }
-                                    
+                                // If this playlist already has songs in it, then we'll make sure no dupes get added and update
+                                // index numbers accordingly
+                                if let currentSongs = privatePlaylist.songs?.allObjects as? [PlaylistSong] {
+
+                                    let currentSongIds = currentSongs.map { $0.jellyfinId! }
+
+                                    let newSongs = playlistSongs.filter { !currentSongIds.contains($0.jellyfinId!) }
+
                                     newSongs.forEach({ playlistSong in
                                         privatePlaylist.addToSongs(playlistSong)
                                     })
+//
+//                                    let existingSongs = playlistSongs.filter { currentSongIds.contains($0.jellyfinId! )}
+//
+//                                    existingSongs.forEach({ existingSong in
+//                                        (privateContext.object(with: self.retrievePlaylistSongFromCore(playlistSongId: existingSong.jellyfinId!)!) as! PlaylistSong).indexNumber = existingSong.indexNumber
+//                                    })
                                 }
                                 // Else we'll toss everything into this playlist
                                 else {
@@ -354,6 +363,92 @@ class NetworkingManager : ObservableObject {
             .store(in: &cancellables)
     }
     
+    public func moveInPlaylist(playlist: Playlist, indexSet: IndexSet, newIndex: Int) {
+    
+        let oldIndex = indexSet.first!
+        let updatedIndex = newIndex == 0 || newIndex < oldIndex ? newIndex : newIndex - 1
+                
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        
+        privateContext.parent = self.context
+        
+        let privatePlaylist = privateContext.object(with: self.retrievePlaylistFromCore(playlistId: playlist.jellyfinId!)!) as! Playlist
+        
+        let playlistSong = playlist.songs?.sortedArray(using: [NSSortDescriptor(key: #keyPath(PlaylistSong.indexNumber), ascending: true)])[oldIndex] as? PlaylistSong
+        
+        for index in indexSet {
+            print(index)
+            print(updatedIndex)
+        }
+        
+        print("Moving song \(playlistSong!.song!.name!) to index \(updatedIndex) from \(oldIndex)")
+        
+        if let playlistSongs : [PlaylistSong] = playlist.songs?.map({ $0 as! PlaylistSong }) {
+
+            playlistSongs.forEach({ song in
+                
+                if song.jellyfinId! != playlistSong!.jellyfinId! {
+                    
+                    let songToShift = privateContext.object(with: self.retrievePlaylistSongFromCore(playlistSongId: song.jellyfinId!)!) as! PlaylistSong
+
+                    // If moving song forward in playlist...
+                    if updatedIndex < oldIndex {
+
+                        // Bump the index number of each song that will come after the playlist song's new position,
+                        // and fill up the gap to where the playlist song used to be
+                        if songToShift.indexNumber >= updatedIndex && songToShift.indexNumber < oldIndex {
+                            
+                            songToShift.indexNumber += 1
+                        }
+                    }
+
+                    // Else we're moving the song back...
+                    else {
+                        if songToShift.indexNumber <= updatedIndex && songToShift.indexNumber > oldIndex {
+                            songToShift.indexNumber -= 1
+                        }
+                    }
+                    
+                    try! privateContext.save()
+                } else {
+                    playlistSong?.indexNumber = Int16(updatedIndex)
+                }
+            })
+        }
+        
+        PlaylistsAPI.moveItem(playlistId: playlist.jellyfinId!, itemId: playlistSong!.jellyfinId!, newIndex: updatedIndex)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    print("Playlist item moved")
+                    self.saveContext()
+                case .failure:
+                    print("Playlist item move failed")
+                }
+            }, receiveValue: { response in
+//                if playlist.songs != nil {
+//
+//                    privatePlaylist.songs!.forEach({ playlistSong in
+//                        privateContext.delete(playlistSong as! NSManagedObject)
+//                        try! privateContext.save()
+//                    })
+//
+//                }
+//                self.loadPlaylistItems(playlist: privatePlaylist, context: privateContext, complete: { playlistSongs in
+//                    print("Playlist addition and refresh")
+//
+//                    playlistSongs.forEach({ playlistSong in
+//                        privatePlaylist.addToSongs(playlistSong)
+//                    })
+//
+//                    try! privateContext.save()
+//
+//                    self.saveContext()
+//                })
+            })
+            .store(in: &self.cancellables)
+    }
+    
     public func retrieveArtistByJellyfinId(jellyfinId: String) -> Artist? {
         return self.context.object(with: self.retrieveArtistFromCoreById(jellyfinId: jellyfinId)!) as? Artist
     }
@@ -364,24 +459,16 @@ class NetworkingManager : ObservableObject {
 
     public func loadAlbumArtwork(album: Album) -> Void {
                 
-        ImageAPI.getItemImage(itemId: album.jellyfinId!, imageType: .primary, apiResponseQueue: processingQueue)
+        ImageAPI.getItemImage(itemId: album.jellyfinId!, imageType: .primary, apiResponseQueue: imageQueue)
             .sink(receiveCompletion: { completion in
                 print("Image receive completion: \(completion)")
             }, receiveValue: { url in
                       
                 do {
-                    let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-                    
-                    privateContext.parent = self.privateContext
 
-                    let privateAlbum : Album = privateContext.object(with: self.retrieveAlbumFromCore(albumId: album.jellyfinId!)!) as! Album
-
-                    privateAlbum.artwork = try Data(contentsOf: url)
-                    privateAlbum.thumbnail = try Data(contentsOf: url)
-                    
-                    // This causes a recursive save call error
-                    try privateContext.save()
-                    
+                    album.artwork = try Data(contentsOf: url)
+                    album.thumbnail = try Data(contentsOf: url)
+                                        
                     self.saveContext()
                 } catch {
                     print("Error setting artwork for album: \(album.name!)")
@@ -392,7 +479,8 @@ class NetworkingManager : ObservableObject {
     }
     
     public func loadArtistImage(artist: Artist) -> Void {
-        ImageAPI.getItemImage(itemId: artist.jellyfinId!, imageType: .primary)
+                
+        ImageAPI.getItemImage(itemId: artist.jellyfinId!, imageType: .primary, apiResponseQueue: imageQueue)
             .sink(receiveCompletion: { completion in
                 print("Artist image receive completion: \(completion)")
             }, receiveValue: { url in
@@ -400,7 +488,7 @@ class NetworkingManager : ObservableObject {
                 do {
                     artist.thumbnail = try Data(contentsOf: url)
                     
-                    self.saveContext()
+                     self.saveContext()
                 } catch {
                     print("Error setting thumbnail for artist: \(artist.name!)")
                     
@@ -411,7 +499,7 @@ class NetworkingManager : ObservableObject {
     }
     
     public func loadPlaylistImage(playlist: Playlist) -> Void {
-        ImageAPI.getItemImage(itemId: playlist.jellyfinId!, imageType: .primary)
+        ImageAPI.getItemImage(itemId: playlist.jellyfinId!, imageType: .primary, apiResponseQueue: imageQueue)
             .sink(receiveCompletion: { completion in
                 print("Artist image receive completion: \(completion)")
             }, receiveValue: { url in
@@ -476,9 +564,9 @@ class NetworkingManager : ObservableObject {
                 self.loadingPhase = nil
                 
                 self.deleteAllOfEntity(entityName: "User")
-                self.deleteAllOfEntity(entityName: "Album")
-                self.deleteAllOfEntity(entityName: "Song")
                 self.deleteAllOfEntity(entityName: "PlaylistSong")
+                self.deleteAllOfEntity(entityName: "Song")
+                self.deleteAllOfEntity(entityName: "Album")
                 self.deleteAllOfEntity(entityName: "Artist")
                 self.deleteAllOfEntity(entityName: "Playlist")
                 self.deleteAllOfEntity(entityName: "Genre")
@@ -977,7 +1065,8 @@ class NetworkingManager : ObservableObject {
                         
                         playlistSong.indexNumber = Int16(index)
                         
-                        playlistSongs.insert(playlistSong, at: index)
+//                        self.saveContext()
+//                        playlistSongs.insert(playlistSong, at: index)
                     }
                     
                     index += 1
@@ -1189,6 +1278,20 @@ class NetworkingManager : ObservableObject {
             return try privateContext.fetch(fetchRequest).first?.objectID
         } catch let error as NSError {
             print("Error retrieving playlist song from CoreData: \(error)")
+            
+            return nil
+        }
+    }
+    
+    private func retrievePlaylistSongFromCore(indexNumber: Int) -> PlaylistSong? {
+        let fetchRequest = PlaylistSong.fetchRequest()
+        
+        fetchRequest.predicate = NSPredicate(format: "indexNumber == %@", indexNumber)
+        
+        do {
+            return try self.privateContext.fetch(fetchRequest).first
+        } catch let error as NSError {
+            print("Error retrieving playlist song by index number from CoreData: \(error)")
             
             return nil
         }

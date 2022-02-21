@@ -54,9 +54,7 @@ struct SongsListView: View {
 //                                #selector(NSString.caseInsensitiveCompare))]
 //        )
         
-        self.fetchRequest = FetchRequest(fetchRequest: request, animation: nil)
-                        
-        print("Song view rendered")
+        self.fetchRequest = FetchRequest(fetchRequest: request, animation: nil)                        
     }
     
     var body: some View {
