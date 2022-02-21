@@ -61,8 +61,8 @@ struct AlbumsGalleryView: View {
                         }
                 }
             }
+            .searchable(text: $searchBar.search, prompt: "Search albums")
         }
-        .searchable(text: $searchBar.search, prompt: "Search albums")
         .disableAutocorrection(true)
         .onReceive(searchBar.$search.debounce(for: .seconds(Globals.debounceDuration), scheduler: DispatchQueue.main))
         {

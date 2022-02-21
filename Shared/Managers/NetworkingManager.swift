@@ -55,32 +55,7 @@ class NetworkingManager : ObservableObject {
 
                             let privatePlaylist = privateContext.object(with: self.retrievePlaylistFromCore(playlistId: playlist.jellyfinId!)!) as! Playlist
 
-                            self.loadPlaylistItems(playlist: privatePlaylist, context: privateContext, complete: { playlistSongs in
-                                
-                                // If this playlist already has songs in it, then we'll make sure no dupes get added and update
-                                // index numbers accordingly
-                                if let currentSongs = privatePlaylist.songs?.allObjects as? [PlaylistSong] {
-
-                                    let currentSongIds = currentSongs.map { $0.jellyfinId! }
-
-                                    let newSongs = playlistSongs.filter { !currentSongIds.contains($0.jellyfinId!) }
-
-                                    newSongs.forEach({ playlistSong in
-                                        privatePlaylist.addToSongs(playlistSong)
-                                    })
-//
-//                                    let existingSongs = playlistSongs.filter { currentSongIds.contains($0.jellyfinId! )}
-//
-//                                    existingSongs.forEach({ existingSong in
-//                                        (privateContext.object(with: self.retrievePlaylistSongFromCore(playlistSongId: existingSong.jellyfinId!)!) as! PlaylistSong).indexNumber = existingSong.indexNumber
-//                                    })
-                                }
-                                // Else we'll toss everything into this playlist
-                                else {
-                                    playlistSongs.forEach({ playlistSong in
-                                        privatePlaylist.addToSongs(playlistSong)
-                                    })
-                                }
+                            self.loadPlaylistItems(playlist: privatePlaylist, context: privateContext, complete: {
                                 
                                 do {
                                     try privateContext.save()
@@ -270,12 +245,8 @@ class NetworkingManager : ObservableObject {
                     })
                     
                 }
-                self.loadPlaylistItems(playlist: privatePlaylist, context: privateContext, complete: { playlistSongs in
+                self.loadPlaylistItems(playlist: privatePlaylist, context: privateContext, complete: {
                     print("Playlist addition and refresh")
-                    
-                    playlistSongs.forEach({ playlistSong in
-                        privatePlaylist.addToSongs(playlistSong)
-                    })
                     
                     try! privateContext.save()
                     
@@ -309,11 +280,7 @@ class NetworkingManager : ObservableObject {
                 newPlaylist.jellyfinId = response.id
                 newPlaylist.name = name
                                 
-                self.loadPlaylistItems(playlist: newPlaylist, context: privateContext, complete: { playlistSongs in
-                    
-                    playlistSongs.forEach({ playlistSong in
-                        newPlaylist.addToSongs(playlistSong)
-                    })
+                self.loadPlaylistItems(playlist: newPlaylist, context: privateContext, complete: {
                     
                     try! privateContext.save()
                     
@@ -1033,48 +1000,50 @@ class NetworkingManager : ObservableObject {
             .store(in: &self.cancellables)
     }
     
-    private func loadPlaylistItems(playlist: Playlist, context: NSManagedObjectContext, complete: @escaping ([PlaylistSong]) -> Void) -> Void {
+    /**
+     Loads a playlist's tracks from the API and associates them with the playlist, adding new tracks, removing old tracks, and updating index numbers
+     */
+    private func loadPlaylistItems(playlist: Playlist, context: NSManagedObjectContext, complete: @escaping () -> Void) -> Void {
         PlaylistsAPI.getPlaylistItems(playlistId: playlist.jellyfinId!, userId: self.userId, apiResponseQueue: self.processingQueue)
         .sink(receiveCompletion: { complete in
             print("Playlist song retrieval for playlist \(playlist.name): \(complete)")
         }, receiveValue: { playlistItems in
             if playlistItems.items != nil {
                 
-                var playlistSongs : [PlaylistSong] = []
+                // Build dictionary of playlist items and their index numbers
+                var playlistItemDictionary : [Int: String] = Dictionary(uniqueKeysWithValues: playlistItems.items!.map { ($0.indexNumber!, $0.id!) })
                 
+                
+                                
                 var index = 0
+                
+                // Clear out all songs to repopulate with new data
+                if playlist.songs != nil {
+                    
+                    self.deleteAllPlaylistSongsFromPlaylist(playlist: playlist, context: context)
+                }
                 
                 playlistItems.items!.forEach({ playlistItem in
                     
-                    if (self.retrievePlaylistSongFromCore(playlistSongId: playlistItem.playlistItemId!) == nil) {
-                        let playlistSong = PlaylistSong(context: context)
-                        
-                        playlistSong.jellyfinId = playlistItem.playlistItemId
-                        
-                        playlistSong.playlist = playlist
-                        playlistSong.indexNumber = Int16(index)
-                        
-                        let song: Song = context.object(with: self.retrieveSongFromCore(songId: playlistItem.id!)!) as! Song
-                        playlistSong.song = song
-                        song.addToPlaylists(playlistSong)
-                        
-                        playlistSongs.append(playlistSong)
-                    } else {
-                        
-                        let playlistSong = context.object(with: self.retrievePlaylistSongFromCore(playlistSongId: playlistItem.playlistItemId!)!) as! PlaylistSong
-                        
-                        playlistSong.indexNumber = Int16(index)
-                        
-//                        self.saveContext()
-//                        playlistSongs.insert(playlistSong, at: index)
-                    }
+                    let playlistSong = PlaylistSong(context: context)
+                    
+                    playlistSong.jellyfinId = playlistItem.playlistItemId
+                    
+                    playlistSong.playlist = playlist
+                    playlistSong.indexNumber = Int16(index)
+                    
+                    let song: Song = context.object(with: self.retrieveSongFromCore(songId: playlistItem.id!)!) as! Song
+                    playlistSong.song = song
+                    
+                    playlist.addToSongs(playlistSong)
                     
                     index += 1
                 })
                                 
-                complete(playlistSongs)
+                self.saveContext()
+                complete()
             } else {
-                complete([])
+                complete()
             }
         })
         .store(in: &self.cancellables)
@@ -1083,6 +1052,24 @@ class NetworkingManager : ObservableObject {
     
     private func loadImages() -> Void {
         
+    }
+    
+    private func deleteAllPlaylistSongsFromPlaylist(playlist: Playlist, context: NSManagedObjectContext) -> Void {
+        (playlist.songs!.allObjects as! [PlaylistSong]).forEach({ song in
+            self.deletePlaylistSongByJellyfinId(playlistSongId: song.jellyfinId!, context: context)
+        })
+    }
+    
+    private func deletePlaylistSongByJellyfinId(playlistSongId: String, context: NSManagedObjectContext) -> Void {
+        do {
+            let playlistSongObjectId = self.retrievePlaylistSongFromCore(playlistSongId: playlistSongId)
+            
+            let playlistSong = context.object(with: playlistSongObjectId!)
+            
+            context.delete(playlistSong)
+        } catch {
+            print("Error deleting playlist song by it's Jellyfin ID: \(error)")
+        }
     }
     
     private func retrieveArtistFromCore(artistName: String) -> NSManagedObjectID? {

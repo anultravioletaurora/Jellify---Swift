@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import SwiftUIX
 
 struct ArtistsGalleryView: View {
     
@@ -23,6 +24,7 @@ struct ArtistsGalleryView: View {
                     ArtistGalleryItem(artist: artist)
                 }
             }
+            .padding(.top, 5)
         }
         .searchable(text: $searchBar.search, prompt: "Search artists")
         .disableAutocorrection(true)
@@ -52,7 +54,6 @@ struct ArtistGalleryItem: View {
                     .font(.subheadline)
                     .foregroundColor(.primary)
             }
-            .frame(height: 150)
         })
     }
 }
