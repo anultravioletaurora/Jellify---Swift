@@ -39,6 +39,13 @@ class Builders {
             // If the song has two artists, we'll join them with an ampersand
             // and list the album artist first, else in alphabetical order
             else if artists.count == 2 {
+                
+                if artists.map({ $0.name! }).contains(where: { name in
+                    name.contains("&")
+                }) {
+                    return artists.filter { $0.name != nil }.map { $0.name! }.sorted(by: { $0 == song!.album!.albumArtistName || $0 > $1 }).joined(separator: ", ")
+                }
+                
                 return artists.filter { $0.name != nil }.map { $0.name! }.sorted(by: { $0 == song!.album!.albumArtistName || $0 < $1 }).joined(separator: " & ")
             }
             // Else if we have more than 2, line them up, album artist first, and
@@ -58,10 +65,12 @@ class Builders {
         }
     }
     
-    static func streamUrl(song: Song, sessionId: String) -> URL {
+    static func streamUrl(song: Song) -> URL {
         let container = "opus,mp3,aac,m4a,flac,webma,webm,wav,ogg,mpa,wma"
         
         let transcodingContainer = "m4a"
+        
+        let sessionId = "\(Double.random(in: 0..<1496213367201))".replacingOccurrences(of: ".", with: "")
 
         var streamEndpointComponents = URLComponents()
         

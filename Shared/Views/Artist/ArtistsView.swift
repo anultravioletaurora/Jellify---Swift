@@ -20,8 +20,8 @@ struct ArtistsView: View {
     @ObservedObject
     var networkingManager = NetworkingManager.shared
     
-    @State
-    var galleryView : Bool = UserDefaults.standard.bool(forKey: "artistGalleryView")
+    @EnvironmentObject
+    var settings : Settings
     
     init() {
                 
@@ -35,7 +35,7 @@ struct ArtistsView: View {
         NavigationView {
                        
             VStack {
-                if galleryView {
+                if settings.displayAsGallery {
                     ArtistsGalleryView(artists: artists)
                 } else {
                     ArtistsListView(artists: artists)
@@ -52,11 +52,10 @@ struct ArtistsView: View {
                 ToolbarItem(placement: .navigationBarLeading) {
                     Button(action: {
                         withAnimation {
-                            galleryView.toggle()
-                            UserDefaults.standard.set(self.galleryView, forKey: "artistGalleryView")
+                            settings.displayAsGallery.toggle()
                         }
                     }, label: {
-                        if galleryView {
+                        if settings.displayAsGallery {
                             Image(systemName: "list.bullet")
                         } else {
                             Image(systemName: "circle.grid.2x2")

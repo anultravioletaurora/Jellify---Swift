@@ -13,28 +13,36 @@ struct PlayerQueueView: View {
     var player = Player.shared
     
     var height = UIScreen.main.bounds.height / 2.5
-    
-    @Environment(\.colorScheme)
-    var colorScheme: ColorScheme
+        
+    @Environment(\.editMode)
+    var editMode
     
     var body: some View {
             
+        HStack {
             Text("Now Playing")
                 .font(Font.title3)
                 .bold()
-                .padding(.top, 30)
             
-            List(player.songs.suffix(from: player.songIndex)) { song in
+            Spacer()
+            
+            EditButton()
+        }
+        .padding(.top, 30)
+        .frame(width: height)
+            
+        List {
+            
+            ForEach(player.songs.suffix(from: player.songIndex)) { song in
                 HStack {
-                                                
+                            
                     if player.currentSong != nil && song == player.currentSong! {
                         ZStack {
                             
                             AlbumThumbnail(album: song.song.album!)
-                                .brightness(colorScheme == .dark ? -0.3 : 0.3)
+                                .brightness(-0.3)
                             
-                            Image(systemName: "speaker.wave.3")
-                                .font(.title)
+                            NowPlayingIndicator()
                         }
                     } else {
                         AlbumThumbnail(album: song.song.album!)
@@ -43,16 +51,8 @@ struct PlayerQueueView: View {
                     VStack(alignment: .leading) {
                         Text(song.song.name!)
 
-                        if song.song.artists!.count ?? 0 > 1 {
-                            Text((song.song.artists?.allObjects as [Artist]).map { $0.name! }.joined(separator: ", "))
-                                .font(.subheadline)
-                                .transition(.opacity)
-                        } else {
-                            Text(song.song.album!.albumArtistName! ?? "")
-                                .font(Font.subheadline)
-                                .transition(.opacity)
-                        }
-
+                        Text(Builders.artistName(song: song.song))
+                            .font(.subheadline)
                     }
                 }
                 .listRowBackground(Color.clear)
@@ -60,9 +60,16 @@ struct PlayerQueueView: View {
                     player.next(song: song)
                 })
             }
-            .frame(width: height, height: height + 40)
-            .background(Color.clear)
-            .listStyle(PlainListStyle())
-            .animation(Animation.easeInOut)
+            .onDelete { indexSet in
+                player.songs.remove(atOffsets: indexSet)
+            }
+            .onMove { indexSet, index in
+                player.songs.move(fromOffsets: indexSet, toOffset: index)
+            }
         }
+        .frame(width: height, height: height + 40)
+        .background(Color.clear)
+        .listStyle(PlainListStyle())
+        .animation(Animation.easeInOut)
+    }
 }

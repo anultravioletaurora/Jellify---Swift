@@ -90,20 +90,37 @@ struct AlbumDetailView: View {
                 AlbumArtwork(album: album)
                     .listRowSeparator(Visibility.hidden)
                 
-                HStack {
-                    Spacer()
-                    Text(networkingManager.retrieveArtistByName(name: album.albumArtistName ?? "Unknown Artist")?.name ?? "Unknown Artist")
-                        .opacity(0.6)
+                VStack(alignment: .center) {
+                    HStack {
+                        
+                        Spacer()
+                        
+                        Text(album.name ?? "Unknown Album")
+                        .font(.title3)
+                        .semibold()
+                        
+                        Spacer()
+                    }
+
+                    HStack {
+                        Spacer()
+                        
+                        Text(networkingManager.retrieveArtistByName(name: album.albumArtistName ?? "Unknown Artist")?.name ?? "Unknown Artist")
+                            .foregroundColor(.accentColor)
+
+                        Spacer()
+                    }
                     
-                    Image(systemName: "circle.fill")
-                        .resizable()
-                        .frame(width: 5, height: 5)
-                        .opacity(0.6)
-                    
-                    Text(String(album.productionYear)).font(.body)
-                        .opacity(0.6)
-                    Spacer()
+                    HStack {
+                        Spacer()
+                        
+                        Text(String(album.productionYear)).font(.caption)
+                            .opacity(0.6)
+
+                        Spacer()
+                    }
                 }
+                .padding(.bottom, 5)
                 
                 ForEach(songs) { song in
                     SongRow(song: song, selectedSong: $selectedSong, songs: Array(songs), showPlaylistSheet: $showPlaylistSheet, type: .album)
@@ -115,7 +132,6 @@ struct AlbumDetailView: View {
         }
 
         .listStyle(PlainListStyle())
-        .navigationTitle(album.name ?? "Unknown Album")
         }
     }
     
@@ -140,9 +156,7 @@ struct AlbumDetailView: View {
     struct AlbumArtwork: View {
         
         var album: Album
-                
-        var height = UIScreen.main.bounds.height / 4
-        
+                        
         var body: some View {
             
             HStack {

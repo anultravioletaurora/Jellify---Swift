@@ -41,6 +41,16 @@ public class DownloadManager {
         })
     }
     
+    public func cancelSongDownload(song: Song) {
+        
+        if let url = song.downloadUrl {
+            SAPlayer.Downloader.cancelDownload(withRemoteUrl: url)
+            
+            song.downloaded = false
+            song.downloading = false
+        }
+    }
+    
     public func deleteSongDownload(song: Song) {
         if let url = song.downloadUrl {
             SAPlayer.Downloader.deleteDownloaded(withSavedUrl: url)

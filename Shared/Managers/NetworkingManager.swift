@@ -61,17 +61,18 @@ class NetworkingManager : ObservableObject {
                                     try privateContext.save()
 
                                     if playlist == playlists.last! {
-                                        DispatchQueue.main.sync {
                                             self.saveContext()
                                             print("Loading complete!")
+                                        
+                                        DispatchQueue.main.async {
                                             self.loadingPhase = nil
                                             self.libraryIsPopulated = true
                                         }
                                     }
                                 } catch {
-                                    DispatchQueue.main.sync {
                                         self.saveContext()
                                         print("Loading complete!")
+                                    DispatchQueue.main.async {
                                         self.loadingPhase = nil
                                         self.libraryIsPopulated = true
                                     }
@@ -238,18 +239,18 @@ class NetworkingManager : ObservableObject {
                 print("Playlist addition response: \(response)")
                 
                 if playlist.songs != nil {
-                    
+
                     privatePlaylist.songs!.forEach({ playlistSong in
                         privateContext.delete(playlistSong as! NSManagedObject)
                         try! privateContext.save()
                     })
-                    
+
                 }
                 self.loadPlaylistItems(playlist: privatePlaylist, context: privateContext, complete: {
                     print("Playlist addition and refresh")
-                    
+
                     try! privateContext.save()
-                    
+
                     self.saveContext()
                     complete()
                 })
@@ -313,27 +314,33 @@ class NetworkingManager : ObservableObject {
             .store(in: &cancellables)
     }
     
-    public func deleteFromPlaylist(playlist: Playlist, playlistSong: PlaylistSong) -> Void {
+    public func deleteFromPlaylist(playlist: Playlist, indexSet: IndexSet) -> Void {
+        
+        let indexToRemove = indexSet.first!
+        
+        if var playlistSongs = playlist.songs?.allObjects as? [PlaylistSong]{
+            let remainingPlaylistSongIds = playlistSongs.filter { indexToRemove != $0.indexNumber }.map { $0.jellyfinId! }
+            
+                                
+            let playlistSongIdsToRemove = (playlist.songs!.allObjects as! [PlaylistSong]).map { $0.jellyfinId! }.filter { !remainingPlaylistSongIds.contains($0)}
+                    
+            PlaylistsAPI.removeFromPlaylist(playlistId: playlist.jellyfinId!, entryIds: playlistSongIdsToRemove, apiResponseQueue: JellyfinAPI.apiResponseQueue)
+                .sink(receiveCompletion: { completion in
+                    print("Call to remove song from playlist complete: \(completion)")
+                }, receiveValue: { response in
 
-        print("Removing \(playlistSong.song!.name!) - \(playlistSong.jellyfinId!) from playlist \(playlist.name!) - \(playlist.jellyfinId!)")
-                
-        PlaylistsAPI.removeFromPlaylist(playlistId: playlist.jellyfinId!, entryIds: [playlistSong.jellyfinId!], apiResponseQueue: JellyfinAPI.apiResponseQueue)
-            .sink(receiveCompletion: { completion in
-                print("Call to remove song from playlist complete: \(completion)")
-            }, receiveValue: { response in
-
-                print("Playlist removal response: \(response)")
-                self.context.delete(playlistSong)
-                
-                self.saveContext()
-            })
-            .store(in: &cancellables)
+                    self.loadPlaylistItems(playlist: playlist, context: self.context, complete: {
+                        
+                    })
+                })
+                .store(in: &cancellables)
+        }
     }
     
     public func moveInPlaylist(playlist: Playlist, indexSet: IndexSet, newIndex: Int) {
     
         let oldIndex = indexSet.first!
-        let updatedIndex = newIndex == 0 || newIndex < oldIndex ? newIndex : newIndex - 1
+        let updatedIndex = newIndex == 0 || newIndex <= oldIndex ? newIndex : newIndex - 1
                 
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         
@@ -749,7 +756,7 @@ class NetworkingManager : ObservableObject {
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished :
-                    
+                    print("Finished album retrieval")
                     DispatchQueue.main.sync {
                         self.loadingPhase = .songs
                     }
@@ -824,8 +831,8 @@ class NetworkingManager : ObservableObject {
                 .sink(receiveCompletion: { completion in
                     switch completion {
                     case .finished :
-                        
-                        self.saveContext()
+                        print("Finished song retrieval at \(startIndex ?? 0)")
+//                        self.saveContext()
                     case .failure:
                         print("Error retrieving artists: \(completion)")
                         
@@ -983,6 +990,14 @@ class NetworkingManager : ObservableObject {
                             
                             
                             try! privateContext.save()
+                        } else {
+                            
+                            let playlist = privateContext.object(with: self.retrievePlaylistFromCore(playlistId: playlistResult.id!)!) as! Playlist
+                            
+                            // Update the name if it's changed
+                            playlist.name = playlistResult.name!
+                            
+                            try! privateContext.save()
                         }
                         
                         if playlistResult == response.items!.last {
@@ -1011,7 +1026,7 @@ class NetworkingManager : ObservableObject {
             if playlistItems.items != nil {
                 
                 // Build dictionary of playlist items and their index numbers
-                var playlistItemDictionary : [Int: String] = Dictionary(uniqueKeysWithValues: playlistItems.items!.map { ($0.indexNumber!, $0.id!) })
+                // var playlistItemDictionary : [Int: String] = Dictionary(uniqueKeysWithValues: playlistItems.items!.map { ($0.indexNumber!, $0.id!) })
                 
                 
                                 
@@ -1039,8 +1054,8 @@ class NetworkingManager : ObservableObject {
                     
                     index += 1
                 })
-                                
-                self.saveContext()
+                      
+                try! context.save()
                 complete()
             } else {
                 complete()
@@ -1197,7 +1212,7 @@ class NetworkingManager : ObservableObject {
     
     private func retrieveAllSongsFromCore() -> [Song] {
         let fetchRequest = Song.fetchRequest()
-        
+                
         let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
         
         privateContext.parent = self.context
@@ -1210,6 +1225,24 @@ class NetworkingManager : ObservableObject {
             return []
         }
     }
+    
+//    private func retrieveAllSongsIdsFromCore() -> [String] {
+//        let fetchRequest = Song.fetchRequest()
+//        
+//        fetchRequest.propertiesToFetch = [#keyPath(Song.jellyfinId)]
+//        
+//        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+//        
+//        privateContext.parent = self.context
+//        
+//        do {
+//            return try privateContext.fetch(fetchRequest)
+//        } catch let error as NSError {
+//            print("Error retrieving all songs from CoreData: \(error)")
+//            
+//            return []
+//        }
+//    }
     
     private func retrieveSongsToDownload() -> [Song] {
         

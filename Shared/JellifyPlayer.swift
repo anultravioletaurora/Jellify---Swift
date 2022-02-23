@@ -13,19 +13,25 @@ import UIKit
 class JellifyPlayer {
     
     let saplayer = SAPlayer.shared
-        
+    
     @Published
     var songs : [Song] {
         didSet {
+            
+            saplayer.clearAllQueuedAudio()
+            
             songs.forEach({ song in
                 
                 var lockScreenInfo = SALockScreenInfo.init(title: song.name ?? "", artist: Builders.artistName(song: song), albumTitle: song.album!.name ?? "", artwork: getAlbumUiImage(data: song.album!.artwork), releaseDate: 0)
                 
                 if song.downloaded {
                     saplayer.queueSavedAudio(withSavedUrl: song.downloadUrl!, mediaInfo: lockScreenInfo)
+                } else {
+                     saplayer.queueRemoteAudio(withRemoteUrl: Builders.streamUrl(song: song), mediaInfo: lockScreenInfo)
                 }
-//                saplayer.queueRemoteAudio(withRemoteUrl: Builders.streamUrl(song: song), mediaInfo: lockScreenInfo)
             })
+            
+            saplayer.skipForward()
         }
     }
     

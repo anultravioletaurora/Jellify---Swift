@@ -27,6 +27,8 @@
 		0442A26B27B3F95900003F0C /* LibrarySelectionService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0442A26927B3F95900003F0C /* LibrarySelectionService.swift */; };
 		0462B3BD27BBCFEE009066CD /* ArtistModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0462B3BC27BBCFEE009066CD /* ArtistModel.swift */; };
 		0462B3BE27BBCFEE009066CD /* ArtistModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0462B3BC27BBCFEE009066CD /* ArtistModel.swift */; };
+		0463E08627C65F2400D3957A /* NowPlayingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0463E08527C65F2400D3957A /* NowPlayingIndicator.swift */; };
+		0463E08727C65F2400D3957A /* NowPlayingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0463E08527C65F2400D3957A /* NowPlayingIndicator.swift */; };
 		047D147F27BD1B5B00EE1878 /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047D147E27BD1B5B00EE1878 /* Globals.swift */; };
 		047D148027BD1B5B00EE1878 /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047D147E27BD1B5B00EE1878 /* Globals.swift */; };
 		047F493027BBF4920076B45E /* SwiftAudioPlayer in Frameworks */ = {isa = PBXBuildFile; productRef = 047F492F27BBF4920076B45E /* SwiftAudioPlayer */; };
@@ -95,7 +97,6 @@
 		04DE4C3C27C1C96600666E9C /* JellifyPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DE4C3B27C1C96600666E9C /* JellifyPlayer.swift */; };
 		04DE4C3D27C1C96600666E9C /* JellifyPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DE4C3B27C1C96600666E9C /* JellifyPlayer.swift */; };
 		04DE4C3F27C1CA7800666E9C /* Builders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DE4C3E27C1CA7800666E9C /* Builders.swift */; };
-		04DE4C4027C1CA7800666E9C /* Builders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DE4C3E27C1CA7800666E9C /* Builders.swift */; };
 		04E1071A270CD307002CACB0 /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E10719270CD307002CACB0 /* Tests_iOS.swift */; };
 		04E1071C270CD307002CACB0 /* Tests_iOSLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E1071B270CD307002CACB0 /* Tests_iOSLaunchTests.swift */; };
 		04E10726270CD307002CACB0 /* Tests_macOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E10725270CD307002CACB0 /* Tests_macOS.swift */; };
@@ -126,6 +127,10 @@
 		04E2DE1D270E48D9007ABE38 /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E2DE1B270E48D9007ABE38 /* TabBarView.swift */; };
 		04E2DE23270E4A48007ABE38 /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E2DE22270E4A48007ABE38 /* BlurView.swift */; };
 		04E2DE24270E4A48007ABE38 /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E2DE22270E4A48007ABE38 /* BlurView.swift */; };
+		04E5332F27C5124900D83D66 /* SwimplyPlayIndicator in Frameworks */ = {isa = PBXBuildFile; productRef = 04E5332E27C5124900D83D66 /* SwimplyPlayIndicator */; };
+		04E5333127C515E300D83D66 /* PlaylistArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E5333027C515E300D83D66 /* PlaylistArtwork.swift */; };
+		04EED65427C66DB400BBBEF2 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04EED65327C66DB400BBBEF2 /* Settings.swift */; };
+		04EED65527C66DB400BBBEF2 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04EED65327C66DB400BBBEF2 /* Settings.swift */; };
 		04FBD83727A631D400E780F3 /* PlaylistHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FBD83627A631D400E780F3 /* PlaylistHelper.swift */; };
 		04FBD83927A635F200E780F3 /* SongHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FBD83827A635F200E780F3 /* SongHelper.swift */; };
 		04FBD83B27A721A900E780F3 /* PlaylistThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FBD83A27A721A900E780F3 /* PlaylistThumbnail.swift */; };
@@ -162,6 +167,7 @@
 		0442A26627B3F94000003F0C /* AuthenticationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthenticationService.swift; sourceTree = "<group>"; };
 		0442A26927B3F95900003F0C /* LibrarySelectionService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LibrarySelectionService.swift; sourceTree = "<group>"; };
 		0462B3BC27BBCFEE009066CD /* ArtistModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistModel.swift; sourceTree = "<group>"; };
+		0463E08527C65F2400D3957A /* NowPlayingIndicator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowPlayingIndicator.swift; sourceTree = "<group>"; };
 		047D147E27BD1B5B00EE1878 /* Globals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Globals.swift; sourceTree = "<group>"; };
 		04848BC72725A9FE0072A81E /* PlaylistItemThumbnail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistItemThumbnail.swift; sourceTree = "<group>"; };
 		04848BC92725AA610072A81E /* ItemThumbnail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemThumbnail.swift; sourceTree = "<group>"; };
@@ -228,6 +234,8 @@
 		04E2DE18270E264B007ABE38 /* ArtistDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ArtistDetailView.swift; sourceTree = "<group>"; };
 		04E2DE1B270E48D9007ABE38 /* TabBarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarView.swift; sourceTree = "<group>"; };
 		04E2DE22270E4A48007ABE38 /* BlurView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurView.swift; sourceTree = "<group>"; };
+		04E5333027C515E300D83D66 /* PlaylistArtwork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistArtwork.swift; sourceTree = "<group>"; };
+		04EED65327C66DB400BBBEF2 /* Settings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Settings.swift; sourceTree = "<group>"; };
 		04FBD83627A631D400E780F3 /* PlaylistHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistHelper.swift; sourceTree = "<group>"; };
 		04FBD83827A635F200E780F3 /* SongHelper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SongHelper.swift; sourceTree = "<group>"; };
 		04FBD83A27A721A900E780F3 /* PlaylistThumbnail.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlaylistThumbnail.swift; sourceTree = "<group>"; };
@@ -243,6 +251,7 @@
 			files = (
 				041D3E79271DABF1002185CF /* JellyfinAPI in Frameworks */,
 				04FE474927BA815E00BDEDFF /* LNPopupUI-Static in Frameworks */,
+				04E5332F27C5124900D83D66 /* SwimplyPlayIndicator in Frameworks */,
 				040EFDD327C3BEE800D67B79 /* SwiftUIX in Frameworks */,
 				047F493027BBF4920076B45E /* SwiftAudioPlayer in Frameworks */,
 			);
@@ -330,6 +339,7 @@
 				04FBD83A27A721A900E780F3 /* PlaylistThumbnail.swift */,
 				04FBD83C27A7253E00E780F3 /* ArtistImage.swift */,
 				04FE474A27BA91BA00BDEDFF /* NowPlayingThumbnail.swift */,
+				04E5333027C515E300D83D66 /* PlaylistArtwork.swift */,
 			);
 			path = Images;
 			sourceTree = "<group>";
@@ -419,7 +429,7 @@
 				0462B3BC27BBCFEE009066CD /* ArtistModel.swift */,
 				047D147E27BD1B5B00EE1878 /* Globals.swift */,
 				04DE4C3B27C1C96600666E9C /* JellifyPlayer.swift */,
-				04DE4C3E27C1CA7800666E9C /* Builders.swift */,
+				04EED65327C66DB400BBBEF2 /* Settings.swift */,
 			);
 			path = Shared;
 			sourceTree = "<group>";
@@ -478,6 +488,7 @@
 				049AE64627B69635006813DE /* AirPlayView.swift */,
 				04DCB7F127B9A532005355C0 /* LazyNavigationView.swift */,
 				04DD579427BE96B50030D25C /* SyncLibraryButton.swift */,
+				0463E08527C65F2400D3957A /* NowPlayingIndicator.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -536,6 +547,7 @@
 		04FBD83527A631B500E780F3 /* Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				04DE4C3E27C1CA7800666E9C /* Builders.swift */,
 				04FBD83627A631D400E780F3 /* PlaylistHelper.swift */,
 				04FBD83827A635F200E780F3 /* SongHelper.swift */,
 				04DCB7F327BA0192005355C0 /* RefreshRateHelper.swift */,
@@ -564,6 +576,7 @@
 				04FE474827BA815E00BDEDFF /* LNPopupUI-Static */,
 				047F492F27BBF4920076B45E /* SwiftAudioPlayer */,
 				040EFDD227C3BEE800D67B79 /* SwiftUIX */,
+				04E5332E27C5124900D83D66 /* SwimplyPlayIndicator */,
 			);
 			productName = "FinTune (iOS)";
 			productReference = 04E10708270CD307002CACB0 /* Jellify.app */;
@@ -662,6 +675,7 @@
 				04FE474727BA815E00BDEDFF /* XCRemoteSwiftPackageReference "LNPopupUI" */,
 				047F492E27BBF4920076B45E /* XCRemoteSwiftPackageReference "SwiftAudioPlayer" */,
 				040EFDD127C3BEE800D67B79 /* XCRemoteSwiftPackageReference "SwiftUIX" */,
+				04E5332D27C5124900D83D66 /* XCRemoteSwiftPackageReference "SwimplyPlayIndicator" */,
 			);
 			productRefGroup = 04E10709270CD307002CACB0 /* Products */;
 			projectDirPath = "";
@@ -742,6 +756,7 @@
 				041D3E7B2722E93F002185CF /* NowPlayingView.swift in Sources */,
 				04CBCDB6271371C8003E9BE9 /* ResultSet.swift in Sources */,
 				04DCB7F427BA0192005355C0 /* RefreshRateHelper.swift in Sources */,
+				04EED65427C66DB400BBBEF2 /* Settings.swift in Sources */,
 				04E10748270CD6B8002CACB0 /* SongsView.swift in Sources */,
 				04E1074E270CD6ED002CACB0 /* ArtistsView.swift in Sources */,
 				04E2DE19270E264B007ABE38 /* ArtistDetailView.swift in Sources */,
@@ -750,6 +765,7 @@
 				04848BDB272650050072A81E /* AlbumBackdropImage.swift in Sources */,
 				04DD578F27BE94BF0030D25C /* ArtistsListView.swift in Sources */,
 				04E1074B270CD6E6002CACB0 /* AlbumsListView.swift in Sources */,
+				0463E08627C65F2400D3957A /* NowPlayingIndicator.swift in Sources */,
 				041D3E6D271AC0D7002185CF /* CacheAsyncImage.swift in Sources */,
 				04D4B5F32710E9D30089CFC3 /* LoginView.swift in Sources */,
 				04848BD02725AF940072A81E /* ArtistThumbnail.swift in Sources */,
@@ -782,6 +798,7 @@
 				04D4B60D27135FA50089CFC3 /* ArtistResult.swift in Sources */,
 				0442A25127B3115700003F0C /* ToolbarView.swift in Sources */,
 				04DCB7EC27B8632C005355C0 /* SongsListView.swift in Sources */,
+				04E5333127C515E300D83D66 /* PlaylistArtwork.swift in Sources */,
 				04FBD83B27A721A900E780F3 /* PlaylistThumbnail.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -799,6 +816,7 @@
 				04E1072C270CD307002CACB0 /* ContentView.swift in Sources */,
 				04E1074F270CD6ED002CACB0 /* ArtistsView.swift in Sources */,
 				04E2DE1A270E264B007ABE38 /* ArtistDetailView.swift in Sources */,
+				04EED65527C66DB400BBBEF2 /* Settings.swift in Sources */,
 				04848BDC272650050072A81E /* AlbumBackdropImage.swift in Sources */,
 				04D4B60A27135DEA0089CFC3 /* SessionInfo.swift in Sources */,
 				04848BE827271F760072A81E /* AlbumRow.swift in Sources */,
@@ -812,7 +830,6 @@
 				04DE4C2B27C17B4B00666E9C /* DownloadManager.swift in Sources */,
 				04E2DE1D270E48D9007ABE38 /* TabBarView.swift in Sources */,
 				0442A26B27B3F95900003F0C /* LibrarySelectionService.swift in Sources */,
-				04DE4C4027C1CA7800666E9C /* Builders.swift in Sources */,
 				04CBCDC92713D1F0003E9BE9 /* LibraryResult.swift in Sources */,
 				0462B3BE27BBCFEE009066CD /* ArtistModel.swift in Sources */,
 				04D4B60727135DE50089CFC3 /* UserResult.swift in Sources */,
@@ -827,6 +844,7 @@
 				04CBCDDE27169BBA003E9BE9 /* CoreData.xcdatamodeld in Sources */,
 				04D4B60427135DD50089CFC3 /* LoginResult.swift in Sources */,
 				04E2806B27B13D06009082B1 /* NetworkingManager.swift in Sources */,
+				0463E08727C65F2400D3957A /* NowPlayingIndicator.swift in Sources */,
 				04D4B60E27135FA50089CFC3 /* ArtistResult.swift in Sources */,
 				041D3E6E271AC0D7002185CF /* CacheAsyncImage.swift in Sources */,
 				04D4B5FA2712246D0089CFC3 /* Login.swift in Sources */,
@@ -1012,7 +1030,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.6;
+				MARKETING_VERSION = 0.7;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jackcaulifield.Jellify;
 				PRODUCT_NAME = Jellify;
 				SDKROOT = iphoneos;
@@ -1047,7 +1065,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.6;
+				MARKETING_VERSION = 0.7;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jackcaulifield.Jellify;
 				PRODUCT_NAME = Jellify;
 				SDKROOT = iphoneos;
@@ -1287,6 +1305,14 @@
 				minimumVersion = 7.0.0;
 			};
 		};
+		04E5332D27C5124900D83D66 /* XCRemoteSwiftPackageReference "SwimplyPlayIndicator" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/obrhoff/SwimplyPlayIndicator";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
 		04FE474727BA815E00BDEDFF /* XCRemoteSwiftPackageReference "LNPopupUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/LeoNatan/LNPopupUI";
@@ -1312,6 +1338,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 047F492E27BBF4920076B45E /* XCRemoteSwiftPackageReference "SwiftAudioPlayer" */;
 			productName = SwiftAudioPlayer;
+		};
+		04E5332E27C5124900D83D66 /* SwimplyPlayIndicator */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 04E5332D27C5124900D83D66 /* XCRemoteSwiftPackageReference "SwimplyPlayIndicator" */;
+			productName = SwimplyPlayIndicator;
 		};
 		04FE474827BA815E00BDEDFF /* LNPopupUI-Static */ = {
 			isa = XCSwiftPackageProductDependency;

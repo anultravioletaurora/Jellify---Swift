@@ -20,6 +20,9 @@ struct ContentView: View {
     
     @ObservedObject
     var player = Player.shared
+    
+    @EnvironmentObject
+    var settings : Settings
         
     init() {
         
@@ -48,28 +51,8 @@ struct ContentView: View {
         // Else have them start listening
         else {
             
-            ZStack(alignment: Alignment(horizontal: .center, vertical: .bottom), content: {
-                
+            TabBarView()
 
-                if networkingManager.libraryIsPopulated {
-                    TabBarView()
-                } else {
-                    switch networkingManager.loadingPhase {
-                        case .artists:
-                            ProgressView("Loading Artists")
-                        case .albums:
-                            ProgressView("Loading Albums")
-                        case .songs:
-                            ProgressView("Loading Songs")
-                        case .playlists:
-                            ProgressView("Loading Playlists")
-                        case .artwork:
-                            ProgressView("Loading Artwork")
-                        default:
-                            ProgressView("Tuning in")
-                    }
-                }
-            })
 
             .onAppear(perform: {
                 
@@ -79,7 +62,9 @@ struct ContentView: View {
                 networkingManager.processDownloadQueue()
                 
                 // Sync library on app startup
-                networkingManager.syncLibrary()
+                if settings.syncOnStartup {
+                    networkingManager.syncLibrary()
+                }
             })
             .transition(.opacity)
         }

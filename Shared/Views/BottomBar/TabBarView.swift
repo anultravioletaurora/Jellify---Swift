@@ -7,6 +7,7 @@
 
 import SwiftUI
 import LNPopupUI
+import SwiftUIX
 
 struct TabBarView: View {
                     
@@ -14,7 +15,13 @@ struct TabBarView: View {
     var selectedTab : Int = 1
     
     @State
-    var miniplayerPresented = true
+    var miniplayerPresented = true {
+        didSet {
+            if miniplayerPresented {
+                Keyboard.dismiss()
+            }
+        }
+    }
     
     @State
     var miniplayerExpanded = false

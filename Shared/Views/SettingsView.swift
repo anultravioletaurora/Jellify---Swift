@@ -11,9 +11,20 @@ struct SettingsView: View {
     
     let networkingManager = NetworkingManager.shared
     
+    @EnvironmentObject
+    var settings : Settings
+    
     var body: some View {
         NavigationView {
+                        
             Form {
+                Section(header: Text("Library Settings")) {
+                    Toggle("Sync on Startup", isOn: $settings.syncOnStartup)
+                }
+                
+                Section(header: Text("Appearance")) {
+                    Toggle("Display as Gallery", isOn: $settings.displayAsGallery)
+                }
                 
                 Section(header: Text("Current User")) {
                     HStack {

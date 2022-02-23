@@ -3,7 +3,7 @@ import SwiftUI
 struct SongRow: View {
     
     @ObservedObject
-    var song: Song
+    var song: FetchedResults<Song>.Element
     
     @Binding
     var selectedSong: Song?
@@ -17,10 +17,7 @@ struct SongRow: View {
     var player : Player = Player.shared
     
     var downloadManager : DownloadManager = DownloadManager.shared
-    
-    @Environment(\.colorScheme)
-    var colorScheme: ColorScheme
-    
+        
     var type : SongRowType
     
     var body: some View {
@@ -33,8 +30,10 @@ struct SongRow: View {
                 if type == .album {
                     
                     if player.currentSong?.song == song {
-                        Image(systemName: "speaker.wave.3")
-                            .frame(width: 50)
+//                        SwimplyPlayIndicator(state: $player.audioState, count: 3, color: .accentColor, style: .legacy)
+                        NowPlayingIndicator()
+                            .padding(.horizontal, 10)
+
                     } else {
                         VStack(alignment: .center, spacing: 10, content: {
                             Text(String(song.indexNumber))
@@ -51,20 +50,29 @@ struct SongRow: View {
                             ZStack {
                                 
                                 AlbumThumbnail(album: song.album!)
-                                    .brightness(colorScheme == .dark ? -0.3 : 0.3)
+                                    .brightness(-0.3)
                                 
-                                Image(systemName: "speaker.wave.3")
-                                    .font(.title)
+//                                SwimplyPlayIndicator(state: $player.audioState, count: 3, color: .accentColor, style: .legacy)
+                                NowPlayingIndicator()
                             }
                         } else {
                             AlbumThumbnail(album: song.album!)
+                        }
+                    } else {
+                        if player.currentSong?.song == song {
+//                            SwimplyPlayIndicator(state: $player.audioState, count: 3, color: .accentColor, style: .legacy)
+                            NowPlayingIndicator()
                         }
                     }
                 }
                                         
                 VStack(alignment: .leading, spacing: 10) {
                     
-                    Text(song.name ?? "Unknown Song")
+                    if player.currentSong?.song == song {
+                        Text(song.name ?? "Unknown Song").foregroundColor(.accentColor)
+                    } else {
+                        Text(song.name ?? "Unknown Song")
+                    }
                                      
                     if (type == .songs || (type == .album && song.artists?.count ?? 0 > 1)) {
                         Text(Builders.artistName(song: song))
@@ -86,28 +94,6 @@ struct SongRow: View {
         })
         .padding(.horizontal, 10)
         .buttonStyle(PlainButtonStyle())
-        .swipeActions {
-            Button(action: {
-                print("Artist Swiped")
-            }) {
-                Image(systemName: "heart")
-            }
-            .tint(.purple)
-            
-            Button(action: {
-                print("Add to playlist sheet activated")
-                selectedSong = song
-                
-                print("Showing playlist sheet for: \(selectedSong!.name)")
-                
-                showPlaylistSheet.toggle()
-                
-                print(showPlaylistSheet ? "Showing Playlist Sheet" : "Hiding Playlist Sheet")
-            }) {
-                Image(systemName: "music.note.list")
-            }
-            .tint(.blue)
-        }
         .contextMenu {
             Button(action: {
                 player.appendSongsNext([song])
@@ -118,6 +104,17 @@ struct SongRow: View {
                     Text("Play Next")
                 }
             })
+            
+            Button(action: {
+                player.appendSongsEnd([song])
+            }, label: {
+                HStack {
+                    Image(systemName: "text.badge.plus")
+                    
+                    Text("Add to Queue")
+                }
+            })
+            
             Button(action: {
                 
                 selectedSong = song
@@ -125,7 +122,7 @@ struct SongRow: View {
                 showPlaylistSheet.toggle()
             }, label: {
                 HStack {
-                    Image(systemName: "text.badge.plus")
+                    Image(systemName: "plus.rectangle.on.rectangle")
                     
                     Text("Add to Playlist")
                 }
@@ -141,11 +138,13 @@ struct SongRow: View {
                 })
             } else if song.downloading {
                 
-                HStack {
-                    Text("Downloading")
+                Button(action: {
+                    downloadManager.cancelSongDownload(song: song)
+                }, label: {
+                    Image(systemName: "xmark.circle")
                     
-                    ProgressView()
-                }
+                    Text("Cancel Download")
+                })
             } else {
                 Button(action: {
                     downloadManager.downloadSong(song: song)

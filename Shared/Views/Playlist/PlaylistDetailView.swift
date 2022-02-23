@@ -26,6 +26,8 @@ struct PlaylistDetailView: View {
     @State
     var showPlaylistSheet: Bool = false
 
+    @ObservedObject
+    var player = Player.shared
     
     init(playlist: Playlist) {
         self.playlist = playlist
@@ -39,42 +41,50 @@ struct PlaylistDetailView: View {
     
     var body: some View {
         List {
+            
+            PlaylistArtwork(playlist: playlist)
+                .listRowSeparator(Visibility.hidden)
+            
+            HStack {
+                
+                Spacer()
+                
+                Text(playlist.name ?? "Unknown Playlist")
+                    .font(.title3)
+                    .semibold()
+                
+                Spacer()
+            }
+            .padding(.bottom, 15)
+            
             ForEach(playlistSongs) { playlistSong in
-                Button(action: {
-                    Player.shared.loadSongs(playlistSongs.map { song in
-                        return song.song!
-                    }, songId: playlistSong.song!.jellyfinId!)
-                    Player.shared.isPlaying = true
-                }, label: {
-                    SongRow(song: playlistSong.song!, selectedSong: $selectedSong, songs: playlistSongs.map { $0.song! }, showPlaylistSheet: $showPlaylistSheet, type: .songs)
-                })
-                .onAppear(perform: {
-                    if playlistSong.song!.album != nil && playlistSong.song!.album!.thumbnail == nil {
-                        networkingManager.loadAlbumArtwork(album: playlistSong.song!.album!)
-                    }
-                })
-                .swipeActions(allowsFullSwipe: true, content: {
+                
+                // Check that the song exists here, in the case of a user adding or removing a song to a playlist
+                // while it's detail open, this check will prevent a crash
+                if playlistSong.song != nil {
                     Button(action: {
-                        print("Playlist Item Swiped to delete")
-                        
-                        networkingManager.deleteFromPlaylist(playlist: playlist, playlistSong: playlistSong)
-                    }) {
-                        Image(systemName: "trash")
-                            .background(.red)
-                    }
-                    .tint(.red)
-
-                })
-                .buttonStyle(PlainButtonStyle())
+                        player.loadSongs(playlistSongs.map { song in
+                            return song.song!
+                        }, songId: playlistSong.song!.jellyfinId!)
+                        player.isPlaying = true
+                    }, label: {
+                        SongRow(song: playlistSong.song!, selectedSong: $selectedSong, songs: playlistSongs.map { $0.song! }, showPlaylistSheet: $showPlaylistSheet, type: .songs)
+                    })
+                    .onAppear(perform: {
+                        if playlistSong.song != nil && playlistSong.song!.album != nil && playlistSong.song!.album!.thumbnail == nil {
+                            networkingManager.loadAlbumArtwork(album: playlistSong.song!.album!)
+                        }
+                    })
+                    .buttonStyle(PlainButtonStyle())
+                }
+            }
+            .onDelete { indexSet in
+                networkingManager.deleteFromPlaylist(playlist: playlist, indexSet: indexSet)
             }
             .onMove { indexSet, index in
                 networkingManager.moveInPlaylist(playlist: playlist, indexSet: indexSet, newIndex: index)
             }
         }
-        
-        // Give this list an ID, because if the user adds a song to this playlist and navigates back to this view,
-        // it'll cause a crash
-        .id(UUID())
         
         .toolbar {
             EditButton()
@@ -86,8 +96,6 @@ struct PlaylistDetailView: View {
                 .offset(y: UIScreen.main.bounds.height - 150)
         })
         .listStyle(PlainListStyle())
-        .navigationTitle(playlist.name ?? "Unknown Playlist")
-        .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showPlaylistSheet, content: {
             PlaylistSelectionSheet(song: $selectedSong, showPlaylistSheet: $showPlaylistSheet)
         })

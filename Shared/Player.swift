@@ -12,6 +12,7 @@ import AVFoundation
 import MediaPlayer
 import JellyfinAPI
 import SwiftAudioPlayer
+import SwimplyPlayIndicator
 
 open class AVPlayerItemId: AVPlayerItem, Identifiable{
     public let id = UUID().uuidString
@@ -201,10 +202,13 @@ class Player: ObservableObject {
 //        }
 //    }
     
+    @Published public var audioState : SwimplyPlayIndicator.AudioState = .stop
+    
     @Published public var isPlaying = false {
         didSet {
             if isPlaying {
                 setupBackgroundPlay()
+                audioState = .play
             }
             
             if isPlaying {
@@ -226,6 +230,7 @@ class Player: ObservableObject {
                 
             } else {
                 player?.pause()
+                audioState = .pause
                 
                 var dto = PlaybackProgressInfo()
                 
@@ -503,9 +508,11 @@ class Player: ObservableObject {
                         }
                     }
                     
-                }else if repeatMode == .repeatOne{
-                    self.appendSongsNext([newSong.song])
-                    player?.advanceToNextItem()
+                }
+                
+                // Back up to the beginning of the song if we're repeating one
+                else if repeatMode == .repeatOne{
+                    seek(progress: 0.0)
                 }
             } else if index == -1 {
                 seek(progress: 0.0)
@@ -585,14 +592,8 @@ class Player: ObservableObject {
             }
             UIApplication.shared.beginReceivingRemoteControlEvents()
             
-            var artistNameArray : [String] = []
-
-            currentItem.song.artists?.forEach({ artist in
-                artistNameArray.append((artist as! Artist).name ?? "")
-            })
-            
             let info: [String: Any] = [
-                MPMediaItemPropertyArtist: artistNameArray.joined(separator: ", "),
+                MPMediaItemPropertyArtist: Builders.artistName(song: currentItem.song),
                 MPMediaItemPropertyAlbumTitle: currentItem.song.album?.name ?? "Unknown Album",
                 MPMediaItemPropertyTitle: currentItem.song.name ?? "Unknown Track",
                 MPMediaItemPropertyArtwork: MPMediaItemArtwork(boundsSize: CGSize(width: 500, height: 500), requestHandler: { (size: CGSize) -> UIImage in
