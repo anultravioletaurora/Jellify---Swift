@@ -15,10 +15,19 @@ struct ScrubberBarView: View {
     @EnvironmentObject
     var player : Player
             
+    @State
+    var progress : Double = 0.0
+    
+    @State
+    var timeElapsed : String = "0:00"
+    
+    @State
+    var timeRemaining : String = "-0:00"
+    
     var body: some View {
         
         VStack {
-            Slider(value: $player.playProgress, onEditingChanged: { (scrubStarted) in
+            Slider(value: $progress, onEditingChanged: { (scrubStarted) in
                 
                 print("Seeking")
                 
@@ -29,20 +38,50 @@ struct ScrubberBarView: View {
                         return
                     }
                     
-                    self.player.seek(progress: player.playProgress)
+                    self.player.seek(progress: progress)
                 }
             })
 
             HStack {
-                Text(player.timeElasped)
+                Text(timeElapsed)
                     .font(.subheadline)
                 
                 Spacer()
                 
-                Text(player.timeRemaining)
+                Text(timeRemaining)
                     .font(.subheadline)
             }
         }
         .padding(.horizontal, 25)
+        .onAppear(perform: {
+            _ = Timer.scheduledTimer(withTimeInterval: Globals.playProgressRefresh,
+                                             repeats: true,
+                                             block: { timer in
+
+                if let queuePlayer = player.player {
+                
+                    let duration = queuePlayer.currentItem!.duration.seconds
+                    
+                    guard !duration.isNaN else {
+                        return
+                    }
+
+                    self.progress = queuePlayer.currentTime().seconds / duration
+                                        
+                    let playItemPosition = Int(queuePlayer.currentTime().seconds)
+                    let playTimeSeconds = Int(playItemPosition % 3600) % 60
+                    let playTimeMinutes = Int(playItemPosition % 3600) / 60
+                    let timeElapsedString = "\(playTimeMinutes):\(String(format: "%02d", playTimeSeconds))"
+                    self.timeElapsed = timeElapsedString
+                    
+                    let remainingTimeSecs = Int(duration) - playItemPosition
+                    let remainingTimeSeconds = Int(remainingTimeSecs % 3600) % 60
+                    let remainingTimeMinutes = Int(remainingTimeSecs % 3600) / 60
+                    let remainingTimeString = "-\(remainingTimeMinutes):\(String(format: "%02d", remainingTimeSeconds))"
+                    self.timeRemaining = remainingTimeString
+                }
+            })
+
+        })
     }
 }

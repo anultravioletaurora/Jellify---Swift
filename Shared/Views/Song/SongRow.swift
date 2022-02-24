@@ -13,9 +13,9 @@ struct SongRow: View {
     @Binding
     var showPlaylistSheet: Bool
     
-    @ObservedObject
-    var player : Player = Player.shared
-    
+    @EnvironmentObject
+    var player : Player
+
     var downloadManager : DownloadManager = DownloadManager.shared
         
     var type : SongRowType

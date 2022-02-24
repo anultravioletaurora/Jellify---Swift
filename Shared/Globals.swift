@@ -9,7 +9,7 @@ import Foundation
 import UIKit
 
 public class Globals{
-    public static let playProgressRefresh: Double = 1.0
+    public static let playProgressRefresh: Double = 0.3
     public static let componentOpacity: Double = 0.6
     public static let debounceDuration: Double = 0.5
     

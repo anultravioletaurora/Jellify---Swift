@@ -56,7 +56,6 @@ struct NowPlayingView: View {
                     AlbumBackdropImage(album: player.currentSong!.song.album!)
                 }
             })
-            .popupProgress(player.playProgress)
             .popupTitle(player.currentSong?.song.name ?? "Nothing Playing", subtitle: Builders.artistName(song: player.currentSong?.song) )
             .popupImage(player.currentSong != nil ? Image(data: player.currentSong!.song.album!.artwork).resizable() :  Image("placeholder").resizable())
             .popupBarItems({

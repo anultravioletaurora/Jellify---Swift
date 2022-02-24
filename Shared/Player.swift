@@ -292,7 +292,7 @@ class Player: ObservableObject {
     
     public var player: AVQueuePlayer?
     private var timeTimer: Timer?
-    @Published public var animationTimer = Timer.publish(every: 9, on: .main, in: .common).autoconnect()
+//    @Published public var animationTimer = Timer.publish(every: 9, on: .main, in: .common).autoconnect()
     init() {
         let nc = NotificationCenter.default
         nc.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
@@ -636,13 +636,14 @@ class Player: ObservableObject {
                 timeTimer?.invalidate()
                 timeTimer = nil
             }
-            timeTimer = Timer.scheduledTimer(withTimeInterval: Globals.playProgressRefresh,
-                                             repeats: true,
-                                             block:
-                { [weak self] timer in
-                
-                    self?.refreshPlayingInfo()
-                })
+                        
+//            timeTimer = Timer.scheduledTimer(withTimeInterval: Globals.playProgressRefresh,
+//                                             repeats: true,
+//                                             block:
+//                { [weak self] timer in
+//
+//                    self?.refreshPlayingInfo()
+//                })
         } else {
             timeTimer?.invalidate()
             timeTimer = nil
@@ -660,10 +661,10 @@ class Player: ObservableObject {
         return Double(0)
     }
     
-    public func seek(progress: Float){
+    public func seek(progress: Double){
         if let duration = player?.currentItem?.duration.seconds {
             
-            let durationSecs = Float(duration)
+            let durationSecs = duration
             let playTimeSecs = Double(durationSecs * progress)
             self.player?.seek(to: CMTime(seconds: playTimeSecs, preferredTimescale: 1), completionHandler: { _ in
                 self.seeking = false
@@ -709,7 +710,7 @@ class Player: ObservableObject {
                         }else{
                             self.playProgress = 0
                         }
-                        self.trigger = false
+//                        self.trigger = false
 
                         var infos = MPNowPlayingInfoCenter.default().nowPlayingInfo
                         infos?[MPMediaItemPropertyPlaybackDuration] = duration

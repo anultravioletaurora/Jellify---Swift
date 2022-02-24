@@ -25,10 +25,7 @@ struct TabBarView: View {
     
     @State
     var miniplayerExpanded = false
-    
-//    @EnvironmentObject
-//    var player : Player
-            
+                
     var body: some View {
         
         TabView(selection: $selectedTab) {
@@ -74,5 +71,6 @@ struct TabBarView: View {
         })
         .popupBarProgressViewStyle(.top)
         .popupBarMarqueeScrollEnabled(true)
+        .popupInteractionStyle(.drag)
     }
 }
