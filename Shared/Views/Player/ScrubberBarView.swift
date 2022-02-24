@@ -8,28 +8,34 @@
 import SwiftUI
 import AVFoundation
 import MediaPlayer
+import SwiftUIX
 
 
 struct ScrubberBarView: View {
     
-    @ObservedObject
-    var player = Player.shared
+    @EnvironmentObject
+    var player : Player
+    
+    @State
+    var double = 0.0
     
     let refreshRateHelper = RefreshRateHelper.shared
-        
+            
     var body: some View {
         
         VStack {
-            Slider(value: $player.playProgressAhead, onEditingChanged: { (scrubStarted) in
+            Slider(value: $player.playProgress, onEditingChanged: { (scrubStarted) in
+                
+                print("Seeking")
                 
                 if scrubStarted {
                     self.player.seeking = true
                 } else {
-                    guard let item = self.player.player?.currentItem else {
+                    guard self.player.player?.currentItem != nil else {
                         return
                     }
                     
-                    self.player.seek(progress: Double(player.playProgressAhead))
+                    self.player.seek(progress: player.playProgress)
                 }
             })
 

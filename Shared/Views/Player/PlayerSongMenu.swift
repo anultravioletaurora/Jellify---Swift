@@ -9,9 +9,9 @@ import SwiftUI
 
 struct PlayerSongMenu: View {
     
-    @ObservedObject
-    var player = Player.shared
-    
+    @EnvironmentObject
+    var player : Player
+
     var downloadManager = DownloadManager.shared
     
     @Binding

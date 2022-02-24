@@ -11,9 +11,9 @@ import MediaPlayer
 
 struct NowPlayingView: View {
         
-    @ObservedObject
-    var player = Player.shared
-                
+    @EnvironmentObject
+    var player : Player
+
     @State
     private var airPlayView = AirPlayView()
         
@@ -113,9 +113,9 @@ struct PlayerViewBody : View {
     @Binding
     var viewingQueue : Bool
     
-    @ObservedObject
-    var player = Player.shared
-                
+    @EnvironmentObject
+    var player : Player
+
     @State
     private var airPlayView = AirPlayView()
     

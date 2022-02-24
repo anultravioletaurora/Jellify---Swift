@@ -27,9 +27,9 @@ struct PlaylistDetailView: View {
     @State
     var showPlaylistSheet: Bool = false
 
-    @ObservedObject
-    var player = Player.shared
-    
+    @EnvironmentObject
+    var player : Player
+
     init(playlist: Playlist) {
         self.playlist = playlist
         

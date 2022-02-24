@@ -9,8 +9,8 @@ import SwiftUI
 
 struct NowPlayingThumbnail: View {
     
-    @ObservedObject
-    var player = Player.shared
+    @EnvironmentObject
+    var player : Player
     
     var body: some View {
         if player.currentSong != nil {

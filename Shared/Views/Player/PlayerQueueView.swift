@@ -9,9 +9,9 @@ import SwiftUI
 
 struct PlayerQueueView: View {
     
-    @ObservedObject
-    var player = Player.shared
-    
+    @EnvironmentObject
+    var player : Player
+
     var height = UIScreen.main.bounds.height / 2.5
         
     @Environment(\.editMode)

@@ -9,9 +9,9 @@ import SwiftUI
 
 struct NowPlayingIndicator: View {
     
-    @ObservedObject
-    var player = Player.shared
-    
+    @EnvironmentObject
+    var player : Player
+
     @Environment(\.colorScheme)
     var colorScheme
     

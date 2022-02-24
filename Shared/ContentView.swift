@@ -18,9 +18,6 @@ struct ContentView: View {
     @ObservedObject
     var networkingManager = NetworkingManager.shared
     
-    @ObservedObject
-    var player = Player.shared
-    
     @EnvironmentObject
     var settings : Settings
         

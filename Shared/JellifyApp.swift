@@ -31,6 +31,7 @@ struct JellifyApp: App {
                 ContentView()
                 .environment(\.managedObjectContext, networkingManager.context)
                 .environmentObject(Settings())
+                .environmentObject(Player.shared)
         }
         .onChange(of: scenePhase) { _ in
             persistenceController.save()
