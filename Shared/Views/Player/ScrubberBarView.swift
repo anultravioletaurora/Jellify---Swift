@@ -8,18 +8,12 @@
 import SwiftUI
 import AVFoundation
 import MediaPlayer
-import SwiftUIX
 
 
 struct ScrubberBarView: View {
     
     @EnvironmentObject
     var player : Player
-    
-    @State
-    var double = 0.0
-    
-    let refreshRateHelper = RefreshRateHelper.shared
             
     var body: some View {
         

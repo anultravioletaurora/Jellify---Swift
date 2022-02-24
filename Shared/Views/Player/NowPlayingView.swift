@@ -57,7 +57,7 @@ struct NowPlayingView: View {
                 }
             })
             .popupProgress(player.playProgress)
-            .popupTitle(player.currentSong?.song.name ?? "Nothing Playing", subtitle: player.currentSong?.song.album!.albumArtistName ?? nil)
+            .popupTitle(player.currentSong?.song.name ?? "Nothing Playing", subtitle: Builders.artistName(song: player.currentSong?.song) )
             .popupImage(player.currentSong != nil ? Image(data: player.currentSong!.song.album!.artwork).resizable() :  Image("placeholder").resizable())
             .popupBarItems({
                 HStack {
@@ -188,8 +188,6 @@ struct PlayerViewBody : View {
             
             ScrubberBarView()
                 .padding(.bottom, 25)
-//                    ProgressBarView()
-//                        .padding(.all)
                         
             HStack {
                 // Skip track
