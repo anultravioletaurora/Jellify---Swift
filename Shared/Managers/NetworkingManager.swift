@@ -1331,7 +1331,7 @@ class NetworkingManager : ObservableObject {
         }
     }
     
-    private func saveContext() {
+    public func saveContext() {
         
         self.privateContext.performAndWait {
             do {

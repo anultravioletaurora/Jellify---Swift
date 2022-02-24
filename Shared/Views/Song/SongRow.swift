@@ -130,7 +130,7 @@ struct SongRow: View {
             
             if song.downloaded {
                 Button(action: {
-                    downloadManager.deleteSongDownload(song: song)
+                    downloadManager.delete(song: song)
                 }, label: {
                     Image(systemName: "trash.circle")
                     
@@ -147,7 +147,7 @@ struct SongRow: View {
                 })
             } else {
                 Button(action: {
-                    downloadManager.downloadSong(song: song)
+                    downloadManager.download(song: song)
                 }, label: {
                     HStack {
                         Image(systemName: "arrow.down.circle")

@@ -94,8 +94,8 @@
             filePath = "Shared/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "129"
-            endingLineNumber = "129"
+            startingLineNumber = "128"
+            endingLineNumber = "128"
             landmarkName = "songs"
             landmarkType = "24">
          </BreakpointContent>
@@ -590,24 +590,8 @@
             filePath = "Shared/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "398"
-            endingLineNumber = "398"
-            landmarkName = "loadSongs(_:songId:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "81AF1B94-A824-4285-89DC-DF728A38EF75"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Shared/Player.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "410"
-            endingLineNumber = "410"
+            startingLineNumber = "393"
+            endingLineNumber = "393"
             landmarkName = "loadSongs(_:songId:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1182,8 +1166,8 @@
             filePath = "Shared/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "487"
-            endingLineNumber = "487"
+            startingLineNumber = "489"
+            endingLineNumber = "489"
             landmarkName = "changeSong(newIndex:skipping:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1198,8 +1182,8 @@
             filePath = "Shared/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "33"
-            endingLineNumber = "33"
+            startingLineNumber = "32"
+            endingLineNumber = "32"
             landmarkName = "init(song:order:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1214,8 +1198,8 @@
             filePath = "Shared/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "40"
-            endingLineNumber = "40"
+            startingLineNumber = "39"
+            endingLineNumber = "39"
             landmarkName = "init(song:order:)"
             landmarkType = "7">
             <Locations>
@@ -1262,8 +1246,8 @@
             filePath = "Shared/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "708"
-            endingLineNumber = "708"
+            startingLineNumber = "710"
+            endingLineNumber = "710"
             landmarkName = "refreshPlayingInfo()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1278,8 +1262,8 @@
             filePath = "Shared/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "709"
-            endingLineNumber = "709"
+            startingLineNumber = "711"
+            endingLineNumber = "711"
             landmarkName = "refreshPlayingInfo()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1294,8 +1278,8 @@
             filePath = "Shared/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "663"
-            endingLineNumber = "663"
+            startingLineNumber = "665"
+            endingLineNumber = "665"
             landmarkName = "setTimeElapsed(progress:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1438,8 +1422,8 @@
             filePath = "Shared/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "681"
-            endingLineNumber = "681"
+            startingLineNumber = "683"
+            endingLineNumber = "683"
             landmarkName = "seek(progress:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1470,8 +1454,8 @@
             filePath = "Shared/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "717"
-            endingLineNumber = "717"
+            startingLineNumber = "719"
+            endingLineNumber = "719"
             landmarkName = "refreshPlayingInfo()"
             landmarkType = "7">
          </BreakpointContent>
@@ -1567,8 +1551,8 @@
             filePath = "Shared/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "359"
-            endingLineNumber = "359"
+            startingLineNumber = "354"
+            endingLineNumber = "354"
             landmarkName = "handleInterruption(notification:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1583,8 +1567,8 @@
             filePath = "Shared/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "352"
-            endingLineNumber = "352"
+            startingLineNumber = "347"
+            endingLineNumber = "347"
             landmarkName = "handleInterruption(notification:)"
             landmarkType = "7">
             <Locations>
@@ -1631,8 +1615,8 @@
             filePath = "Shared/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "322"
-            endingLineNumber = "322"
+            startingLineNumber = "317"
+            endingLineNumber = "317"
             landmarkName = "handleRouteChange(notification:)"
             landmarkType = "7">
             <Locations>
@@ -1736,22 +1720,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "586BAE04-C87D-48B0-8405-929127D76EDA"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Shared/Player.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "420"
-            endingLineNumber = "420"
-            landmarkName = "toPlayerItem(_:order:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "1D60EDDB-C9C9-494A-AD30-8CAFA29233A4"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -1759,8 +1727,8 @@
             filePath = "Shared/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "474"
-            endingLineNumber = "474"
+            startingLineNumber = "476"
+            endingLineNumber = "476"
             landmarkName = "changeSong(newIndex:skipping:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1775,8 +1743,8 @@
             filePath = "Shared/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "215"
-            endingLineNumber = "215"
+            startingLineNumber = "211"
+            endingLineNumber = "211"
             landmarkName = "isPlaying"
             landmarkType = "24">
          </BreakpointContent>
@@ -1791,58 +1759,10 @@
             filePath = "Shared/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "216"
-            endingLineNumber = "216"
+            startingLineNumber = "212"
+            endingLineNumber = "212"
             landmarkName = "isPlaying"
             landmarkType = "24">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "BA3BA8B7-046D-4534-8702-5BEDD201E158"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Shared/Player.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "419"
-            endingLineNumber = "419"
-            landmarkName = "toPlayerItem(_:order:)"
-            landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "BA3BA8B7-046D-4534-8702-5BEDD201E158 - 4c2c1128d6ec0c62"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Jellify.Player.toPlayerItem(_: Jellify.Song, order: Swift.Int) -&gt; Jellify.AVPlayerItemId"
-                  moduleName = "Jellify"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/jack/Projects/FinTune-Native/Shared/Player.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "408"
-                  endingLineNumber = "408"
-                  offsetFromSymbolStart = "352">
-               </Location>
-               <Location
-                  uuid = "BA3BA8B7-046D-4534-8702-5BEDD201E158 - 4c2c1128d6ec0c62"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Jellify.Player.toPlayerItem(_: Jellify.Song, order: Swift.Int) -&gt; Jellify.AVPlayerItemId"
-                  moduleName = "Jellify"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/jack/Projects/FinTune-Native/Shared/Player.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "408"
-                  endingLineNumber = "408"
-                  offsetFromSymbolStart = "932">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1855,8 +1775,8 @@
             filePath = "Shared/Player.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "29"
-            endingLineNumber = "29"
+            startingLineNumber = "28"
+            endingLineNumber = "28"
             landmarkName = "init(song:localAsset:order:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -1951,8 +1871,8 @@
             filePath = "Shared/Managers/DownloadManager.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "29"
-            endingLineNumber = "29"
+            startingLineNumber = "67"
+            endingLineNumber = "67"
             landmarkName = "downloadSong(song:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -2514,6 +2434,54 @@
             startingLineNumber = "776"
             endingLineNumber = "776"
             landmarkName = "loadAlbums(complete:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "8452DE84-910F-456C-B1C6-D4A88D0DE16F"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Shared/Player.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "410"
+            endingLineNumber = "410"
+            landmarkName = "toPlayerItem(_:order:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "07330FAB-0272-4847-AC3B-7493DA63FFDB"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Shared/Managers/DownloadManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "55"
+            endingLineNumber = "55"
+            landmarkName = "download(song:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "0D4D6568-6F42-4086-802F-6F7580348FD9"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Shared/Managers/DownloadManager.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "44"
+            endingLineNumber = "44"
+            landmarkName = "download(song:)"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

@@ -12,7 +12,6 @@ import AVFoundation
 import MediaPlayer
 import JellyfinAPI
 import SwiftAudioPlayer
-import SwimplyPlayIndicator
 
 open class AVPlayerItemId: AVPlayerItem, Identifiable{
     public let id = UUID().uuidString
@@ -201,14 +200,11 @@ class Player: ObservableObject {
 //              }
 //        }
 //    }
-    
-    @Published public var audioState : SwimplyPlayIndicator.AudioState = .stop
-    
+        
     @Published public var isPlaying = false {
         didSet {
             if isPlaying {
                 setupBackgroundPlay()
-                audioState = .play
             }
             
             if isPlaying {
@@ -230,7 +226,6 @@ class Player: ObservableObject {
                 
             } else {
                 player?.pause()
-                audioState = .pause
                 
                 var dto = PlaybackProgressInfo()
                 
@@ -414,14 +409,21 @@ class Player: ObservableObject {
         // See if the item is marked as downloaded
         if song.downloaded {
             
-            if let localUrl = song.downloadUrl {
-            
-                let localAsset = AVURLAsset(url: song.downloadUrl!)
-                return AVPlayerItemId(song: song, localAsset: localAsset, order: order)
+            guard song.downloadUrl != nil else {
+                song.downloaded = false
+                song.downloading = false
+                return AVPlayerItemId(song: song, order: order)
             }
             
-            song.downloaded = false
-            song.downloading = false
+            let localAsset = AVURLAsset(url: song.downloadUrl!)
+            
+            guard localAsset.isPlayable else {
+                song.downloaded = false
+                song.downloading = false
+                return AVPlayerItemId(song: song, order: order)
+            }
+            
+            return AVPlayerItemId(song: song, localAsset: localAsset, order: order)
         }
         //Fallback to streaming or cache if we reach here
         return AVPlayerItemId(song: song, order: order)

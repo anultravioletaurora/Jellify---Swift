@@ -29,9 +29,7 @@ class JellifyPlayer {
                 } else {
                      saplayer.queueRemoteAudio(withRemoteUrl: Builders.streamUrl(song: song), mediaInfo: lockScreenInfo)
                 }
-            })
-            
-            saplayer.skipForward()
+            })            
         }
     }
     

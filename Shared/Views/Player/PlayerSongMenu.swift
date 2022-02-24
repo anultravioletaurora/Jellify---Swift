@@ -35,7 +35,7 @@ struct PlayerSongMenu: View {
             
             if player.currentSong!.song.downloaded {
                 Button(action: {
-                    downloadManager.deleteSongDownload(song: player.currentSong!.song)
+                    downloadManager.delete(song: player.currentSong!.song)
                 }, label: {
                     Image(systemName: "trash.circle")
                     
