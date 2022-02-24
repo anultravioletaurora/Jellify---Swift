@@ -12,6 +12,9 @@ struct NowPlayingIndicator: View {
     @ObservedObject
     var player = Player.shared
     
+    @Environment(\.colorScheme)
+    var colorScheme
+    
     var body: some View {
                 
         ZStack {
@@ -19,7 +22,7 @@ struct NowPlayingIndicator: View {
             
             Image(systemName: "speaker.wave.3")
                 .font(.body)
-                .foregroundColor(.white)
+                .foregroundColor(colorScheme == .dark ? .black : .white)
         }
     }
 }

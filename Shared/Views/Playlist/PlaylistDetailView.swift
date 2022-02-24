@@ -19,6 +19,7 @@ struct PlaylistDetailView: View {
     }
     
     let networkingManager : NetworkingManager = NetworkingManager.shared
+    let downloadManager : DownloadManager = DownloadManager.shared
     
     @State
     var selectedSong: Song?
@@ -55,7 +56,35 @@ struct PlaylistDetailView: View {
                 
                 Spacer()
             }
+            .listRowSeparator(.hidden)
+            
+            HStack {
+                Spacer()
+                
+                if playlist.downloaded {
+                    Button(action: {
+                        downloadManager.delete(playlist: playlist)
+                    }, label: {
+                        Image(systemName: "arrow.down.circle.fill")
+                            .font(.largeTitle)
+                            .foregroundColor(.accentColor)
+                    })
+                        .buttonStyle(PlainButtonStyle())
+
+                } else {
+                    Button(action: {
+                        downloadManager.download(playlist: playlist)
+                    }, label: {
+                        Image(systemName: "arrow.down.circle")
+                            .font(.largeTitle)
+                    })
+                        .buttonStyle(PlainButtonStyle())
+                }
+                
+                Spacer()
+            }
             .padding(.bottom, 15)
+            
             
             ForEach(playlistSongs) { playlistSong in
                 

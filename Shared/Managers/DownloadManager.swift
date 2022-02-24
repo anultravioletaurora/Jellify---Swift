@@ -18,11 +18,31 @@ public class DownloadManager {
     static let shared: DownloadManager = DownloadManager()
     let networkingManager : NetworkingManager = NetworkingManager.shared
     
-    public func download(song: Song){
-         withAnimation{
-             song.downloading = true
-         }
-             print("Starting")
+    public func download(album: Album) -> Void {
+        
+        album.downloaded = true
+        networkingManager.saveContext()
+        
+        if let songs = album.songs?.allObjects as? [Song] {
+            songs.filter({ !$0.downloaded }).forEach({ song in
+                self.download(song: song)
+            })
+        }
+    }
+    
+    public func download(playlist: Playlist) -> Void {
+        
+        playlist.downloaded = true
+        networkingManager.saveContext()
+        
+        if let songs = playlist.songs?.allObjects as? [PlaylistSong] {
+            songs.map { $0.song }.filter { $0 != nil && !$0!.downloaded }.forEach({ song in
+                self.download(song: song!)
+            })
+        }
+    }
+    
+    public func download(song: Song) -> Void {
                 
         song.downloading = true
         
@@ -38,7 +58,7 @@ public class DownloadManager {
                 let soundURL = documentDirectory.appendingPathComponent("\(song.jellyfinId!).m4a")
                 
                 let audio = try! Data(contentsOf: audioUrl)
-                
+                                
                 try! audio.write(to: soundURL!)
                 
                 if soundURL!.isFileURL && AVURLAsset(url: soundURL!).isPlayable {
@@ -54,39 +74,45 @@ public class DownloadManager {
             .store(in: &networkingManager.cancellables)
     }
     
-    public func downloadSong(song: Song) {
-        let seshId = "\(Double.random(in: 0..<1496213367201))".replacingOccurrences(of: ".", with: "")
+    public func delete(album: Album) {
         
-        song.downloading = true
-        DispatchQueue.main.async {
-            try! self.networkingManager.context.save()
+        if let songs = album.songs?.allObjects as? [Song] {
+            songs.forEach({ song in
+                
+                // If this song is downloaded in a playlist elsewhere, we won't remove it
+                if let playlistSongs = song.playlists?.allObjects as? [PlaylistSong] {
+                    
+                    // Get all of the playlists this album's song is associated with
+                    let playlists : [Playlist] = playlistSongs.map({ $0.playlist! })
+                    
+                    // Find out if any of them are downloaded
+                    let downloadedPlaylists = playlists.filter({ $0.downloaded })
+                    
+                    if downloadedPlaylists.isEmpty {
+                        self.delete(song: song)
+                    }
+                }
+            })
         }
-
-        SAPlayer.Downloader.downloadAudio(withRemoteUrl: AVPlayerItemId.getStream(songId: song.jellyfinId!, sessionId: seshId), completion: { url, error in
-            
-            if error == nil {
-                song.downloadUrl = url
-                song.downloaded = true
-                song.downloading = false
-            } else {
-                song.downloaded = false
-                song.downloading = false
-            }
-            
-            DispatchQueue.main.async {
-                try! self.networkingManager.context.save()
-            }
-        })
+        
+        album.downloaded = false
+        networkingManager.saveContext()
     }
     
-    public func cancelSongDownload(song: Song) {
+    public func delete(playlist: Playlist) {
         
-        if let url = song.downloadUrl {
-            SAPlayer.Downloader.cancelDownload(withRemoteUrl: url)
-            
-            song.downloaded = false
-            song.downloading = false
+        if let songs = playlist.songs?.allObjects as? [PlaylistSong] {
+            songs.map { $0.song }.filter { $0 != nil && $0!.downloaded }.forEach({ song in
+                
+                // If this song's album is still downloaded, then we'll keep the track
+                if song!.album == nil || !song!.album!.downloaded {
+                    self.delete(song: song!)
+                }
+            })
         }
+        
+        playlist.downloaded = false
+        networkingManager.saveContext()
     }
     
     public func delete(song: Song) {
@@ -101,6 +127,5 @@ public class DownloadManager {
         
         song.downloading = false
         self.networkingManager.saveContext()
-
     }
 }

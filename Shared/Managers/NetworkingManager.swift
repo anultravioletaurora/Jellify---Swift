@@ -570,8 +570,17 @@ class NetworkingManager : ObservableObject {
     
     public func processDownloadQueue() -> Void {
         
+        self.retrievePlaylistsToDownload().forEach({ playlist in
+            (playlist.songs?.allObjects as! [PlaylistSong]).forEach({ playlistSong in
+                
+                if playlistSong.song!.downloadUrl == nil {
+                    DownloadManager.shared.download(song: playlistSong.song!)
+                }
+            })
+        })
+        
         self.retrieveSongsToDownload().forEach({ song in
-            DownloadManager.shared.downloadSong(song: song)
+            DownloadManager.shared.download(song: song)
         })
     }
 
@@ -1280,6 +1289,21 @@ class NetworkingManager : ObservableObject {
             return try self.privateContext.fetch(fetchRequest)
         } catch let error as NSError {
             print("Error retrieving all playlists from CoreData: \(error)")
+            
+            return []
+        }
+    }
+    
+    private func retrievePlaylistsToDownload() -> [Playlist] {
+        
+        let fetchRequest = Playlist.fetchRequest()
+        
+        fetchRequest.predicate = NSPredicate(format: "downloaded == true")
+        
+        do {
+            return try self.privateContext.fetch(fetchRequest)
+        } catch let error as NSError {
+            print("Error retrieving playlists queued to download from CoreData: \(error)")
             
             return []
         }

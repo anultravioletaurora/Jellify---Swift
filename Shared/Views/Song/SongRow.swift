@@ -92,6 +92,7 @@ struct SongRow: View {
                 }
             })
         })
+            .id(UUID())
         .padding(.horizontal, 10)
         .buttonStyle(PlainButtonStyle())
         .contextMenu {
@@ -128,34 +129,29 @@ struct SongRow: View {
                 }
             })
             
-            if song.downloaded {
-                Button(action: {
-                    downloadManager.delete(song: song)
-                }, label: {
-                    Image(systemName: "trash.circle")
-                    
-                    Text("Remove Download")
-                })
-            } else if song.downloading {
+            Button(action: {
                 
-                Button(action: {
-                    downloadManager.cancelSongDownload(song: song)
-                }, label: {
-                    Image(systemName: "xmark.circle")
-                    
-                    Text("Cancel Download")
-                })
-            } else {
-                Button(action: {
+                if song.downloaded {
+                    downloadManager.delete(song: song)
+                } else {
                     downloadManager.download(song: song)
-                }, label: {
+                }
+            }, label: {
+                
+                if song.downloaded {
+                    HStack {
+                        Image(systemName: "trash.circle")
+                        
+                        Text("Remove Download")
+                    }
+                } else {
                     HStack {
                         Image(systemName: "arrow.down.circle")
                         
                         Text("Download")
                     }
-                })
-            }
+                }
+            })
         }
     }
     

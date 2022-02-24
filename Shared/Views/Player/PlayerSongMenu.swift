@@ -54,7 +54,7 @@ struct PlayerSongMenu: View {
                 })
             } else {
                 Button(action: {
-                    downloadManager.downloadSong(song: player.currentSong!.song)
+                    downloadManager.download(song: player.currentSong!.song)
                 }, label: {
                     HStack {
                         Image(systemName: "arrow.down.circle")

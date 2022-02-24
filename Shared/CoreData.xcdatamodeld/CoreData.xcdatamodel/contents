@@ -3,6 +3,7 @@
     <entity name="Album" representedClassName="Album" syncable="YES" codeGenerationType="class">
         <attribute name="albumArtistName" optional="YES" attributeType="String"/>
         <attribute name="artwork" optional="YES" attributeType="Binary"/>
+        <attribute name="downloaded" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="jellyfinId" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
         <attribute name="productionYear" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
@@ -28,6 +29,7 @@
         <relationship name="albums" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Album" inverseName="genres" inverseEntity="Album"/>
     </entity>
     <entity name="Playlist" representedClassName="Playlist" syncable="YES" codeGenerationType="class">
+        <attribute name="downloaded" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES"/>
         <attribute name="jellyfinId" attributeType="String"/>
         <attribute name="name" attributeType="String"/>
         <attribute name="thumbnail" optional="YES" attributeType="Binary"/>
@@ -66,10 +68,10 @@
         <attribute name="playCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
     </entity>
     <elements>
-        <element name="Album" positionX="-250.671875" positionY="-102.76171875" width="128" height="179"/>
+        <element name="Album" positionX="-250.671875" positionY="-102.76171875" width="128" height="194"/>
         <element name="Artist" positionX="-453.94140625" positionY="-31.875" width="128" height="149"/>
         <element name="Genre" positionX="0" positionY="126" width="128" height="88"/>
-        <element name="Playlist" positionX="0" positionY="126" width="128" height="89"/>
+        <element name="Playlist" positionX="0" positionY="126" width="128" height="104"/>
         <element name="PlaylistSong" positionX="-252" positionY="27" width="128" height="89"/>
         <element name="Song" positionX="-437.8984375" positionY="131.203125" width="128" height="194"/>
         <element name="User" positionX="-243.81640625" positionY="156.03515625" width="128" height="133"/>

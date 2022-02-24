@@ -31,6 +31,8 @@ struct AlbumDetailView: View {
     var player : AVPlayer = AVPlayer()
         
     let networkingManager : NetworkingManager = NetworkingManager.shared
+    
+    let downloadManager : DownloadManager = DownloadManager.shared
             
     init(album: Album) {
         self.album = album
@@ -120,7 +122,34 @@ struct AlbumDetailView: View {
                         Spacer()
                     }
                 }
-                .padding(.bottom, 5)
+                .listRowSeparator(.hidden)
+
+                HStack {
+                    Spacer()
+                    
+                    if album.downloaded {
+                        Button(action: {
+                            downloadManager.delete(album: album)
+                        }, label: {
+                            Image(systemName: "arrow.down.circle.fill")
+                                .font(.largeTitle)
+                                .foregroundColor(.accentColor)
+                        })
+                            .buttonStyle(PlainButtonStyle())
+
+                    } else {
+                        Button(action: {
+                            downloadManager.download(album: album)
+                        }, label: {
+                            Image(systemName: "arrow.down.circle")
+                                .font(.largeTitle)
+                        })
+                            .buttonStyle(PlainButtonStyle())
+                    }
+                    
+                    Spacer()
+                }
+                .padding(.bottom, 15)
                 
                 ForEach(songs) { song in
                     SongRow(song: song, selectedSong: $selectedSong, songs: Array(songs), showPlaylistSheet: $showPlaylistSheet, type: .album)
