@@ -9,8 +9,6 @@ import Foundation
 import CoreData
 import SwiftUI
 import JellyfinAPI
-import SwiftAudioPlayer
-import HLSion
 import AVFoundation
 
 public class DownloadManager {
@@ -121,10 +119,36 @@ public class DownloadManager {
         let documentDirectory = urls[0] as NSURL
         let soundURL = documentDirectory.appendingPathComponent("\(song.jellyfinId!).m4a")
         
-        try! fileManager.removeItem(at: soundURL!)
+        do {
+            try fileManager.removeItem(at: soundURL!)
+        } catch {
+            print("Unable to delete song, marking as deleted")
+        }
+        
+        // Check if this song was the last one downloaded for an album or playlist, if it was,
+        // then we'll mark those as not downloaded
+        if let album = song.album {
+            if let albumSongs = album.songs?.allObjects as? [Song] {
+                
+                if albumSongs.filter({ $0 != song && $0.downloaded }).isEmpty {
+                    album.downloaded = false
+                }
+            }
+        }
+        
+        if let playlistSongs = song.playlists?.allObjects as? [PlaylistSong] {
+            playlistSongs.map({ $0.playlist }).forEach({ playlist in
+                
+                if let songs = playlist!.songs?.allObjects as? [PlaylistSong] {
+                    
+                    if songs.filter({ $0.song! != song && $0.song!.downloaded }).isEmpty {
+                        playlist?.downloaded = false
+                    }
+                }
+            })
+        }
         
         song.downloaded = false
-        
         song.downloading = false
         self.networkingManager.saveContext()
     }

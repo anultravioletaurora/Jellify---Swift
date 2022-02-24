@@ -11,7 +11,6 @@ import Combine
 import AVFoundation
 import MediaPlayer
 import JellyfinAPI
-import SwiftAudioPlayer
 
 open class AVPlayerItemId: AVPlayerItem, Identifiable{
     public let id = UUID().uuidString

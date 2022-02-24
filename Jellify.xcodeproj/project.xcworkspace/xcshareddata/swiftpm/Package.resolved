@@ -11,15 +11,6 @@
         }
       },
       {
-        "package": "HLSion",
-        "repositoryURL": "https://github.com/r-plus/HLSion",
-        "state": {
-          "branch": "master",
-          "revision": "60f3473454cb70aea300be5c769f4cf69eaeefce",
-          "version": null
-        }
-      },
-      {
         "package": "JellyfinAPI",
         "repositoryURL": "https://github.com/jellyfin/jellyfin-sdk-swift",
         "state": {
@@ -47,30 +38,12 @@
         }
       },
       {
-        "package": "SwiftAudioPlayer",
-        "repositoryURL": "https://github.com/tanhakabir/SwiftAudioPlayer",
-        "state": {
-          "branch": null,
-          "revision": "2fdfc62ce9f5d8b818ee1b2a9ac061fce4f64af9",
-          "version": "7.6.0"
-        }
-      },
-      {
         "package": "SwiftUIX",
         "repositoryURL": "https://github.com/SwiftUIX/SwiftUIX",
         "state": {
           "branch": "master",
           "revision": "05b3412d3cd67dff19329c87a8327971593dfd35",
           "version": null
-        }
-      },
-      {
-        "package": "SwimplyPlayIndicator",
-        "repositoryURL": "https://github.com/obrhoff/SwimplyPlayIndicator",
-        "state": {
-          "branch": null,
-          "revision": "d511ae7b95f456328a48182b62a0d58d5bc571a2",
-          "version": "1.1.0"
         }
       }
     ]

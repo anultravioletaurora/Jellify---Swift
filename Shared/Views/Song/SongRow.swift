@@ -30,7 +30,6 @@ struct SongRow: View {
                 if type == .album {
                     
                     if player.currentSong?.song == song {
-//                        SwimplyPlayIndicator(state: $player.audioState, count: 3, color: .accentColor, style: .legacy)
                         NowPlayingIndicator()
                             .padding(.horizontal, 10)
 

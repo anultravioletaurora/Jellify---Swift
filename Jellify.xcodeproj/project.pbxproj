@@ -31,7 +31,6 @@
 		0463E08727C65F2400D3957A /* NowPlayingIndicator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0463E08527C65F2400D3957A /* NowPlayingIndicator.swift */; };
 		047D147F27BD1B5B00EE1878 /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047D147E27BD1B5B00EE1878 /* Globals.swift */; };
 		047D148027BD1B5B00EE1878 /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 047D147E27BD1B5B00EE1878 /* Globals.swift */; };
-		047F493027BBF4920076B45E /* SwiftAudioPlayer in Frameworks */ = {isa = PBXBuildFile; productRef = 047F492F27BBF4920076B45E /* SwiftAudioPlayer */; };
 		04848BC82725A9FE0072A81E /* PlaylistItemThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04848BC72725A9FE0072A81E /* PlaylistItemThumbnail.swift */; };
 		04848BCA2725AA610072A81E /* ItemThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04848BC92725AA610072A81E /* ItemThumbnail.swift */; };
 		04848BCC2725AAFE0072A81E /* AlbumThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04848BCB2725AAFE0072A81E /* AlbumThumbnail.swift */; };
@@ -94,8 +93,6 @@
 		04DE4C2B27C17B4B00666E9C /* DownloadManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DE4C2927C17B4B00666E9C /* DownloadManager.swift */; };
 		04DE4C3327C1A4A100666E9C /* PlayerSongMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DE4C3227C1A4A100666E9C /* PlayerSongMenu.swift */; };
 		04DE4C3427C1A4A100666E9C /* PlayerSongMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DE4C3227C1A4A100666E9C /* PlayerSongMenu.swift */; };
-		04DE4C3C27C1C96600666E9C /* JellifyPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DE4C3B27C1C96600666E9C /* JellifyPlayer.swift */; };
-		04DE4C3D27C1C96600666E9C /* JellifyPlayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DE4C3B27C1C96600666E9C /* JellifyPlayer.swift */; };
 		04DE4C3F27C1CA7800666E9C /* Builders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04DE4C3E27C1CA7800666E9C /* Builders.swift */; };
 		04E1071A270CD307002CACB0 /* Tests_iOS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E10719270CD307002CACB0 /* Tests_iOS.swift */; };
 		04E1071C270CD307002CACB0 /* Tests_iOSLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E1071B270CD307002CACB0 /* Tests_iOSLaunchTests.swift */; };
@@ -127,11 +124,9 @@
 		04E2DE1D270E48D9007ABE38 /* TabBarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E2DE1B270E48D9007ABE38 /* TabBarView.swift */; };
 		04E2DE23270E4A48007ABE38 /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E2DE22270E4A48007ABE38 /* BlurView.swift */; };
 		04E2DE24270E4A48007ABE38 /* BlurView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E2DE22270E4A48007ABE38 /* BlurView.swift */; };
-		04E5332F27C5124900D83D66 /* SwimplyPlayIndicator in Frameworks */ = {isa = PBXBuildFile; productRef = 04E5332E27C5124900D83D66 /* SwimplyPlayIndicator */; };
 		04E5333127C515E300D83D66 /* PlaylistArtwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04E5333027C515E300D83D66 /* PlaylistArtwork.swift */; };
 		04EED65427C66DB400BBBEF2 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04EED65327C66DB400BBBEF2 /* Settings.swift */; };
 		04EED65527C66DB400BBBEF2 /* Settings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04EED65327C66DB400BBBEF2 /* Settings.swift */; };
-		04EED65827C7185800BBBEF2 /* HLSion in Frameworks */ = {isa = PBXBuildFile; productRef = 04EED65727C7185800BBBEF2 /* HLSion */; };
 		04FBD83727A631D400E780F3 /* PlaylistHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FBD83627A631D400E780F3 /* PlaylistHelper.swift */; };
 		04FBD83927A635F200E780F3 /* SongHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FBD83827A635F200E780F3 /* SongHelper.swift */; };
 		04FBD83B27A721A900E780F3 /* PlaylistThumbnail.swift in Sources */ = {isa = PBXBuildFile; fileRef = 04FBD83A27A721A900E780F3 /* PlaylistThumbnail.swift */; };
@@ -210,7 +205,6 @@
 		04DD579727C00D390030D25C /* AlbumsGalleryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlbumsGalleryView.swift; sourceTree = "<group>"; };
 		04DE4C2927C17B4B00666E9C /* DownloadManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DownloadManager.swift; sourceTree = "<group>"; };
 		04DE4C3227C1A4A100666E9C /* PlayerSongMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PlayerSongMenu.swift; sourceTree = "<group>"; };
-		04DE4C3B27C1C96600666E9C /* JellifyPlayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JellifyPlayer.swift; sourceTree = "<group>"; };
 		04DE4C3E27C1CA7800666E9C /* Builders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Builders.swift; sourceTree = "<group>"; };
 		04E10701270CD304002CACB0 /* JellifyApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JellifyApp.swift; sourceTree = "<group>"; };
 		04E10702270CD304002CACB0 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
@@ -252,10 +246,7 @@
 			files = (
 				041D3E79271DABF1002185CF /* JellyfinAPI in Frameworks */,
 				04FE474927BA815E00BDEDFF /* LNPopupUI-Static in Frameworks */,
-				04E5332F27C5124900D83D66 /* SwimplyPlayIndicator in Frameworks */,
 				040EFDD327C3BEE800D67B79 /* SwiftUIX in Frameworks */,
-				047F493027BBF4920076B45E /* SwiftAudioPlayer in Frameworks */,
-				04EED65827C7185800BBBEF2 /* HLSion in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -430,7 +421,6 @@
 				04CBCDDF27169CF9003E9BE9 /* PersistenceController.swift */,
 				0462B3BC27BBCFEE009066CD /* ArtistModel.swift */,
 				047D147E27BD1B5B00EE1878 /* Globals.swift */,
-				04DE4C3B27C1C96600666E9C /* JellifyPlayer.swift */,
 				04EED65327C66DB400BBBEF2 /* Settings.swift */,
 			);
 			path = Shared;
@@ -576,10 +566,7 @@
 			packageProductDependencies = (
 				041D3E78271DABF1002185CF /* JellyfinAPI */,
 				04FE474827BA815E00BDEDFF /* LNPopupUI-Static */,
-				047F492F27BBF4920076B45E /* SwiftAudioPlayer */,
 				040EFDD227C3BEE800D67B79 /* SwiftUIX */,
-				04E5332E27C5124900D83D66 /* SwimplyPlayIndicator */,
-				04EED65727C7185800BBBEF2 /* HLSion */,
 			);
 			productName = "FinTune (iOS)";
 			productReference = 04E10708270CD307002CACB0 /* Jellify.app */;
@@ -676,10 +663,7 @@
 			packageReferences = (
 				041D3E77271DABF1002185CF /* XCRemoteSwiftPackageReference "jellyfin-sdk-swift" */,
 				04FE474727BA815E00BDEDFF /* XCRemoteSwiftPackageReference "LNPopupUI" */,
-				047F492E27BBF4920076B45E /* XCRemoteSwiftPackageReference "SwiftAudioPlayer" */,
 				040EFDD127C3BEE800D67B79 /* XCRemoteSwiftPackageReference "SwiftUIX" */,
-				04E5332D27C5124900D83D66 /* XCRemoteSwiftPackageReference "SwimplyPlayIndicator" */,
-				04EED65627C7185800BBBEF2 /* XCRemoteSwiftPackageReference "HLSion" */,
 			);
 			productRefGroup = 04E10709270CD307002CACB0 /* Products */;
 			projectDirPath = "";
@@ -783,7 +767,6 @@
 				04FE474D27BAA05C00BDEDFF /* ScrubberBarView.swift in Sources */,
 				0442A25427B3F52900003F0C /* ImageExtensions.swift in Sources */,
 				04E2806E27B1B307009082B1 /* ArrayExtensions.swift in Sources */,
-				04DE4C3C27C1C96600666E9C /* JellifyPlayer.swift in Sources */,
 				04CBCDB927139AA1003E9BE9 /* UserDataResult.swift in Sources */,
 				04DD579527BE96B50030D25C /* SyncLibraryButton.swift in Sources */,
 				04CBCDE027169CF9003E9BE9 /* PersistenceController.swift in Sources */,
@@ -841,7 +824,6 @@
 				0442A25527B3F52900003F0C /* ImageExtensions.swift in Sources */,
 				04848BE527271D810072A81E /* ArtistRow.swift in Sources */,
 				04D4B5FD271232B90089CFC3 /* UserResponse.swift in Sources */,
-				04DE4C3D27C1C96600666E9C /* JellifyPlayer.swift in Sources */,
 				04CBCDD22715B700003E9BE9 /* Player.swift in Sources */,
 				04DD579627BE96B50030D25C /* SyncLibraryButton.swift in Sources */,
 				04CBCDB7271371C8003E9BE9 /* ResultSet.swift in Sources */,
@@ -1034,7 +1016,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.7;
+				MARKETING_VERSION = 0.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jackcaulifield.Jellify;
 				PRODUCT_NAME = Jellify;
 				SDKROOT = iphoneos;
@@ -1069,7 +1051,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.7;
+				MARKETING_VERSION = 0.8;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jackcaulifield.Jellify;
 				PRODUCT_NAME = Jellify;
 				SDKROOT = iphoneos;
@@ -1301,30 +1283,6 @@
 				kind = branch;
 			};
 		};
-		047F492E27BBF4920076B45E /* XCRemoteSwiftPackageReference "SwiftAudioPlayer" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/tanhakabir/SwiftAudioPlayer";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 7.0.0;
-			};
-		};
-		04E5332D27C5124900D83D66 /* XCRemoteSwiftPackageReference "SwimplyPlayIndicator" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/obrhoff/SwimplyPlayIndicator";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
-		04EED65627C7185800BBBEF2 /* XCRemoteSwiftPackageReference "HLSion" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/r-plus/HLSion";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 		04FE474727BA815E00BDEDFF /* XCRemoteSwiftPackageReference "LNPopupUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/LeoNatan/LNPopupUI";
@@ -1345,21 +1303,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 041D3E77271DABF1002185CF /* XCRemoteSwiftPackageReference "jellyfin-sdk-swift" */;
 			productName = JellyfinAPI;
-		};
-		047F492F27BBF4920076B45E /* SwiftAudioPlayer */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 047F492E27BBF4920076B45E /* XCRemoteSwiftPackageReference "SwiftAudioPlayer" */;
-			productName = SwiftAudioPlayer;
-		};
-		04E5332E27C5124900D83D66 /* SwimplyPlayIndicator */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 04E5332D27C5124900D83D66 /* XCRemoteSwiftPackageReference "SwimplyPlayIndicator" */;
-			productName = SwimplyPlayIndicator;
-		};
-		04EED65727C7185800BBBEF2 /* HLSion */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 04EED65627C7185800BBBEF2 /* XCRemoteSwiftPackageReference "HLSion" */;
-			productName = HLSion;
 		};
 		04FE474827BA815E00BDEDFF /* LNPopupUI-Static */ = {
 			isa = XCSwiftPackageProductDependency;

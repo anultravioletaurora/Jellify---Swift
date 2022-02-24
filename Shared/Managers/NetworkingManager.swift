@@ -10,7 +10,6 @@ import JellyfinAPI
 import CoreData
 import Combine
 import UIKit
-import SwiftAudioPlayer
 
 class NetworkingManager : ObservableObject {
     
