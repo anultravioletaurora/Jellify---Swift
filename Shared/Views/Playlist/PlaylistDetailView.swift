@@ -26,6 +26,9 @@ struct PlaylistDetailView: View {
     
     @State
     var showPlaylistSheet: Bool = false
+    
+    @State
+    var confirmDeleteDownload : Bool = false
 
     @EnvironmentObject
     var player : Player
@@ -63,13 +66,24 @@ struct PlaylistDetailView: View {
                 
                 if playlist.downloaded {
                     Button(action: {
-                        downloadManager.delete(playlist: playlist)
+                        confirmDeleteDownload = true
                     }, label: {
                         Image(systemName: "arrow.down.circle.fill")
                             .font(.largeTitle)
                             .foregroundColor(.accentColor)
                     })
                         .buttonStyle(PlainButtonStyle())
+                        .confirmationDialog("Remove from Downloads?", isPresented: $confirmDeleteDownload, titleVisibility: Visibility.visible) {
+                            Button("Remove", role: .destructive) {
+                                downloadManager.delete(playlist: playlist)
+                            }
+                            
+                            Button("Cancel", role: .cancel) {
+
+                            }
+                        } message: {
+                            Text("You won't be able to play this offline")
+                        }
 
                 } else {
                     Button(action: {

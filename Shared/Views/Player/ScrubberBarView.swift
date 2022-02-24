@@ -50,11 +50,5 @@ struct ScrubberBarView: View {
             }
         }
         .padding(.horizontal, 25)
-        .onAppear(perform: {
-            refreshRateHelper.preferredFrameRateRange(.init(minimum: 80, maximum: 120, __preferred: 120))
-        })
-        .onDisappear(perform: {
-            refreshRateHelper.preferredFrameRateRange(.default)
-        })
     }
 }

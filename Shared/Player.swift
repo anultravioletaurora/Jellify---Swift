@@ -209,9 +209,7 @@ class Player: ObservableObject {
         didSet {
             if isPlaying {
                 setupBackgroundPlay()
-            }
-            
-            if isPlaying {
+
                 player?.play()
                 
                 var dto = PlaybackStartInfo()
@@ -294,7 +292,7 @@ class Player: ObservableObject {
     
     public var player: AVQueuePlayer?
     private var timeTimer: Timer?
-//    @Published public var animationTimer = Timer.publish(every: 9, on: .main, in: .common).autoconnect()
+    @Published public var animationTimer = Timer.publish(every: 9, on: .main, in: .common).autoconnect()
     init() {
         let nc = NotificationCenter.default
         nc.addObserver(forName: .AVPlayerItemDidPlayToEndTime,
@@ -638,7 +636,7 @@ class Player: ObservableObject {
                 timeTimer?.invalidate()
                 timeTimer = nil
             }
-            timeTimer = Timer.scheduledTimer(withTimeInterval: 0.1,
+            timeTimer = Timer.scheduledTimer(withTimeInterval: Globals.playProgressRefresh,
                                              repeats: true,
                                              block:
                 { [weak self] timer in

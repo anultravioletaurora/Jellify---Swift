@@ -31,9 +31,12 @@ struct AlbumDetailView: View {
     var player : AVPlayer = AVPlayer()
         
     let networkingManager : NetworkingManager = NetworkingManager.shared
+        
+    @State
+    var confirmDeleteDownload : Bool = false
     
     let downloadManager : DownloadManager = DownloadManager.shared
-            
+
     init(album: Album) {
         self.album = album
         
@@ -129,13 +132,24 @@ struct AlbumDetailView: View {
                     
                     if album.downloaded {
                         Button(action: {
-                            downloadManager.delete(album: album)
+                            confirmDeleteDownload = true
                         }, label: {
                             Image(systemName: "arrow.down.circle.fill")
                                 .font(.largeTitle)
                                 .foregroundColor(.accentColor)
                         })
                             .buttonStyle(PlainButtonStyle())
+                            .confirmationDialog("Remove from Downloads?", isPresented: $confirmDeleteDownload, titleVisibility: Visibility.visible) {
+                                Button("Remove", role: .destructive) {
+                                    downloadManager.delete(album: album)
+                                }
+                                
+                                Button("Cancel", role: .cancel) {
+
+                                }
+                            } message: {
+                                Text("You won't be able to play this offline")
+                            }
 
                     } else {
                         Button(action: {

@@ -54,7 +54,7 @@ struct PlaylistsView: View {
                     Button(action: {
                         networkingManager.deletePlaylist(playlist: playlist)
                     }) {
-                        Image(systemName: "trash")
+                        Text("Delete")
                     }
                     .tint(.red)
                 }
