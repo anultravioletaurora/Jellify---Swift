@@ -102,7 +102,7 @@ struct AlbumDetailView: View {
                         
                         Text(album.name ?? "Unknown Album")
                         .font(.title3)
-                        .semibold()
+                        .bold()
                         
                         Spacer()
                     }

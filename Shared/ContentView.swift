@@ -20,6 +20,13 @@ struct ContentView: View {
     
     @EnvironmentObject
     var settings : Settings
+    
+    @State
+    var miniplayerPresented = true
+    
+    @State
+    var miniplayerExpanded = false
+
         
     init() {
         
@@ -29,8 +36,6 @@ struct ContentView: View {
     }
 
     var body: some View {
-        
-        
         
         // Prompt the user to login if they haven't already
         // TODO: Fix this
@@ -64,6 +69,12 @@ struct ContentView: View {
                 }
             })
             .transition(.opacity)
+            .popup(isBarPresented: $miniplayerPresented, isPopupOpen: $miniplayerExpanded, popupContent: {
+                NowPlayingView(miniplayerExpanded: $miniplayerExpanded)
+            })
+            .popupBarProgressViewStyle(.top)
+            .popupBarMarqueeScrollEnabled(true)
+            .popupInteractionStyle(.drag)
         }
     }
 }

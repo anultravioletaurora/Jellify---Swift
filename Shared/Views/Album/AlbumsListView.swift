@@ -9,10 +9,7 @@ import SwiftUI
 import CoreData
 
 struct AlbumsListView: View {
-    
-    @Environment(\.managedObjectContext)
-    var managedObjectContext
-        
+            
     var fetchRequest: FetchRequest<Album>
     
     var albums: FetchedResults<Album>{

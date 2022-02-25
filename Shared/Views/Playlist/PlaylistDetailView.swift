@@ -55,7 +55,7 @@ struct PlaylistDetailView: View {
                 
                 Text(playlist.name ?? "Unknown Playlist")
                     .font(.title3)
-                    .semibold()
+                    .bold()
                 
                 Spacer()
             }

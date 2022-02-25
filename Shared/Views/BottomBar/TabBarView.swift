@@ -7,28 +7,17 @@
 
 import SwiftUI
 import LNPopupUI
-import SwiftUIX
 
 struct TabBarView: View {
                     
     @State
     var selectedTab : Int = 1
-    
-    @State
-    var miniplayerPresented = true {
-        didSet {
-            if miniplayerPresented {
-                Keyboard.dismiss()
-            }
-        }
-    }
-    
-    @State
-    var miniplayerExpanded = false
-                
+                    
     var body: some View {
         
-        TabView(selection: $selectedTab) {
+        print(Self._printChanges())
+
+        return TabView(selection: $selectedTab) {
             
             // Artists Tab
             ArtistsView()
@@ -66,11 +55,5 @@ struct TabBarView: View {
                     Label("Settings", systemImage: "gear")
                 }
         }
-        .popup(isBarPresented: $miniplayerPresented, isPopupOpen: $miniplayerExpanded, popupContent: {
-            NowPlayingView(miniplayerExpanded: $miniplayerExpanded)
-        })
-        .popupBarProgressViewStyle(.top)
-        .popupBarMarqueeScrollEnabled(true)
-        .popupInteractionStyle(.drag)
     }
 }
