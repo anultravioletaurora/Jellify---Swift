@@ -58,27 +58,38 @@ struct ScrubberBarView: View {
                                              repeats: true,
                                              block: { timer in
 
-                if let queuePlayer = player.player {
-                
-                    let duration = queuePlayer.currentItem!.duration.seconds
+                // Only perform progress updates if we aren't seeking
+                if !player.seeking {
                     
-                    guard !duration.isNaN else {
-                        return
-                    }
+                    // Use the AVQueuePlayer from the Player, as using published properties on the
+                    // player itself causing graphics hitching when dismissing the nowplayingview
+                    if let queuePlayer = player.player {
+                    
+                        let duration = queuePlayer.currentItem!.duration.seconds
+                        
+                        // If the duration isn't a number, we need to pump the brakes otherwise we'll crash
+                        guard !duration.isNaN else {
+                            return
+                        }
 
-                    self.progress = queuePlayer.currentTime().seconds / duration
-                                        
-                    let playItemPosition = Int(queuePlayer.currentTime().seconds)
-                    let playTimeSeconds = Int(playItemPosition % 3600) % 60
-                    let playTimeMinutes = Int(playItemPosition % 3600) / 60
-                    let timeElapsedString = "\(playTimeMinutes):\(String(format: "%02d", playTimeSeconds))"
-                    self.timeElapsed = timeElapsedString
-                    
-                    let remainingTimeSecs = Int(duration) - playItemPosition
-                    let remainingTimeSeconds = Int(remainingTimeSecs % 3600) % 60
-                    let remainingTimeMinutes = Int(remainingTimeSecs % 3600) / 60
-                    let remainingTimeString = "-\(remainingTimeMinutes):\(String(format: "%02d", remainingTimeSeconds))"
-                    self.timeRemaining = remainingTimeString
+                        self.progress = queuePlayer.currentTime().seconds / duration
+                                            
+                        let playItemPosition = Int(queuePlayer.currentTime().seconds)
+                        let playTimeSeconds = Int(playItemPosition % 3600) % 60
+                        let playTimeMinutes = Int(playItemPosition % 3600) / 60
+                        let timeElapsedString = "\(playTimeMinutes):\(String(format: "%02d", playTimeSeconds))"
+                        self.timeElapsed = timeElapsedString
+                        
+                        let remainingTimeSecs = Int(duration) - playItemPosition
+                        let remainingTimeSeconds = Int(remainingTimeSecs % 3600) % 60
+                        let remainingTimeMinutes = Int(remainingTimeSecs % 3600) / 60
+                        let remainingTimeString = "-\(remainingTimeMinutes):\(String(format: "%02d", remainingTimeSeconds))"
+                        self.timeRemaining = remainingTimeString
+                        
+                        // Refresh the player's state, which will in turn update the NowPlayingMenu at the system
+                        // level
+                        player.refreshPlayingInfo()
+                    }
                 }
             })
 

@@ -273,9 +273,9 @@ class Player: ObservableObject {
     public var repeatMode = RepeatMode.none
 //    @Published
     public var duration = "0:00"
-    @Published
+//    @Published
     public var timeElasped = "0:00"
-    @Published
+//    @Published
     public var timeRemaining = "0:00"
 //    @Published
     public var playProgress: Float = 0
@@ -675,9 +675,8 @@ class Player: ObservableObject {
         }
     }
     
-    private func refreshPlayingInfo() {
+    public func refreshPlayingInfo() {
         
-        queue.sync {
             
             if !seeking {
            
@@ -718,7 +717,6 @@ class Player: ObservableObject {
                         MPNowPlayingInfoCenter.default().nowPlayingInfo = infos
                     }
                 }
-            }
         }
     }
     
