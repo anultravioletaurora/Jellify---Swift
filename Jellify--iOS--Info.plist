@@ -15,10 +15,10 @@
 			<key>CPTemplateApplicationSceneSessionRoleApplication</key>
 			<array>
 				<dict>
-					<key>UISceneConfigurationName</key>
-					<string>Jellify-Car</string>
 					<key>UISceneClassName</key>
 					<string>CPTemplateApplicationScene</string>
+					<key>UISceneConfigurationName</key>
+					<string>Jellify-Car</string>
 					<key>UISceneDelegateClassName</key>
 					<string>Jellify.CarPlaySceneDelegate</string>
 				</dict>

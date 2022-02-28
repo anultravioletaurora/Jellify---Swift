@@ -750,13 +750,15 @@ class NetworkingManager : ObservableObject {
                         
                         print("Album \(index) of \(response.items!.count)")
                         
-                        var album : Album? = self.privateContext.object(with: self.retrieveAlbumFromCore(albumId: albumResult.id!)!) as? Album
+                        var album : Album?
                         
                         if (self.retrieveAlbumFromCore(albumId: albumResult.id!) == nil) {
                             
                             album = Album(context: privateContext)
                             
                             album!.jellyfinId = albumResult.id!
+                        } else {
+                            album = self.privateContext.object(with: self.retrieveAlbumFromCore(albumId: albumResult.id!)!) as? Album
                         }
                         
                         album!.name = albumResult.name!
@@ -885,6 +887,8 @@ class NetworkingManager : ObservableObject {
                                     song.sortName = songResult.sortName ?? songResult.name!
                                     song.container = songResult.mediaSources![0].container
                                     song.favorite = songResult.userData?.isFavorite ?? false
+                                    
+                                    try! privateContext.save()
                                 }
                                 
                                 // Check if we've gone through everything the server has to offer
@@ -1457,11 +1461,17 @@ class NetworkingManager : ObservableObject {
         }
     }
     
-    private func retrieveAllPlaylistsFromCore() -> [Playlist] {
+    public func retrieveAllPlaylistsFromCore() -> [Playlist] {
         let fetchRequest = Playlist.fetchRequest()
         
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Playlist.sortName), ascending: true)]
+        
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        
+        privateContext.parent = self.context
+        
         do {
-            return try self.privateContext.fetch(fetchRequest)
+            return try privateContext.fetch(fetchRequest)
         } catch let error as NSError {
             print("Error retrieving all playlists from CoreData: \(error)")
             
@@ -1516,10 +1526,10 @@ class NetworkingManager : ObservableObject {
         }
     }
     
-    private func retrievePlaylistSongsFromCore(playlistId: String) -> [NSManagedObjectID]? {
+    public func retrievePlaylistSongsFromCore(playlistId: String) -> [NSManagedObjectID]? {
         let fetchRequest = PlaylistSong.fetchRequest()
         
-        fetchRequest.predicate = NSPredicate(format: "playlist == %@", playlistId)
+        fetchRequest.predicate = NSPredicate(format: "playlist.jellyfinId == %@", playlistId)
         
         do {
             return try self.context.fetch(fetchRequest).map({ $0.objectID })
