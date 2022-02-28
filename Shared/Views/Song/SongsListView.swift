@@ -43,8 +43,8 @@ struct SongsListView: View {
                         
         let request = NSFetchRequest<Song>(entityName: "Song")
         
-        request.sortDescriptors = [NSSortDescriptor(key: #keyPath(Song.name), ascending: true, selector:
-                                                    #selector(NSString.caseInsensitiveCompare))]
+        request.sortDescriptors = [NSSortDescriptor(key: #keyPath(Song.sortName), ascending: true, selector:
+                                                        #selector(NSString.caseInsensitiveCompare))]
                 
         request.fetchLimit = limit.wrappedValue
         
@@ -89,8 +89,18 @@ struct SongsListView: View {
                 songs.nsPredicate = nil
                 return
             }
+            
+            var searches = [searchBar.search.trimmingCharacters(in: .whitespaces)]
+            
+            if searchBar.search.contains("and") {
+                searches.append(searchBar.search.replacingOccurrences(of: "and", with: "&").trimmingCharacters(in: .whitespaces))
+            }
+            
+            let predicates = searches.map { search in
+                NSPredicate(format: "%K beginswith[c] %@", #keyPath(Song.name), search)
+            }
                     
-            songs.nsPredicate = searchBar.search.isEmpty ? nil : NSPredicate(format: "%K beginswith[c] %@", #keyPath(Song.name), searchBar.search.trimmingCharacters(in: .whitespaces))
+            songs.nsPredicate = searchBar.search.isEmpty ? nil : NSCompoundPredicate(orPredicateWithSubpredicates: predicates)
             
         }
         .listStyle(PlainListStyle())

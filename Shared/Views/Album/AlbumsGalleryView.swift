@@ -30,7 +30,7 @@ struct AlbumsGalleryView: View {
         
         let request = NSFetchRequest<Album>(entityName: "Album")
         
-        request.sortDescriptors = [NSSortDescriptor(key: #keyPath(Album.name), ascending: true, selector: #selector(NSString.caseInsensitiveCompare))]
+        request.sortDescriptors = [NSSortDescriptor(key: #keyPath(Album.sortName), ascending: true, selector: #selector(NSString.caseInsensitiveCompare))]
         
         request.fetchLimit = limit.wrappedValue
         
@@ -70,7 +70,18 @@ struct AlbumsGalleryView: View {
                 albums.nsPredicate = nil
                 return
             }
-            albums.nsPredicate = searchBar.search.isEmpty ? nil : NSPredicate(format: "%K beginswith[c] %@", #keyPath(Album.name), searchBar.search.trimmingCharacters(in: .whitespaces))
+            
+            var searches = [searchBar.search.trimmingCharacters(in: .whitespaces)]
+            
+            if searchBar.search.contains("and") {
+                searches.append(searchBar.search.replacingOccurrences(of: "and", with: "&").trimmingCharacters(in: .whitespaces))
+            }
+            
+            let predicates = searches.map { search in
+                NSPredicate(format: "%K beginswith[c] %@", #keyPath(Album.name), search)
+            }
+            
+            albums.nsPredicate = searchBar.search.isEmpty ? nil : NSCompoundPredicate(orPredicateWithSubpredicates: predicates)
         }
     }
 }

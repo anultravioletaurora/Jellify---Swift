@@ -39,7 +39,17 @@ struct ArtistsListView: View {
                 return
             }
             
-            artists.nsPredicate = searchBar.search.isEmpty ? nil : NSPredicate(format: "%K beginswith[c] %@", #keyPath(Artist.name), searchBar.search.trimmingCharacters(in: .whitespaces))
+            var searches = [searchBar.search.trimmingCharacters(in: .whitespaces)]
+            
+            if searchBar.search.contains("and") {
+                searches.append(searchBar.search.replacingOccurrences(of: "and", with: "&").trimmingCharacters(in: .whitespaces))
+            }
+            
+            let predicates = searches.map { search in
+                NSPredicate(format: "%K beginswith[c] %@", #keyPath(Artist.name), search)
+            }
+            
+            artists.nsPredicate = searchBar.search.isEmpty ? nil : NSCompoundPredicate(orPredicateWithSubpredicates: predicates)
         }
         .listStyle(PlainListStyle())
     }

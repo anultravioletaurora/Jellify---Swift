@@ -25,7 +25,7 @@ class Builders {
             if artists.count == 0 {
                 
                 if let album = song!.album {
-                    return album.albumArtistName!
+                    return album.albumArtistName ?? ""
                 } else {
                     return ""
                 }

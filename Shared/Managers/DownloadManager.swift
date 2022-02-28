@@ -22,9 +22,8 @@ public class DownloadManager {
         networkingManager.saveContext()
         
         if let songs = album.songs?.allObjects as? [Song] {
-            songs.filter({ !$0.downloaded }).forEach({ song in
-                self.download(song: song)
-            })
+            
+            self.download(songs: songs.filter({ !$0.downloaded }))
         }
     }
     
@@ -34,9 +33,8 @@ public class DownloadManager {
         networkingManager.saveContext()
         
         if let songs = playlist.songs?.allObjects as? [PlaylistSong] {
-            songs.map { $0.song }.filter { $0 != nil && !$0!.downloaded }.forEach({ song in
-                self.download(song: song!)
-            })
+            
+            self.download(songs: songs.map { $0.song! }.filter { $0 != nil && !$0!.downloaded })
         }
     }
     
@@ -46,23 +44,24 @@ public class DownloadManager {
         
         LibraryAPI.getDownload(itemId: song.jellyfinId!)
             .sink(receiveCompletion: { completion in
-                
-                
             }, receiveValue: { audioUrl in
                 
                 let fileManager = FileManager.default
                 let urls = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
                 let documentDirectory = urls[0] as NSURL
-                let soundURL = documentDirectory.appendingPathComponent("\(song.jellyfinId!).m4a")
+                let soundURL = documentDirectory.appendingPathComponent("\(song.jellyfinId!).\(song.container ?? "aac")")
                 
                 let audio = try! Data(contentsOf: audioUrl)
-                                
+                                                
                 try! audio.write(to: soundURL!)
                 
                 if soundURL!.isFileURL && AVURLAsset(url: soundURL!).isPlayable {
+                    print("Song downloaded successfully")
                     song.downloadUrl = soundURL
                     song.downloaded = true
                 } else {
+                    print("URL \(soundURL!.isFileURL ? "is" : "isn't") a file")
+                    print("URL \(AVURLAsset(url: soundURL!).isPlayable ? "is" : "isn't") playable")
                     song.downloaded = false
                 }
                 
@@ -70,6 +69,50 @@ public class DownloadManager {
                 self.networkingManager.saveContext()
             })
             .store(in: &networkingManager.cancellables)
+    }
+    
+    public func download(songs: [Song]) -> Void {
+        
+        guard !songs.isEmpty else {
+            return
+        }
+        
+        let firstSong = songs.first!
+        
+        firstSong.downloading = true
+        
+        LibraryAPI.getDownload(itemId: firstSong.jellyfinId!)
+            .sink(receiveCompletion: { completion in
+            }, receiveValue: { audioUrl in
+                
+                let fileManager = FileManager.default
+                let urls = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
+                let documentDirectory = urls[0] as NSURL
+                let soundURL = documentDirectory.appendingPathComponent("\(firstSong.jellyfinId!).\(firstSong.container ?? "aac")")
+                
+                let audio = try! Data(contentsOf: audioUrl)
+                                
+                try! audio.write(to: soundURL!)
+                
+                
+                
+                if soundURL!.isFileURL && AVURLAsset(url: soundURL!).isPlayable {
+                    print("Song downloaded successfully")
+                    firstSong.downloadUrl = soundURL
+                    firstSong.downloaded = true
+                } else {
+                    print("URL \(soundURL!.isFileURL ? "is" : "isn't") a file")
+                    print("URL \(AVURLAsset(url: soundURL!).isPlayable ? "is" : "isn't") playable")
+                    firstSong.downloaded = false
+                }
+                
+                firstSong.downloading = false
+                
+                self.download(songs: Array(songs.dropFirst()))
+                self.networkingManager.saveContext()
+            })
+            .store(in: &networkingManager.cancellables)
+
     }
     
     public func delete(album: Album) {
@@ -117,7 +160,7 @@ public class DownloadManager {
         let fileManager = FileManager.default
         let urls = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
         let documentDirectory = urls[0] as NSURL
-        let soundURL = documentDirectory.appendingPathComponent("\(song.jellyfinId!).m4a")
+        let soundURL = documentDirectory.appendingPathComponent("\(song.jellyfinId!).\(song.container ?? "aac")")
         
         do {
             try fileManager.removeItem(at: soundURL!)

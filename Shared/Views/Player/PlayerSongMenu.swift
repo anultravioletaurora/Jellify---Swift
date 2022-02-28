@@ -14,6 +14,8 @@ struct PlayerSongMenu: View {
 
     var downloadManager = DownloadManager.shared
     
+    var networkingManager = NetworkingManager.shared
+    
     @Binding
     var showPlaylistSheet: Bool
     
@@ -22,17 +24,7 @@ struct PlayerSongMenu: View {
     
     var body: some View {
         Menu(content: {
-            Button(action: {
-                
-                selectedSong = player.currentSong!.song
-                
-                showPlaylistSheet.toggle()
-            }, label: {
-                Image(systemName: "text.badge.plus")
-                
-                Text("Add to Playlist")
-            })
-            
+
             if player.currentSong!.song.downloaded {
                 Button(action: {
                     downloadManager.delete(song: player.currentSong!.song)
@@ -63,6 +55,43 @@ struct PlayerSongMenu: View {
                     }
                 })
             }
+            
+            Button(action: {
+                
+                selectedSong = player.currentSong!.song
+                
+                showPlaylistSheet.toggle()
+            }, label: {
+                Image(systemName: "text.badge.plus")
+                
+                Text("Add to Playlist")
+            })
+            
+            Button(action: {
+                if player.currentSong!.song.favorite {
+                    networkingManager.unfavorite(jellyfinId: player.currentSong!.song.jellyfinId!, originalValue: player.currentSong!.song.favorite, complete: { result in
+                        player.currentSong!.song.favorite = result
+                    })
+                } else {
+                    networkingManager.favoriteItem(jellyfinId: player.currentSong!.song.jellyfinId!, originalValue: player.currentSong!.song.favorite, complete: { result in
+                        player.currentSong!.song.favorite = result
+                    })
+                }
+            }, label: {
+                if player.currentSong!.song.favorite {
+                                        
+                    Image(systemName: "heart.fill")
+                        .foregroundColor(.accentColor)
+                        .font(.largeTitle)
+                    
+                    Text("Favorited")
+                } else {
+                    Image(systemName: "heart")
+                        .font(.largeTitle)
+                    
+                    Text("Favorite")
+                }
+            })
 
         }, label: {
             Image(systemName: "ellipsis.circle")

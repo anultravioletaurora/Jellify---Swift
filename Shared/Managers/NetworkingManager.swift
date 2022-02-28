@@ -336,6 +336,26 @@ class NetworkingManager : ObservableObject {
         }
     }
     
+    public func favoriteItem(jellyfinId: String, originalValue: Bool?, complete: @escaping (Bool) -> Void) -> Void {
+        UserLibraryAPI.markFavoriteItem(userId: self.userId, itemId: jellyfinId)
+            .sink(receiveCompletion: { complete in
+                print("Favorite item: \(complete)")
+            }, receiveValue: { response in
+                complete(response.isFavorite ?? originalValue ?? false)
+            })
+            .store(in: &self.cancellables)
+    }
+    
+    public func unfavorite(jellyfinId: String, originalValue: Bool?, complete: @escaping (Bool) -> Void) -> Void {
+        UserLibraryAPI.unmarkFavoriteItem(userId: self.userId, itemId: jellyfinId)
+            .sink(receiveCompletion: { complete in
+                print("Unfavorite item: \(complete)")
+            }, receiveValue: { response in
+                complete(response.isFavorite ?? originalValue ?? false)
+            })
+            .store(in: &self.cancellables)
+    }
+    
     public func moveInPlaylist(playlist: Playlist, indexSet: IndexSet, newIndex: Int) {
     
         let oldIndex = indexSet.first!
@@ -668,13 +688,16 @@ class NetworkingManager : ObservableObject {
                             }
                                 // Check if artist already exists in store
                             if artist == nil {
-                                let artist = Artist(context: self.privateContext)
+                                artist = Artist(context: self.privateContext)
                                 
-                                artist.jellyfinId = artistResult.id!
-                                artist.name = artistResult.name ?? "Unknown Artist"
-                                artist.dateCreated = artistResult.dateCreated?.formatted() ?? ""
-                                artist.overview = artistResult.overview
+                                artist!.jellyfinId = artistResult.id!
                             }
+                            
+                            artist!.name = artistResult.name ?? "Unknown Artist"
+                            artist!.dateCreated = artistResult.dateCreated?.formatted() ?? ""
+                            artist!.overview = artistResult.overview
+                            artist!.sortName = artistResult.sortName ?? artistResult.name!
+                            artist!.favorite = artistResult.userData?.isFavorite ?? artist?.favorite ?? false
                         })
                     }
                 }
@@ -684,7 +707,7 @@ class NetworkingManager : ObservableObject {
     }
     
     private func loadAlbums(complete: @escaping () -> Void) -> Void {
-        ItemsAPI.getItemsByUserId(userId: self.userId, maxOfficialRating: nil, hasThemeSong: nil, hasThemeVideo: nil, hasSubtitles: nil, hasSpecialFeature: nil, hasTrailer: nil, adjacentTo: nil, parentIndexNumber: nil, hasParentalRating: nil, isHd: nil, is4K: nil, locationTypes: nil, excludeLocationTypes: nil, isMissing: nil, isUnaired: nil, minCommunityRating: nil, minCriticRating: nil, minPremiereDate: nil, minDateLastSaved: nil, minDateLastSavedForUser: nil, maxPremiereDate: nil, hasOverview: nil, hasImdbId: nil, hasTmdbId: nil, hasTvdbId: nil, excludeItemIds: nil, startIndex: nil, limit: nil, recursive: true, searchTerm: nil, sortOrder: nil, parentId: nil, fields: nil, excludeItemTypes: nil, includeItemTypes: ["MusicAlbum"], filters: nil, isFavorite: nil, mediaTypes: nil, imageTypes: nil, sortBy: nil, isPlayed: nil, genres: nil, officialRatings: nil, tags: nil, years: nil, enableUserData: true, imageTypeLimit: nil, enableImageTypes: nil, person: nil, personIds: nil, personTypes: nil, studios: nil, artists: nil, excludeArtistIds: nil, artistIds: nil, albumArtistIds: nil, contributingArtistIds: nil, albums: nil, albumIds: nil, ids: nil, videoTypes: nil, minOfficialRating: nil, isLocked: nil, isPlaceHolder: nil, hasOfficialRating: nil, collapseBoxSetItems: nil, minWidth: nil, minHeight: nil, maxWidth: nil, maxHeight: nil, is3D: nil, seriesStatus: nil, nameStartsWithOrGreater: nil, nameStartsWith: nil, nameLessThan: nil, studioIds: nil, genreIds: nil, enableTotalRecordCount: nil, enableImages: nil, apiResponseQueue: processingQueue)
+        ItemsAPI.getItemsByUserId(userId: self.userId, maxOfficialRating: nil, hasThemeSong: nil, hasThemeVideo: nil, hasSubtitles: nil, hasSpecialFeature: nil, hasTrailer: nil, adjacentTo: nil, parentIndexNumber: nil, hasParentalRating: nil, isHd: nil, is4K: nil, locationTypes: nil, excludeLocationTypes: nil, isMissing: nil, isUnaired: nil, minCommunityRating: nil, minCriticRating: nil, minPremiereDate: nil, minDateLastSaved: nil, minDateLastSavedForUser: nil, maxPremiereDate: nil, hasOverview: nil, hasImdbId: nil, hasTmdbId: nil, hasTvdbId: nil, excludeItemIds: nil, startIndex: nil, limit: nil, recursive: true, searchTerm: nil, sortOrder: nil, parentId: nil, fields: [ItemFields.sortName], excludeItemTypes: nil, includeItemTypes: ["MusicAlbum"], filters: nil, isFavorite: nil, mediaTypes: nil, imageTypes: nil, sortBy: nil, isPlayed: nil, genres: nil, officialRatings: nil, tags: nil, years: nil, enableUserData: true, imageTypeLimit: nil, enableImageTypes: nil, person: nil, personIds: nil, personTypes: nil, studios: nil, artists: nil, excludeArtistIds: nil, artistIds: nil, albumArtistIds: nil, contributingArtistIds: nil, albums: nil, albumIds: nil, ids: nil, videoTypes: nil, minOfficialRating: nil, isLocked: nil, isPlaceHolder: nil, hasOfficialRating: nil, collapseBoxSetItems: nil, minWidth: nil, minHeight: nil, maxWidth: nil, maxHeight: nil, is3D: nil, seriesStatus: nil, nameStartsWithOrGreater: nil, nameStartsWith: nil, nameLessThan: nil, studioIds: nil, genreIds: nil, enableTotalRecordCount: nil, enableImages: nil, apiResponseQueue: processingQueue)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished :
@@ -703,7 +726,7 @@ class NetworkingManager : ObservableObject {
             }, receiveValue: { response in
                 if response.items != nil {
                     
-                    var albumIds = response.items!.map { $0.id! }
+                    let albumIds = response.items!.map { $0.id! }
                     
                     self.deleteMissingAlbums(retrievedAlbumIds: albumIds)
                     
@@ -727,30 +750,37 @@ class NetworkingManager : ObservableObject {
                         
                         print("Album \(index) of \(response.items!.count)")
                         
+                        var album : Album? = self.privateContext.object(with: self.retrieveAlbumFromCore(albumId: albumResult.id!)!) as? Album
+                        
                         if (self.retrieveAlbumFromCore(albumId: albumResult.id!) == nil) {
                             
-                            let album = Album(context: privateContext)
+                            album = Album(context: privateContext)
                             
-                            album.jellyfinId = albumResult.id!
-                            album.name = albumResult.name!
-                            album.productionYear = Int16(albumResult.productionYear ?? 0)
+                            album!.jellyfinId = albumResult.id!
+                        }
+                        
+                        album!.name = albumResult.name!
+                        album!.sortName = albumResult.sortName ?? albumResult.name!
+                        album!.productionYear = Int16(albumResult.productionYear ?? 0)
+                        album!.favorite = albumResult.userData?.isFavorite ?? album?.favorite ?? false
+                        
+                        // Run Time?
+                        
+                        var artist : Artist? = nil
+                        
+                        if (albumResult.albumArtist != nil) {
                             
-                            var artist : Artist? = nil
-                            
-                            if (albumResult.albumArtist != nil) {
-                                
-                                if (self.retrieveArtistFromCore(artistName: albumResult.albumArtist!) != nil) {
-                                    artist = privateContext.object(with: self.retrieveArtistFromCore(artistName: albumResult.albumArtist!)!) as! Artist?
-                                }
+                            if (self.retrieveArtistFromCore(artistName: albumResult.albumArtist!) != nil) {
+                                artist = privateContext.object(with: self.retrieveArtistFromCore(artistName: albumResult.albumArtist!)!) as! Artist?
                             }
+                        }
+                        
+                        if (artist != nil) {
+                            album!.albumArtistName = artist!.name!
                             
-                            if (artist != nil) {
-                                album.albumArtistName = artist!.name!
-                                
-                                self.retrieveArtistsFromCoreByJellyfinIds(jellyfinIds: albumResult.albumArtists!.map { $0.id! }).forEach({ artistObjectId in
-                                    album.addToAlbumArtists(privateContext.object(with: artistObjectId) as! Artist)
-                                })
-                            }
+                            self.retrieveArtistsFromCoreByJellyfinIds(jellyfinIds: albumResult.albumArtists!.map { $0.id! }).forEach({ artistObjectId in
+                                album!.addToAlbumArtists(privateContext.object(with: artistObjectId) as! Artist)
+                            })
                         }
                         
                         try! privateContext.save()
@@ -766,7 +796,7 @@ class NetworkingManager : ObservableObject {
         }
         
     private func loadSongs(complete: @escaping () -> Void, startIndex: Int?, retrievedSongIds: [String]?) -> Void {
-        ItemsAPI.getItemsByUserId(userId: self.userId, maxOfficialRating: nil, hasThemeSong: nil, hasThemeVideo: nil, hasSubtitles: nil, hasSpecialFeature: nil, hasTrailer: nil, adjacentTo: nil, parentIndexNumber: nil, hasParentalRating: nil, isHd: nil, is4K: nil, locationTypes: nil, excludeLocationTypes: nil, isMissing: nil, isUnaired: nil, minCommunityRating: nil, minCriticRating: nil, minPremiereDate: nil, minDateLastSaved: nil, minDateLastSavedForUser: nil, maxPremiereDate: nil, hasOverview: nil, hasImdbId: nil, hasTmdbId: nil, hasTvdbId: nil, excludeItemIds: nil, startIndex: startIndex, limit: Globals.API_FETCH_PAGE_SIZE, recursive: true, searchTerm: nil, sortOrder: nil, parentId: nil, fields: nil, excludeItemTypes: nil, includeItemTypes: ["Audio"], filters: nil, isFavorite: nil, mediaTypes: nil, imageTypes: nil, sortBy: nil, isPlayed: nil, genres: nil, officialRatings: nil, tags: nil, years: nil, enableUserData: true, imageTypeLimit: nil, enableImageTypes: nil, person: nil, personIds: nil, personTypes: nil, studios: nil, artists: nil, excludeArtistIds: nil, artistIds: nil, albumArtistIds: nil, contributingArtistIds: nil, albums: nil, albumIds: nil, ids: nil, videoTypes: nil, minOfficialRating: nil, isLocked: nil, isPlaceHolder: nil, hasOfficialRating: nil, collapseBoxSetItems: nil, minWidth: nil, minHeight: nil, maxWidth: nil, maxHeight: nil, is3D: nil, seriesStatus: nil, nameStartsWithOrGreater: nil, nameStartsWith: nil, nameLessThan: nil, studioIds: nil, genreIds: nil, enableTotalRecordCount: nil, enableImages: false, apiResponseQueue: processingQueue)
+        ItemsAPI.getItemsByUserId(userId: self.userId, maxOfficialRating: nil, hasThemeSong: nil, hasThemeVideo: nil, hasSubtitles: nil, hasSpecialFeature: nil, hasTrailer: nil, adjacentTo: nil, parentIndexNumber: nil, hasParentalRating: nil, isHd: nil, is4K: nil, locationTypes: nil, excludeLocationTypes: nil, isMissing: nil, isUnaired: nil, minCommunityRating: nil, minCriticRating: nil, minPremiereDate: nil, minDateLastSaved: nil, minDateLastSavedForUser: nil, maxPremiereDate: nil, hasOverview: nil, hasImdbId: nil, hasTmdbId: nil, hasTvdbId: nil, excludeItemIds: nil, startIndex: startIndex, limit: Globals.API_FETCH_PAGE_SIZE, recursive: true, searchTerm: nil, sortOrder: nil, parentId: nil, fields: [ItemFields.sortName, ItemFields.mediaSources], excludeItemTypes: nil, includeItemTypes: ["Audio"], filters: nil, isFavorite: nil, mediaTypes: nil, imageTypes: nil, sortBy: nil, isPlayed: nil, genres: nil, officialRatings: nil, tags: nil, years: nil, enableUserData: true, imageTypeLimit: nil, enableImageTypes: nil, person: nil, personIds: nil, personTypes: nil, studios: nil, artists: nil, excludeArtistIds: nil, artistIds: nil, albumArtistIds: nil, contributingArtistIds: nil, albums: nil, albumIds: nil, ids: nil, videoTypes: nil, minOfficialRating: nil, isLocked: nil, isPlaceHolder: nil, hasOfficialRating: nil, collapseBoxSetItems: nil, minWidth: nil, minHeight: nil, maxWidth: nil, maxHeight: nil, is3D: nil, seriesStatus: nil, nameStartsWithOrGreater: nil, nameStartsWith: nil, nameLessThan: nil, studioIds: nil, genreIds: nil, enableTotalRecordCount: nil, enableImages: false, apiResponseQueue: processingQueue)
                 .sink(receiveCompletion: { completion in
                     switch completion {
                     case .finished :
@@ -792,15 +822,17 @@ class NetworkingManager : ObservableObject {
                         let newSongs = response.items!.filter { songIds.contains($0.id)}
                         
                         if !newSongs.isEmpty {
+
                             DispatchQueue.concurrentPerform(iterations: newSongs.count) { index in
                                                                 
                                 let songResult = newSongs[index]
                                 
                                 print("Song \(index) of \(newSongs.count)")
-                                                                                                
+                                        
+                                // TODO: Perform a more thorough comparison so that we update metadata if it's changed
                                 if (self.retrieveSongFromCore(songId: songResult.id!) == nil) {
                                     
-                                    self.processingQueue.sync {
+                                    self.processingQueue.async {
                                         let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 
                                         privateContext.parent = self.privateContext
@@ -809,10 +841,21 @@ class NetworkingManager : ObservableObject {
                                         
                                         song.jellyfinId = songResult.id!
                                         song.name = songResult.name!
+                                        song.sortName = songResult.sortName ?? songResult.name!
+                                        song.container = songResult.mediaSources![0].container
+                                        song.favorite = songResult.userData?.isFavorite ?? false
+                                        
+                                        // Run Time?
+                                        song.runTimeTicks = songResult.runTimeTicks!
                                         
                                         // Check that index number exists so we can unwrap it's value safely
                                         if songResult.indexNumber != nil {
                                             song.indexNumber = Int16(songResult.indexNumber!)
+                                        }
+                                        
+                                        // Check that the disk number exists so we can unwrap it's value safely
+                                        if songResult.parentIndexNumber != nil {
+                                            song.diskNumber = Int16(songResult.parentIndexNumber!)
                                         }
                                         
                                         var album : Album?
@@ -831,6 +874,17 @@ class NetworkingManager : ObservableObject {
                                         
                                         try! privateContext.save()
                                     }
+                                } else {
+                                    let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+
+                                    privateContext.parent = self.privateContext
+
+                                    let song = privateContext.object(with: self.retrieveSongFromCore(songId: songResult.id!)!) as! Song
+                                    
+                                    song.name = songResult.name!
+                                    song.sortName = songResult.sortName ?? songResult.name!
+                                    song.container = songResult.mediaSources![0].container
+                                    song.favorite = songResult.userData?.isFavorite ?? false
                                 }
                                 
                                 // Check if we've gone through everything the server has to offer
@@ -840,6 +894,8 @@ class NetworkingManager : ObservableObject {
                                     // have more to give and we should complete
                                     if (response.items!.count < Globals.API_FETCH_PAGE_SIZE) {
                                         
+                                        self.saveContext()
+
                                         // Since we've got everything, remove songs that are no longer on the server
                                         self.deleteMissingSongs(retrievedSongIds: retrievedSongIds! + response.items!.map({ $0.id! }))
 
@@ -870,6 +926,8 @@ class NetworkingManager : ObservableObject {
                             // If this response is less than the configured fetch amount, it means the server doesn't
                             // have more to give and we should complete
                             if (response.items!.count < Globals.API_FETCH_PAGE_SIZE) {
+                                
+                                self.saveContext()
                                 
                                 // Since we've got everything, remove songs that are no longer on the server
                                 self.deleteMissingSongs(retrievedSongIds: retrievedSongIds! + response.items!.map({ $0.id! }))
@@ -904,7 +962,7 @@ class NetworkingManager : ObservableObject {
     
     private func loadPlaylists(complete: @escaping () -> Void) -> Void {
         
-        ItemsAPI.getItemsByUserId(userId: self.userId, maxOfficialRating: nil, hasThemeSong: nil, hasThemeVideo: nil, hasSubtitles: nil, hasSpecialFeature: nil, hasTrailer: nil, adjacentTo: nil, parentIndexNumber: nil, hasParentalRating: nil, isHd: nil, is4K: nil, locationTypes: nil, excludeLocationTypes: nil, isMissing: nil, isUnaired: nil, minCommunityRating: nil, minCriticRating: nil, minPremiereDate: nil, minDateLastSaved: nil, minDateLastSavedForUser: nil, maxPremiereDate: nil, hasOverview: nil, hasImdbId: nil, hasTmdbId: nil, hasTvdbId: nil, excludeItemIds: nil, startIndex: nil, limit: nil, recursive: true, searchTerm: nil, sortOrder: nil, parentId: self.playlistId, fields: nil, excludeItemTypes: nil, includeItemTypes: ["Playlist"], filters: nil, isFavorite: nil, mediaTypes: nil, imageTypes: nil, sortBy: ["SortName"], isPlayed: nil, genres: nil, officialRatings: nil, tags: nil, years: nil, enableUserData: true, imageTypeLimit: nil, enableImageTypes: nil, person: nil, personIds: nil, personTypes: nil, studios: nil, artists: nil, excludeArtistIds: nil, artistIds: nil, albumArtistIds: nil, contributingArtistIds: nil, albums: nil, albumIds: nil, ids: nil, videoTypes: nil, minOfficialRating: nil, isLocked: nil, isPlaceHolder: nil, hasOfficialRating: nil, collapseBoxSetItems: nil, minWidth: nil, minHeight: nil, maxWidth: nil, maxHeight: nil, is3D: nil, seriesStatus: nil, nameStartsWithOrGreater: nil, nameStartsWith: nil, nameLessThan: nil, studioIds: nil, genreIds: nil, enableTotalRecordCount: nil, enableImages: nil, apiResponseQueue: processingQueue)
+        ItemsAPI.getItemsByUserId(userId: self.userId, maxOfficialRating: nil, hasThemeSong: nil, hasThemeVideo: nil, hasSubtitles: nil, hasSpecialFeature: nil, hasTrailer: nil, adjacentTo: nil, parentIndexNumber: nil, hasParentalRating: nil, isHd: nil, is4K: nil, locationTypes: nil, excludeLocationTypes: nil, isMissing: nil, isUnaired: nil, minCommunityRating: nil, minCriticRating: nil, minPremiereDate: nil, minDateLastSaved: nil, minDateLastSavedForUser: nil, maxPremiereDate: nil, hasOverview: nil, hasImdbId: nil, hasTmdbId: nil, hasTvdbId: nil, excludeItemIds: nil, startIndex: nil, limit: nil, recursive: true, searchTerm: nil, sortOrder: nil, parentId: self.playlistId, fields: [ItemFields.sortName], excludeItemTypes: nil, includeItemTypes: ["Playlist"], filters: nil, isFavorite: nil, mediaTypes: nil, imageTypes: nil, sortBy: ["SortName"], isPlayed: nil, genres: nil, officialRatings: nil, tags: nil, years: nil, enableUserData: true, imageTypeLimit: nil, enableImageTypes: nil, person: nil, personIds: nil, personTypes: nil, studios: nil, artists: nil, excludeArtistIds: nil, artistIds: nil, albumArtistIds: nil, contributingArtistIds: nil, albums: nil, albumIds: nil, ids: nil, videoTypes: nil, minOfficialRating: nil, isLocked: nil, isPlaceHolder: nil, hasOfficialRating: nil, collapseBoxSetItems: nil, minWidth: nil, minHeight: nil, maxWidth: nil, maxHeight: nil, is3D: nil, seriesStatus: nil, nameStartsWithOrGreater: nil, nameStartsWith: nil, nameLessThan: nil, studioIds: nil, genreIds: nil, enableTotalRecordCount: nil, enableImages: nil, apiResponseQueue: processingQueue)
             .sink(receiveCompletion: { completion in
                 print("Playlist retrieval: \(completion)")
             }, receiveValue: { response in
@@ -927,14 +985,15 @@ class NetworkingManager : ObservableObject {
                         privateContext.parent = self.privateContext
                         
                         print("Processing playlist: \(playlistResult.name!)")
-                        
+                                                
                         if (self.retrievePlaylistFromCore(playlistId: playlistResult.id!) == nil) {
                                 
-                            let playlist : Playlist = Playlist(context: privateContext)
+                            let playlist = Playlist(context: privateContext)
                             
                             playlist.jellyfinId = playlistResult.id!
                             playlist.name = playlistResult.name!
-                            
+                            playlist.sortName = playlistResult.sortName ?? playlist.name!
+                            playlist.favorite = playlistResult.userData?.isFavorite ?? false
                             
                             try! privateContext.save()
                         } else {
@@ -943,9 +1002,11 @@ class NetworkingManager : ObservableObject {
                             
                             // Update the name if it's changed
                             playlist.name = playlistResult.name!
-                            
-                            try! privateContext.save()
+                            playlist.sortName = playlistResult.sortName ?? playlist.name!
+                            playlist.favorite = playlistResult.userData?.isFavorite ?? playlist.favorite
                         }
+                                                
+                        try! privateContext.save()
                         
                         if playlistResult == response.items!.last {
                             print("Playlist import complete")

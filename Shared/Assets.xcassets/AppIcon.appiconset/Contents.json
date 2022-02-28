@@ -109,6 +109,18 @@
       "size" : "1024x1024"
     },
     {
+      "filename" : "120-2.jpeg",
+      "idiom" : "car",
+      "scale" : "2x",
+      "size" : "60x60"
+    },
+    {
+      "filename" : "180-1.jpeg",
+      "idiom" : "car",
+      "scale" : "3x",
+      "size" : "60x60"
+    },
+    {
       "idiom" : "mac",
       "scale" : "1x",
       "size" : "16x16"

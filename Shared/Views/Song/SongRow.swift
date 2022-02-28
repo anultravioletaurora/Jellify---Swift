@@ -17,6 +17,8 @@ struct SongRow: View {
     var player : Player
 
     var downloadManager : DownloadManager = DownloadManager.shared
+    
+    var networkingManager : NetworkingManager = NetworkingManager.shared
         
     var type : SongRowType
     
@@ -82,6 +84,11 @@ struct SongRow: View {
                 
                 Spacer()
                 
+                if song.favorite {
+                    Image(systemName: "heart.fill")
+                        .foregroundColor(.accentColor)
+                }
+                
                 if song.downloaded {
                     Image(systemName: "arrow.down.circle.fill")
                         .foregroundColor(.accentColor)
@@ -95,6 +102,31 @@ struct SongRow: View {
         .padding(.horizontal, 10)
         .buttonStyle(PlainButtonStyle())
         .contextMenu {
+            Button(action: {
+                if song.favorite {
+                    networkingManager.unfavorite(jellyfinId: song.jellyfinId!, originalValue: song.favorite, complete: { result in
+                        song.favorite = result
+                    })
+                } else {
+                    networkingManager.favoriteItem(jellyfinId: song.jellyfinId!, originalValue: song.favorite, complete: { result in
+                        song.favorite = result
+                    })
+                }
+            }, label: {
+                if song.favorite {
+                    Image(systemName: "heart.fill")
+                        .foregroundColor(.accentColor)
+                        .font(.largeTitle)
+                    
+                    Text("Favorited")
+                } else {
+                    Image(systemName: "heart")
+                        .font(.largeTitle)
+                    
+                    Text("Favorite")
+                }
+            })
+            
             Button(action: {
                 player.appendSongsNext([song])
             }, label: {

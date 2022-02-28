@@ -42,7 +42,7 @@ struct AlbumDetailView: View {
         
         self.fetchRequest = FetchRequest(
             entity: Song.entity(),
-            sortDescriptors: [NSSortDescriptor(key: #keyPath(Song.indexNumber), ascending: true), NSSortDescriptor(key: #keyPath(Song.diskNumber), ascending: true), ],
+            sortDescriptors: [NSSortDescriptor(key: #keyPath(Song.diskNumber), ascending: true), NSSortDescriptor(key: #keyPath(Song.indexNumber), ascending: true)],
             predicate: NSPredicate(format: "(album == %@)", album)
         )
     }
@@ -160,6 +160,29 @@ struct AlbumDetailView: View {
                         })
                             .buttonStyle(PlainButtonStyle())
                     }
+                                        
+                    Button(action: {
+                        if album.favorite {
+                            networkingManager.unfavorite(jellyfinId: album.jellyfinId!, originalValue: album.favorite, complete: { result in
+                                album.favorite = result
+                            })
+                        } else {
+                            networkingManager.favoriteItem(jellyfinId: album.jellyfinId!, originalValue: album.favorite, complete: { result in
+                                album.favorite = result
+                            })
+                        }
+                    }, label: {
+                        if album.favorite {
+                            Image(systemName: "heart.fill")
+                                .foregroundColor(.accentColor)
+                                .font(.largeTitle)
+                        } else {
+                            Image(systemName: "heart")
+                                .font(.largeTitle)
+                        }
+                    })
+                        .buttonStyle(PlainButtonStyle())
+
                     
                     Spacer()
                 }

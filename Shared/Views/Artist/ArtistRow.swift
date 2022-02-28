@@ -40,6 +40,13 @@ struct ArtistRow: View {
 
                     }
                 }
+                
+                Spacer()
+                
+                if artist.favorite {
+                    Image(systemName: "heart.fill")
+                        .foregroundColor(.accentColor)
+                }
             }
         }
 //        .swipeActions {

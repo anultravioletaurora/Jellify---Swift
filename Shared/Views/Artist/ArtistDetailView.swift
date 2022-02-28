@@ -28,6 +28,9 @@ struct ArtistDetailView: View {
     var loading : Bool = true
         
     var artist : Artist
+    
+    @ObservedObject
+    var networkingManager : NetworkingManager = NetworkingManager.shared
                 
     init(_ artist: Artist) {
 
@@ -51,6 +54,35 @@ struct ArtistDetailView: View {
                     Spacer()
                 }
                 .listRowSeparator(.hidden)
+                
+                HStack {
+                    Spacer()
+                    
+                    Button(action: {
+                        if artist.favorite {
+                            networkingManager.unfavorite(jellyfinId: artist.jellyfinId!, originalValue: artist.favorite, complete: { result in
+                                artist.favorite = result
+                            })
+                        } else {
+                            networkingManager.favoriteItem(jellyfinId: artist.jellyfinId!, originalValue: artist.favorite, complete: { result in
+                                artist.favorite = result
+                            })
+                        }
+                    }, label: {
+                        if artist.favorite {
+                            Image(systemName: "heart.fill")
+                                .foregroundColor(.accentColor)
+                                .font(.largeTitle)
+                        } else {
+                            Image(systemName: "heart")
+                                .font(.largeTitle)
+                        }
+                    })
+                        .buttonStyle(PlainButtonStyle())
+                    
+                    Spacer()
+                }
+                .padding(.bottom, 15)
 
                 ForEach(albums) { album in
                     AlbumRow(album: album, artist: artist)

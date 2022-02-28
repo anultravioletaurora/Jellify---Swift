@@ -31,7 +31,7 @@ struct AlbumsListView: View {
         
         let request = NSFetchRequest<Album>(entityName: "Album")
         
-        request.sortDescriptors = [NSSortDescriptor(key: #keyPath(Album.name), ascending: true, selector: #selector(NSString.caseInsensitiveCompare))]
+        request.sortDescriptors = [NSSortDescriptor(key: #keyPath(Album.sortName), ascending: true, selector: #selector(NSString.caseInsensitiveCompare))]
         
         request.fetchLimit = limit.wrappedValue
         
