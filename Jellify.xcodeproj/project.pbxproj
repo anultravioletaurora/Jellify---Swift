@@ -888,7 +888,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.jackcaulfield.Jellify;
 				PRODUCT_NAME = Jellify;
 				PROVISIONING_PROFILE_SPECIFIER = "Jellify iOS";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = Jellify;
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "Jellify Catalyst";
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;
@@ -903,7 +903,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = "Jellify (iOS).entitlements";
-				CODE_SIGN_IDENTITY = "iPhone Distribution";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
@@ -929,8 +929,8 @@
 				MARKETING_VERSION = 0.9;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jackcaulfield.Jellify;
 				PRODUCT_NAME = Jellify;
-				PROVISIONING_PROFILE_SPECIFIER = Jellify;
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = Jellify;
+				PROVISIONING_PROFILE_SPECIFIER = "Jellify iOS";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=macosx*]" = "Jellify Catalyst";
 				SDKROOT = iphoneos;
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_EMIT_LOC_STRINGS = YES;

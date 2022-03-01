@@ -497,9 +497,17 @@ class NetworkingManager : ObservableObject {
                 print("Artist image receive completion: \(completion)")
             }, receiveValue: { url in
                                 
-                playlist.thumbnail = try! Data(contentsOf: url)
+                let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
                 
-                // self.saveContext()
+                privateContext.parent = self.privateContext
+                
+                let privatePlaylist = privateContext.object(with: playlist.objectID) as! Playlist
+
+                privatePlaylist.thumbnail = try! Data(contentsOf: url)
+                
+                try! privateContext.save()
+                 
+                self.saveContext()
             })
             .store(in: &self.cancellables)
     }
@@ -1293,7 +1301,7 @@ class NetworkingManager : ObservableObject {
         }
     }
     
-    private func retrieveAllArtistsFromCore() -> [Artist] {
+    public func retrieveAllArtistsFromCore() -> [Artist] {
         let fetchRequest = Artist.fetchRequest()
         
         do {
@@ -1364,6 +1372,24 @@ class NetworkingManager : ObservableObject {
         }
     }
     
+    public func retrieveAlbumsFromCore(albumArtistName: String) -> [NSManagedObjectID] {
+        let fetchRequest = Album.fetchRequest()
+        
+        fetchRequest.predicate = NSPredicate(format: "albumArtistName == %@", albumArtistName)
+        
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        
+        privateContext.parent = self.context
+        
+        do {
+            return try privateContext.fetch(fetchRequest).map({ $0.objectID })
+        } catch let error as NSError {
+            print("Error retrieving all albums from CoreData: \(error)")
+            
+            return []
+        }
+    }
+    
     private func retrieveAllAlbumsFromCore() -> [Album] {
         let fetchRequest = Album.fetchRequest()
         
@@ -1395,6 +1421,24 @@ class NetworkingManager : ObservableObject {
             print("Error retrieving song from CoreData: \(error)")
             
             return nil
+        }
+    }
+    
+    public func retrieveSongsFromCore(albumId: String) -> [NSManagedObjectID] {
+        let fetchRequest = Song.fetchRequest()
+        
+        fetchRequest.predicate = NSPredicate(format: "album.jellyfinId == %@", albumId)
+        
+        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+        
+        privateContext.parent = self.context
+        
+        do {
+            return try privateContext.fetch(fetchRequest).map({ $0.objectID })
+        } catch let error as NSError {
+            print("Error retrieving songs from CoreData: \(error)")
+            
+            return []
         }
     }
     
