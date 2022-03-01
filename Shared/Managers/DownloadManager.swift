@@ -47,7 +47,8 @@ public class DownloadManager {
             }, receiveValue: { audioUrl in
                 
                 let fileManager = FileManager.default
-                let urls = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
+                
+                let urls = fileManager.urls(for: .documentDirectory, in: .allDomainsMask)
                 let documentDirectory = urls[0] as NSURL
                 let soundURL = documentDirectory.appendingPathComponent("\(song.jellyfinId!).\(song.container ?? "aac")")
                 
@@ -86,7 +87,7 @@ public class DownloadManager {
             }, receiveValue: { audioUrl in
                 
                 let fileManager = FileManager.default
-                let urls = fileManager.urls(for: .documentDirectory, in: .userDomainMask)
+                let urls = fileManager.urls(for: .documentDirectory, in: .allDomainsMask)
                 let documentDirectory = urls[0] as NSURL
                 let soundURL = documentDirectory.appendingPathComponent("\(firstSong.jellyfinId!).\(firstSong.container ?? "aac")")
                 
