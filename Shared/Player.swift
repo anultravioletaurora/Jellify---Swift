@@ -418,14 +418,15 @@ class Player: ObservableObject {
         // See if the item is marked as downloaded
         if song.downloaded {
             
-            guard song.downloadUrl != nil else {
-                song.downloaded = false
-                song.downloading = false
-                return AVPlayerItemId(song: song, order: order)
-            }
+            // Read song from file
+            let fileManager = FileManager.default
+            let documentDirectory = try! fileManager.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+
+            let soundURL = documentDirectory.appendingPathComponent("\(song.jellyfinId!).\(song.container ?? "aac")")
             
-            let localAsset = AVURLAsset(url: song.downloadUrl!)
+            let localAsset = AVURLAsset(url: soundURL)
             
+            // Make sure the saved file can actually be played, otherwise we'll stream it
             guard localAsset.isPlayable else {
                 song.downloaded = false
                 song.downloading = false

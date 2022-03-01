@@ -86,24 +86,27 @@ public class DownloadManager {
             .sink(receiveCompletion: { completion in
             }, receiveValue: { audioUrl in
                 
+                let bundle = Bundle.main.resourceURL
                 let fileManager = FileManager.default
+                                
                 let urls = fileManager.urls(for: .documentDirectory, in: .allDomainsMask)
-                let documentDirectory = urls[0] as NSURL
+                let documentDirectory = try! fileManager.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+
                 let soundURL = documentDirectory.appendingPathComponent("\(firstSong.jellyfinId!).\(firstSong.container ?? "aac")")
                 
                 let audio = try! Data(contentsOf: audioUrl)
                                 
-                try! audio.write(to: soundURL!)
+                try! audio.write(to: soundURL)
                 
                 
                 
-                if soundURL!.isFileURL && AVURLAsset(url: soundURL!).isPlayable {
+                if soundURL.isFileURL && AVURLAsset(url: soundURL).isPlayable {
                     print("Song downloaded successfully")
                     firstSong.downloadUrl = soundURL
                     firstSong.downloaded = true
                 } else {
-                    print("URL \(soundURL!.isFileURL ? "is" : "isn't") a file")
-                    print("URL \(AVURLAsset(url: soundURL!).isPlayable ? "is" : "isn't") playable")
+                    print("URL \(soundURL.isFileURL ? "is" : "isn't") a file")
+                    print("URL \(AVURLAsset(url: soundURL).isPlayable ? "is" : "isn't") playable")
                     firstSong.downloaded = false
                 }
                 
