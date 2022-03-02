@@ -122,10 +122,11 @@ class Player: ObservableObject {
             if player != nil {
                 if let current = player?.currentItem{
                     for queuedItem in player?.items() ?? []{
-                        if queuedItem != current || !isPlaying{
+                        if queuedItem != current {
                             player?.remove(queuedItem)
                         }
                     }
+					
                     songIndex = songs.firstIndex(where: {(current as! AVPlayerItemId).song.id == $0.song.id}) ?? 0
                     for song in songs[(currentSong != nil ? (songIndex + 1) : songIndex)...]{
                         player!.insert(song, after: nil)
@@ -249,24 +250,24 @@ class Player: ObservableObject {
         }
     }
     
-    // TODO: FIX THIS
     @Published
     public var playmode = PlayMode.ordered {
-        didSet{
-                // order or shuffle the songs
-                var newOrder = playmode == .random ? self.songs.shuffled() : self.songs.sorted(by: { $0.initialOrder < $1.initialOrder})
-                if currentSong != nil{
-                    if playmode == .random {
-                        self.songIndex = 0
-                        // place the currently playing song at 0
-                        newOrder.move(currentSong!, to: 0)
-                    }else{
-                        self.songIndex = currentSong!.initialOrder
-                        print(self.songIndex)
-                    }
-                    self.currentSong = player?.currentItem as? AVPlayerItemId
+        didSet {
+            
+            // order or shuffle the songs
+            var newOrder = playmode == .random ? self.songs.shuffled() : self.songs.sorted(by: { $0.initialOrder < $1.initialOrder})
+            if currentSong != nil{
+                if playmode == .random {
+                    self.songIndex = 0
+                    // place the currently playing song at 0
+                    newOrder.move(currentSong!, to: 0)
+                } else {
+                    self.songIndex = currentSong!.initialOrder
+                    print(self.songIndex)
                 }
-                self.songs = newOrder
+                self.currentSong = player?.currentItem as? AVPlayerItemId
+            }
+            self.songs = newOrder
         }
     }
     @Published
@@ -341,15 +342,15 @@ class Player: ObservableObject {
                 userInfo[AVAudioSessionRouteChangePreviousRouteKey] as? AVAudioSessionRouteDescription {
                 self.isPlaying = false
             }
-        
+                    
         default: ()
-            self.isPlaying = false
+            self.isPlaying = true
         }
     }
 
     func hasHeadphones(in routeDescription: AVAudioSessionRouteDescription) -> Bool {
         // Filter the outputs to only those with a port type of headphones.
-        return !routeDescription.outputs.filter({$0.portType == .headphones}).isEmpty
+		return !routeDescription.outputs.filter({$0.portType == .headphones}).isEmpty
     }
     
     @objc func handleInterruption(notification: Notification) {
@@ -410,30 +411,55 @@ class Player: ObservableObject {
         player = player ?? AVQueuePlayer()
         player?.preventsDisplaySleepDuringVideoPlayback = false
         player?.removeAllItems()
-        songIndex = songs.firstIndex(where: { $0.jellyfinId! == songId}) ?? 0
-        self.songs = queueItems
+		
+		// If the songs are to be shuffled, then we'll do that and makee sure the song
+		// the user intially selected is first
+		if playmode == .random {
+			
+			// order or shuffle the songs
+			var newOrder = playmode == .random ? queueItems.shuffled() : queueItems.sorted(by: { $0.initialOrder < $1.initialOrder})
+
+			self.songIndex = 0
+			
+			let firstSong = newOrder.filter({ $0.song.jellyfinId! == songId }).first!
+			
+			// place the currently playing song at 0
+			newOrder.move(firstSong, to: 0)
+			
+			self.songs = newOrder
+		
+		} else {
+			songIndex = songs.firstIndex(where: { $0.jellyfinId! == songId}) ?? 0
+			self.songs = queueItems
+		}
     }
     
     private func toPlayerItem(_ song : Song, order: Int) -> AVPlayerItemId{
+        
         // See if the item is marked as downloaded
         if song.downloaded {
             
-            // Read song from file
-            let fileManager = FileManager.default
-            let documentDirectory = try! fileManager.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+            do {
+                // Read song from file
+                let fileManager = FileManager.default
+                let documentDirectory = try fileManager.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
 
-            let soundURL = documentDirectory.appendingPathComponent("\(song.jellyfinId!).\(song.container ?? "aac")")
-            
-            let localAsset = AVURLAsset(url: soundURL)
-            
-            // Make sure the saved file can actually be played, otherwise we'll stream it
-            guard localAsset.isPlayable else {
-                song.downloaded = false
-                song.downloading = false
+                let soundURL = documentDirectory.appendingPathComponent("\(song.jellyfinId!).\(song.container ?? "aac")")
+                
+                let localAsset = AVURLAsset(url: soundURL)
+                
+                // Make sure the saved file can actually be played, otherwise we'll stream it
+                guard localAsset.isPlayable else {
+                    song.downloaded = false
+                    song.downloading = false
+                    return AVPlayerItemId(song: song, order: order)
+                }
+                
+                return AVPlayerItemId(song: song, localAsset: localAsset, order: order)
+            } catch {
+                print("There was an error loading the downloaded song \(song.jellyfinId!). \(error)")
                 return AVPlayerItemId(song: song, order: order)
             }
-            
-            return AVPlayerItemId(song: song, localAsset: localAsset, order: order)
         }
         //Fallback to streaming or cache if we reach here
         return AVPlayerItemId(song: song, order: order)

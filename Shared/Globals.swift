@@ -16,5 +16,6 @@ public class Globals{
     public static let VIEW_FETCH_PAGE_SIZE : Int = 500
     public static let API_FETCH_PAGE_SIZE : Int = 10000
     public static let ARTWORK_FRAME : CGFloat = UIScreen.main.bounds.height / 4
-
+    public static let MARQUEE_FADE : CGFloat = 16
+    public static let MARQUEE_WAIT_DURATION : CGFloat = 3
 }

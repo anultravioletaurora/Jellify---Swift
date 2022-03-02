@@ -24,7 +24,7 @@ class NetworkingManager : ObservableObject {
     let context : NSManagedObjectContext = PersistenceController.shared.container.viewContext
         
     let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-    
+	    
     let sessionId : UUID = UUID()
     
     @Published
@@ -67,14 +67,16 @@ class NetworkingManager : ObservableObject {
                                             self.loadingPhase = nil
                                             self.libraryIsPopulated = true
                                         }
+										self.processDownloadQueue()
                                     }
                                 } catch {
-                                        self.saveContext()
-                                        print("Loading complete!")
+									self.saveContext()
+									print("Loading complete!")
                                     DispatchQueue.main.async {
                                         self.loadingPhase = nil
                                         self.libraryIsPopulated = true
                                     }
+									self.processDownloadQueue()
                                 }
                             })
                         })
@@ -251,6 +253,7 @@ class NetworkingManager : ObservableObject {
                     try! privateContext.save()
 
                     self.saveContext()
+					
                     complete()
                 })
             })
@@ -315,22 +318,31 @@ class NetworkingManager : ObservableObject {
     
     public func deleteFromPlaylist(playlist: Playlist, indexSet: IndexSet) -> Void {
         
-        let indexToRemove = indexSet.first!
+		// For some reason pulling the index out of the index set is always off by one
+		let indexToRemove = playlist.songs?.count == indexSet.last! + 1 ? indexSet.last! : indexSet.last! + 1
         
         if var playlistSongs = playlist.songs?.allObjects as? [PlaylistSong]{
             let remainingPlaylistSongIds = playlistSongs.filter { indexToRemove != $0.indexNumber }.map { $0.jellyfinId! }
             
                                 
             let playlistSongIdsToRemove = (playlist.songs!.allObjects as! [PlaylistSong]).map { $0.jellyfinId! }.filter { !remainingPlaylistSongIds.contains($0)}
+			
+			print("Removing songs \((playlist.songs!.allObjects as! [PlaylistSong]).filter({ playlistSongIdsToRemove.contains($0.jellyfinId!)}).map({ $0.song!.name!}).joined(separator: ", "))")
                     
             PlaylistsAPI.removeFromPlaylist(playlistId: playlist.jellyfinId!, entryIds: playlistSongIdsToRemove, apiResponseQueue: JellyfinAPI.apiResponseQueue)
                 .sink(receiveCompletion: { completion in
                     print("Call to remove song from playlist complete: \(completion)")
                 }, receiveValue: { response in
 
-                    self.loadPlaylistItems(playlist: playlist, context: self.context, complete: {
-                        
-                    })
+					playlistSongIdsToRemove.forEach({ playlistSongId in
+						self.deletePlaylistSongByJellyfinId(playlistSongId: playlistSongId, context: self.context)
+					})
+					
+					for case let playlistSong as PlaylistSong in playlist.songs! {
+						if playlistSong.indexNumber > indexToRemove {
+							playlistSong.indexNumber -= 1
+						}
+					}
                 })
                 .store(in: &cancellables)
         }
@@ -598,17 +610,16 @@ class NetworkingManager : ObservableObject {
     public func processDownloadQueue() -> Void {
         
         self.retrievePlaylistsToDownload().forEach({ playlist in
-            (playlist.songs?.allObjects as! [PlaylistSong]).forEach({ playlistSong in
-                
-                if playlistSong.song!.downloadUrl == nil {
-                    DownloadManager.shared.download(song: playlistSong.song!)
-                }
-            })
+			
+			DownloadManager.shared.download(playlist: playlist)
+            
         })
+		
+		self.retrieveAlbumsToDownload().forEach({ album in
+			DownloadManager.shared.download(album: album)
+		})
         
-        self.retrieveSongsToDownload().forEach({ song in
-            DownloadManager.shared.download(song: song)
-        })
+		DownloadManager.shared.download(songs: self.retrieveSongsToDownload())
     }
 
     public func syncLibrary() -> Void {
@@ -664,10 +675,11 @@ class NetworkingManager : ObservableObject {
                 switch error {
                 case .finished :
                     
+					self.saveContext()
+					
                     DispatchQueue.main.sync {
                         self.loadingPhase = .albums
                     }
-                    self.saveContext()
                 case .failure:
                     print("Error retrieving artists: \(error)")
                     
@@ -720,10 +732,10 @@ class NetworkingManager : ObservableObject {
                 switch completion {
                 case .finished :
                     print("Finished album retrieval")
+					self.saveContext()
                     DispatchQueue.main.sync {
                         self.loadingPhase = .songs
                     }
-                    self.saveContext()
                 case .failure:
                     print("Error retrieving artists: \(completion)")
                     
@@ -737,11 +749,11 @@ class NetworkingManager : ObservableObject {
                     let albumIds = response.items!.map { $0.id! }
                     
                     self.deleteMissingAlbums(retrievedAlbumIds: albumIds)
+					
+					self.saveContext()
                     
                     let existingAlbumIds = Set(self.retrieveAllAlbumsFromCore()).map({ $0.jellyfinId! })
-                    
-                    self.saveContext()
-                    
+                                        
                     var albumIdsSet = Set(response.items!.map { $0.id! })
                                                 
                     albumIdsSet.subtract(existingAlbumIds)
@@ -842,47 +854,45 @@ class NetworkingManager : ObservableObject {
                                 // TODO: Perform a more thorough comparison so that we update metadata if it's changed
                                 if (self.retrieveSongFromCore(songId: songResult.id!) == nil) {
                                     
-                                    self.processingQueue.async {
-                                        let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+									let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 
-                                        privateContext.parent = self.privateContext
-                                        
-                                        let song = Song(context: privateContext)
-                                        
-                                        song.jellyfinId = songResult.id!
-                                        song.name = songResult.name!
-                                        song.sortName = songResult.sortName ?? songResult.name!
-                                        song.container = songResult.mediaSources![0].container
-                                        song.favorite = songResult.userData?.isFavorite ?? false
-                                        
-                                        // Run Time?
-                                        song.runTimeTicks = songResult.runTimeTicks!
-                                        
-                                        // Check that index number exists so we can unwrap it's value safely
-                                        if songResult.indexNumber != nil {
-                                            song.indexNumber = Int16(songResult.indexNumber!)
-                                        }
-                                        
-                                        // Check that the disk number exists so we can unwrap it's value safely
-                                        if songResult.parentIndexNumber != nil {
-                                            song.diskNumber = Int16(songResult.parentIndexNumber!)
-                                        }
-                                        
-                                        var album : Album?
-                                        
-                                        if (songResult.albumId != nil) {
-                                                                                    
-                                            album = privateContext.object(with: self.retrieveAlbumFromCore(albumId: songResult.albumId!)!) as! Album?
-                                        }
-                                        
-                                        if (album != nil) {
-                                            song.album = album!
-                                            self.retrieveArtistsFromCoreByJellyfinIds(jellyfinIds: songResult.artistItems!.map { $0.id! }).forEach({ artistObjectId in
-                                                song.addToArtists(privateContext.object(with: artistObjectId) as! Artist)
-                                            })
-                                        }
-                                        
-                                        try! privateContext.save()
+									privateContext.parent = self.privateContext
+									
+									let song = Song(context: privateContext)
+									
+									song.jellyfinId = songResult.id!
+									song.name = songResult.name!
+									song.sortName = songResult.sortName ?? songResult.name!
+									song.container = songResult.mediaSources![0].container
+									song.favorite = songResult.userData?.isFavorite ?? false
+									
+									// Run Time?
+									song.runTimeTicks = songResult.runTimeTicks!
+									
+									// Check that index number exists so we can unwrap it's value safely
+									if songResult.indexNumber != nil {
+										song.indexNumber = Int16(songResult.indexNumber!)
+									}
+									
+									// Check that the disk number exists so we can unwrap it's value safely
+									if songResult.parentIndexNumber != nil {
+										song.diskNumber = Int16(songResult.parentIndexNumber!)
+									}
+									
+									var album : Album?
+									
+									if (songResult.albumId != nil) {
+																				
+										album = privateContext.object(with: self.retrieveAlbumFromCore(albumId: songResult.albumId!)!) as! Album?
+									}
+									
+									try! privateContext.save()
+									
+									if (album != nil) {
+										song.album = album!
+										self.retrieveArtistsFromCoreByJellyfinIds(jellyfinIds: songResult.artistItems!.map { $0.id! }).forEach({ artistObjectId in
+											song.addToArtists(privateContext.object(with: artistObjectId) as! Artist)
+										})
                                     }
                                 } else {
                                     let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
@@ -1182,6 +1192,10 @@ class NetworkingManager : ObservableObject {
         
         do {
             let songsToDelete = try self.privateContext.fetch(fetchRequest) as! [Song]
+			
+			songsToDelete.filter({ $0.downloaded }).forEach({ song in
+				DownloadManager.shared.delete(song: song)
+			})
             
             self.deleteMissingPlaylistSongs(songs: songsToDelete)
             
@@ -1205,6 +1219,10 @@ class NetworkingManager : ObservableObject {
         
         do {
             let songsToDelete = try self.privateContext.fetch(fetchRequest) as! [Song]
+			
+			songsToDelete.filter({ $0.downloaded }).forEach({ song in
+				DownloadManager.shared.delete(song: song)
+			})
             
             self.deleteMissingPlaylistSongs(songs: songsToDelete)
             
@@ -1228,6 +1246,10 @@ class NetworkingManager : ObservableObject {
         
         do {
             let songsToDelete = try self.privateContext.fetch(fetchRequest) as! [Song]
+			
+			songsToDelete.filter({ $0.downloaded }).forEach({ song in
+				DownloadManager.shared.delete(song: song)
+			})
             
             self.deleteMissingPlaylistSongs(songs: songsToDelete)
                         
@@ -1389,6 +1411,20 @@ class NetworkingManager : ObservableObject {
             return []
         }
     }
+	
+	private func retrieveAlbumsToDownload() -> [Album] {
+		let fetchRequest = Album.fetchRequest()
+		
+		fetchRequest.predicate = NSPredicate(format: "downloaded == true")
+		
+		do {
+			return try self.context.fetch(fetchRequest)
+		} catch let error as NSError {
+			print("Error retrieving all albums marked for download. \(error)")
+			
+			return []
+		}
+	}
     
     private func retrieveAllAlbumsFromCore() -> [Album] {
         let fetchRequest = Album.fetchRequest()

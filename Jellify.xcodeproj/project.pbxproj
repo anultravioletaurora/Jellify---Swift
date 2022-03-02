@@ -11,7 +11,6 @@
 		041D3E75271CAF89002185CF /* BackgroundCleanerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 041D3E74271CAF89002185CF /* BackgroundCleanerView.swift */; };
 		041D3E79271DABF1002185CF /* JellyfinAPI in Frameworks */ = {isa = PBXBuildFile; productRef = 041D3E78271DABF1002185CF /* JellyfinAPI */; };
 		041D3E7B2722E93F002185CF /* NowPlayingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 041D3E7A2722E93E002185CF /* NowPlayingView.swift */; };
-		0439CD8527C853360046AE21 /* SwiftUIX in Frameworks */ = {isa = PBXBuildFile; productRef = 0439CD8427C853360046AE21 /* SwiftUIX */; };
 		0442A25127B3115700003F0C /* ToolbarView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0442A25027B3115700003F0C /* ToolbarView.swift */; };
 		0442A25427B3F52900003F0C /* ImageExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0442A25327B3F52900003F0C /* ImageExtensions.swift */; };
 		0442A26127B3F8FA00003F0C /* JellyfinService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0442A26027B3F8FA00003F0C /* JellyfinService.swift */; };
@@ -193,7 +192,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				04A0A9EC27CD0461003D30E9 /* CarPlay.framework in Frameworks */,
-				0439CD8527C853360046AE21 /* SwiftUIX in Frameworks */,
 				041D3E79271DABF1002185CF /* JellyfinAPI in Frameworks */,
 				04FE474927BA815E00BDEDFF /* LNPopupUI-Static in Frameworks */,
 			);
@@ -352,6 +350,7 @@
 				04DCB7FA27BA7E06005355C0 /* Frameworks */,
 			);
 			sourceTree = "<group>";
+			usesTabs = 1;
 		};
 		04E10700270CD304002CACB0 /* Shared */ = {
 			isa = PBXGroup;
@@ -517,7 +516,6 @@
 			packageProductDependencies = (
 				041D3E78271DABF1002185CF /* JellyfinAPI */,
 				04FE474827BA815E00BDEDFF /* LNPopupUI-Static */,
-				0439CD8427C853360046AE21 /* SwiftUIX */,
 			);
 			productName = "FinTune (iOS)";
 			productReference = 04E10708270CD307002CACB0 /* Jellify.app */;
@@ -593,7 +591,6 @@
 			packageReferences = (
 				041D3E77271DABF1002185CF /* XCRemoteSwiftPackageReference "jellyfin-sdk-swift" */,
 				04FE474727BA815E00BDEDFF /* XCRemoteSwiftPackageReference "LNPopupUI" */,
-				0439CD8327C853360046AE21 /* XCRemoteSwiftPackageReference "SwiftUIX" */,
 			);
 			productRefGroup = 04E10709270CD307002CACB0 /* Products */;
 			projectDirPath = "";
@@ -1087,14 +1084,6 @@
 				kind = branch;
 			};
 		};
-		0439CD8327C853360046AE21 /* XCRemoteSwiftPackageReference "SwiftUIX" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/SwiftUIX/SwiftUIX";
-			requirement = {
-				branch = master;
-				kind = branch;
-			};
-		};
 		04FE474727BA815E00BDEDFF /* XCRemoteSwiftPackageReference "LNPopupUI" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/LeoNatan/LNPopupUI";
@@ -1110,11 +1099,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 041D3E77271DABF1002185CF /* XCRemoteSwiftPackageReference "jellyfin-sdk-swift" */;
 			productName = JellyfinAPI;
-		};
-		0439CD8427C853360046AE21 /* SwiftUIX */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 0439CD8327C853360046AE21 /* XCRemoteSwiftPackageReference "SwiftUIX" */;
-			productName = SwiftUIX;
 		};
 		04FE474827BA815E00BDEDFF /* LNPopupUI-Static */ = {
 			isa = XCSwiftPackageProductDependency;
