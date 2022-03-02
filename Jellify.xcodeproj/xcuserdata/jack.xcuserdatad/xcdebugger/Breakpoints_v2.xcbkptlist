@@ -462,8 +462,8 @@
             filePath = "Shared/Views/Playlist/PlaylistDetailView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "109"
-            endingLineNumber = "109"
+            startingLineNumber = "131"
+            endingLineNumber = "131"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -606,8 +606,8 @@
             filePath = "Shared/Views/Playlist/PlaylistsView.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "41"
-            endingLineNumber = "41"
+            startingLineNumber = "44"
+            endingLineNumber = "44"
             landmarkName = "body"
             landmarkType = "24">
          </BreakpointContent>
@@ -1392,8 +1392,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "690"
             endingLineNumber = "690"
-            landmarkName = "getRemainingTime()"
-            landmarkType = "7">
+            landmarkName = "Player"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -1521,8 +1521,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "355"
             endingLineNumber = "355"
-            landmarkName = "hasHeadphones(in:)"
-            landmarkType = "7">
+            landmarkName = "Player"
+            landmarkType = "3">
             <Locations>
                <Location
                   uuid = "112B46A9-0976-43D5-8690-27CBAB9EAF82 - 71f645ef5a5c92fe"
@@ -1569,8 +1569,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "325"
             endingLineNumber = "325"
-            landmarkName = "init()"
-            landmarkType = "7">
+            landmarkName = "Player"
+            landmarkType = "3">
             <Locations>
                <Location
                   uuid = "98676B4C-7225-495E-8F6E-96CA3E16ACC0 - d557c649afd42f6f"
@@ -1681,8 +1681,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "510"
             endingLineNumber = "510"
-            landmarkName = "previous()"
-            landmarkType = "7">
+            landmarkName = "Player"
+            landmarkType = "3">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -2305,8 +2305,8 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "437"
             endingLineNumber = "437"
-            landmarkName = "Player"
-            landmarkType = "3">
+            landmarkName = "toPlayerItem(_:order:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy

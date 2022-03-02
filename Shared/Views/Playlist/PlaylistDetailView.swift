@@ -94,6 +94,28 @@ struct PlaylistDetailView: View {
                     })
                         .buttonStyle(PlainButtonStyle())
                 }
+				
+				Button(action: {
+					if playlist.favorite {
+						networkingManager.unfavorite(jellyfinId: playlist.jellyfinId!, originalValue: playlist.favorite, complete: { result in
+							playlist.favorite = result
+						})
+					} else {
+						networkingManager.favoriteItem(jellyfinId: playlist.jellyfinId!, originalValue: playlist.favorite, complete: { result in
+							playlist.favorite = result
+						})
+					}
+				}, label: {
+					if playlist.favorite {
+						Image(systemName: "heart.fill")
+							.foregroundColor(.accentColor)
+							.font(.largeTitle)
+					} else {
+						Image(systemName: "heart")
+							.font(.largeTitle)
+					}
+				})
+					.buttonStyle(PlainButtonStyle())
                 
                 Spacer()
             }

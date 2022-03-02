@@ -31,7 +31,9 @@ struct AlbumsListView: View {
         
         let request = NSFetchRequest<Album>(entityName: "Album")
         
-        request.sortDescriptors = [NSSortDescriptor(key: #keyPath(Album.sortName), ascending: true, selector: #selector(NSString.caseInsensitiveCompare))]
+        request.sortDescriptors = [
+			NSSortDescriptor(key: #keyPath(Album.favorite), ascending: false),
+			NSSortDescriptor(key: #keyPath(Album.sortName), ascending: true, selector: #selector(NSString.caseInsensitiveCompare))]
         
         request.fetchLimit = limit.wrappedValue
         
@@ -51,6 +53,13 @@ struct AlbumsListView: View {
                     AlbumThumbnail(album: album)
                     
                     Text(album.name ?? "Unknown Album")
+					
+					Spacer()
+					
+					if album.favorite {
+						Image(systemName: "heart.fill")
+							.foregroundColor(.accentColor)
+					}
                 }
             }
             .onAppear {

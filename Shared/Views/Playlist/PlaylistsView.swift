@@ -30,7 +30,10 @@ struct PlaylistsView: View {
     init() {
         self.fetchRequest = FetchRequest(
             entity: Playlist.entity(),
-            sortDescriptors: [NSSortDescriptor(key: #keyPath(Playlist.sortName), ascending: true, selector: #selector(NSString.caseInsensitiveCompare))]
+            sortDescriptors: [
+				NSSortDescriptor(key: #keyPath(Playlist.favorite), ascending: false),
+				NSSortDescriptor(key: #keyPath(Playlist.sortName), ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+			]
         )
 
     }
@@ -48,6 +51,13 @@ struct PlaylistsView: View {
                         PlaylistThumbnail(playlist: playlist)
                         
                         Text(playlist.name ?? "Unknown Playlist")
+						
+						Spacer()
+						
+						if playlist.favorite {
+							Image(systemName: "heart.fill")
+								.foregroundColor(.accentColor)
+						}
                     }
                 })
                 .swipeActions {
