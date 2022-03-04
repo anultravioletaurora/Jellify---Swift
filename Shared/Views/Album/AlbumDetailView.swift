@@ -10,6 +10,7 @@ import AVFoundation
 
 struct AlbumDetailView: View {
     
+	@ObservedObject
     var album: Album
         
     var fetchRequest: FetchRequest<Song>
@@ -110,7 +111,7 @@ struct AlbumDetailView: View {
                     HStack {
                         Spacer()
                         
-                        Text(networkingManager.retrieveArtistByName(name: album.albumArtistName ?? "Unknown Artist")?.name ?? "Unknown Artist")
+						Text(networkingManager.retrieveArtistByName(name: album.albumArtistName ?? "Unknown Artist", context: networkingManager.privateContext)?.name ?? "Unknown Artist")
                             .foregroundColor(.accentColor)
 
                         Spacer()
@@ -247,6 +248,12 @@ struct AlbumDetailView: View {
         
         @State
         var showNewPlaylistAlert: Bool = false
+		
+		@State
+		var addingToPlaylist : Bool = false
+		
+		@State
+		var songAddingToPlaylist : Playlist? = nil
         
         let networkingManager : NetworkingManager = NetworkingManager.shared
                 
@@ -265,19 +272,30 @@ struct AlbumDetailView: View {
                 
                 List(playlists) { playlist in
                     Button(action: {
+						addingToPlaylist = true
+						songAddingToPlaylist = playlist
                         networkingManager.addToPlaylist(playlist: playlist, song: song!, complete: {
+							addingToPlaylist = false
                             showPlaylistSheet = false
+							songAddingToPlaylist = nil
                         })
                     }, label: {
-                        VStack(alignment: .leading) {
-                            Text(playlist.name!)
-                                .font(.body)
-                            
-                            Text("\(String(playlist.songs?.count ?? 0)) songs")
-                                .font(.body)
-                                .opacity(Globals.componentOpacity)
-                        }
+						VStack(alignment: .leading) {
+							HStack {
+								Text(playlist.name!)
+									.font(.body)
+								
+								if addingToPlaylist && playlist == songAddingToPlaylist ?? nil {
+									ProgressView()
+								}
+							}
+							
+							Text("\(String(playlist.songs?.count ?? 0)) songs")
+								.font(.body)
+								.opacity(Globals.componentOpacity)
+						}
                     })
+						.disabled(addingToPlaylist)
                         .padding(.vertical, 5)
                 }
                 .listStyle(PlainListStyle())

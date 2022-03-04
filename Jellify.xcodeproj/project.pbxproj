@@ -881,7 +881,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9;
+				MARKETING_VERSION = 0.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jackcaulfield.Jellify;
 				PRODUCT_NAME = Jellify;
 				PROVISIONING_PROFILE_SPECIFIER = "Jellify iOS";
@@ -923,7 +923,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 0.9;
+				MARKETING_VERSION = 0.10;
 				PRODUCT_BUNDLE_IDENTIFIER = com.jackcaulfield.Jellify;
 				PRODUCT_NAME = Jellify;
 				PROVISIONING_PROFILE_SPECIFIER = "Jellify iOS";

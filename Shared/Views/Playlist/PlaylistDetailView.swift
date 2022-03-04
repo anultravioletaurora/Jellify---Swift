@@ -9,7 +9,7 @@ import SwiftUI
 
 struct PlaylistDetailView: View {
     
-    @ObservedObject
+	@ObservedObject
     var playlist : Playlist
         
     var fetchRequest: FetchRequest<PlaylistSong>

@@ -52,7 +52,12 @@ struct AlbumsListView: View {
                 HStack {
                     AlbumThumbnail(album: album)
                     
-                    Text(album.name ?? "Unknown Album")
+					VStack(alignment: .leading) {
+						Text(album.name ?? "Unknown Album")
+						
+						Text(album.albumArtistName ?? "Unknown Artist")
+							.opacity(Globals.componentOpacity)
+					}
 					
 					Spacer()
 					

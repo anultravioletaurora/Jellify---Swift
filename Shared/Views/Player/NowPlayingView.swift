@@ -52,12 +52,12 @@ struct NowPlayingView: View {
             // Blurred album artwork background
             .background(content: {
                 
-                if player.currentSong?.song.album!.artwork != nil {
+				if player.currentSong?.song.album != nil && player.currentSong?.song.album!.artwork != nil {
                     AlbumBackdropImage(album: player.currentSong!.song.album!)
                 }
             })
             .popupTitle(player.currentSong?.song.name ?? "Nothing Playing", subtitle: Builders.artistName(song: player.currentSong?.song) )
-            .popupImage(player.currentSong != nil ? Image(data: player.currentSong!.song.album!.artwork).resizable() :  Image("placeholder").resizable())
+			.popupImage(player.currentSong != nil && player.currentSong!.song.album != nil ? Image(data: player.currentSong!.song.album!.artwork).resizable() :  Image("placeholder").resizable())
             .popupBarItems({
                 HStack {
                     // Play / Pause music

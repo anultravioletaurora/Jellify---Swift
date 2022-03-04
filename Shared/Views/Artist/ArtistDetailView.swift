@@ -37,7 +37,10 @@ struct ArtistDetailView: View {
         self.artist = artist
         self.fetchRequest = FetchRequest(
             entity: Album.entity(),
-            sortDescriptors: [NSSortDescriptor(key: "productionYear", ascending: false)],
+			sortDescriptors: [
+				NSSortDescriptor(key: #keyPath(Album.favorite), ascending: false),
+				NSSortDescriptor(key: #keyPath(Album.productionYear), ascending: false)
+			],
             predicate: NSPredicate(format: "albumArtistName == %@", artist.name!)
         )
     }

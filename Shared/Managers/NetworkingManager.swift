@@ -247,9 +247,14 @@ class NetworkingManager : ObservableObject {
                     })
 
                 }
+				
                 self.loadPlaylistItems(playlist: privatePlaylist, context: privateContext, complete: {
                     print("Playlist addition and refresh")
 
+					if privatePlaylist.downloaded && !song.downloaded {
+						DownloadManager.shared.download(song: song)
+					}
+					
                     try! privateContext.save()
 
                     self.saveContext()
@@ -458,13 +463,13 @@ class NetworkingManager : ObservableObject {
         return self.context.object(with: self.retrieveArtistFromCoreById(jellyfinId: jellyfinId)!) as? Artist
     }
     
-    public func retrieveArtistByName(name: String) -> Artist? {
-        return self.context.object(with: self.retrieveArtistFromCore(artistName: name)!) as? Artist
+	public func retrieveArtistByName(name: String, context: NSManagedObjectContext) -> Artist? {
+        return context.object(with: self.retrieveArtistFromCore(artistName: name)!) as? Artist
     }
 
     public func loadAlbumArtwork(album: Album) -> Void {
                 
-        ImageAPI.getItemImage(itemId: album.jellyfinId!, imageType: .primary, apiResponseQueue: imageQueue)
+		ImageAPI.getItemImage(itemId: album.jellyfinId!, imageType: .primary, apiResponseQueue: DispatchQueue.global(qos: .utility))
             .sink(receiveCompletion: { completion in
                 print("Image receive completion: \(completion)")
             }, receiveValue: { url in
@@ -670,7 +675,7 @@ class NetworkingManager : ObservableObject {
 
     
     private func loadArtists(complete: @escaping () -> Void) -> Void {
-        ArtistsAPI.getAlbumArtists(minCommunityRating: nil, startIndex: nil, limit: nil, searchTerm: nil, parentId: nil, fields: [ItemFields.primaryImageAspectRatio, ItemFields.sortName, ItemFields.basicSyncInfo], excludeItemTypes: nil, includeItemTypes: nil, filters: nil, isFavorite: nil, mediaTypes: nil, genres: nil, genreIds: nil, officialRatings: nil, tags: nil, years: nil, enableUserData: true, imageTypeLimit: nil, enableImageTypes: nil, person: nil, personIds: nil, personTypes: nil, studios: nil, studioIds: nil, userId: self.userId, nameStartsWithOrGreater: nil, nameStartsWith: nil, nameLessThan: nil, enableImages: true, enableTotalRecordCount: nil, apiResponseQueue: processingQueue)
+		ArtistsAPI.getArtists(minCommunityRating: nil, startIndex: nil, limit: nil, searchTerm: nil, parentId: nil, fields: [ItemFields.primaryImageAspectRatio, ItemFields.sortName, ItemFields.basicSyncInfo], excludeItemTypes: nil, includeItemTypes: nil, filters: nil, isFavorite: nil, mediaTypes: nil, genres: nil, genreIds: nil, officialRatings: nil, tags: nil, years: nil, enableUserData: true, imageTypeLimit: nil, enableImageTypes: nil, person: nil, personIds: nil, personTypes: nil, studios: nil, studioIds: nil, userId: self.userId, nameStartsWithOrGreater: nil, nameStartsWith: nil, nameLessThan: nil, enableImages: true, enableTotalRecordCount: nil, apiResponseQueue: processingQueue)
             .sink(receiveCompletion: { error in
                 switch error {
                 case .finished :
@@ -760,13 +765,13 @@ class NetworkingManager : ObservableObject {
                     
                     let newAlbums = response.items!.filter { albumIdsSet.contains($0.id! )}
                     
-                    DispatchQueue.concurrentPerform(iterations: newAlbums.count) { index in
+					DispatchQueue.concurrentPerform(iterations: response.items!.count) { index in
 
                         let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
                         
                         privateContext.parent = self.privateContext
 
-                        let albumResult = newAlbums[index]
+						let albumResult = response.items![index]
                         
                         print("Album \(index) of \(response.items!.count)")
                         
@@ -778,7 +783,7 @@ class NetworkingManager : ObservableObject {
                             
                             album!.jellyfinId = albumResult.id!
                         } else {
-                            album = self.privateContext.object(with: self.retrieveAlbumFromCore(albumId: albumResult.id!)!) as? Album
+                            album = privateContext.object(with: self.retrieveAlbumFromCore(albumId: albumResult.id!)!) as? Album
                         }
                         
                         album!.name = albumResult.name!
@@ -798,7 +803,7 @@ class NetworkingManager : ObservableObject {
                         }
                         
                         if (artist != nil) {
-                            album!.albumArtistName = artist!.name!
+							album!.albumArtistName = albumResult.albumArtist!
                             
                             self.retrieveArtistsFromCoreByJellyfinIds(jellyfinIds: albumResult.albumArtists!.map { $0.id! }).forEach({ artistObjectId in
                                 album!.addToAlbumArtists(privateContext.object(with: artistObjectId) as! Artist)
@@ -843,11 +848,11 @@ class NetworkingManager : ObservableObject {
                                                     
                         let newSongs = response.items!.filter { songIds.contains($0.id)}
                         
-                        if !newSongs.isEmpty {
+                        if true {
 
-                            DispatchQueue.concurrentPerform(iterations: newSongs.count) { index in
+							DispatchQueue.concurrentPerform(iterations: response.items!.count) { index in
                                                                 
-                                let songResult = newSongs[index]
+								let songResult = response.items![index]
                                 
                                 print("Song \(index) of \(newSongs.count)")
                                         
@@ -879,21 +884,17 @@ class NetworkingManager : ObservableObject {
 										song.diskNumber = Int16(songResult.parentIndexNumber!)
 									}
 									
-									var album : Album?
+									if let albumId = songResult.albumId {
+										song.album = privateContext.object(with: self.retrieveAlbumFromCore(albumId: albumId)!) as! Album
+									}
 									
-									if (songResult.albumId != nil) {
-																				
-										album = privateContext.object(with: self.retrieveAlbumFromCore(albumId: songResult.albumId!)!) as! Album?
+									if let artistIds = songResult.artistItems?.map({ $0.name }) {
+										artistIds.forEach({ artistName in
+											song.addToArtists(self.retrieveArtistByName(name: artistName!, context: privateContext)!)
+										})
 									}
 									
 									try! privateContext.save()
-									
-									if (album != nil) {
-										song.album = album!
-										self.retrieveArtistsFromCoreByJellyfinIds(jellyfinIds: songResult.artistItems!.map { $0.id! }).forEach({ artistObjectId in
-											song.addToArtists(privateContext.object(with: artistObjectId) as! Artist)
-										})
-                                    }
                                 } else {
                                     let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 
@@ -905,12 +906,22 @@ class NetworkingManager : ObservableObject {
                                     song.sortName = songResult.sortName ?? songResult.name!
                                     song.container = songResult.mediaSources![0].container
                                     song.favorite = songResult.userData?.isFavorite ?? false
+									
+									if let albumId = songResult.albumId {
+										song.album = privateContext.object(with: self.retrieveAlbumFromCore(albumId: albumId)!) as! Album
+									}
+									
+									if let artistIds = songResult.artistItems?.map({ $0.name }) {
+										artistIds.forEach({ artistName in
+											song.addToArtists(self.retrieveArtistByName(name: artistName!, context: privateContext)!)
+										})
+									}
                                     
                                     try! privateContext.save()
                                 }
                                 
                                 // Check if we've gone through everything the server has to offer
-                                if (songResult == newSongs.last!) {
+								if (songResult == response.items!.last!) {
                                     
                                     // If this response is less than the configured fetch amount, it means the server doesn't
                                     // have more to give and we should complete
@@ -944,6 +955,16 @@ class NetworkingManager : ObservableObject {
                                 }
                             }
                         } else {
+							
+							DispatchQueue.concurrentPerform(iterations: response.items!.count, execute: { index in
+								let responseItem = response.items![index]
+								
+								let song = self.privateContext.object(with: self.retrieveSongFromCore(songId: responseItem.id!)!) as! Song
+								
+								song.name = responseItem.name!
+								song.favorite = responseItem.userData?.isFavorite ?? song.favorite
+								song.container = responseItem.mediaSources?[0].container ?? song.container
+							})
                                 
                             // If this response is less than the configured fetch amount, it means the server doesn't
                             // have more to give and we should complete
@@ -1622,10 +1643,10 @@ class NetworkingManager : ObservableObject {
     
     public func saveContext() {
         
-        self.privateContext.performAndWait {
+		self.privateContext.perform {
             do {
-                try self.privateContext.save()
-                self.context.perform {
+				try self.privateContext.save()
+                self.context.performAndWait {
                     do {
                         try self.context.save()
                     } catch {

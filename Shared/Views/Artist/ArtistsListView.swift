@@ -32,10 +32,10 @@ struct ArtistsListView: View {
         .onReceive(
             searchBar.$search.debounce(for: .seconds(Globals.debounceDuration), scheduler: RunLoop.main)
         ) {
-            listId = UUID()
-            
+			listId = UUID()
+			
             guard !$0.isEmpty else {
-                artists.nsPredicate = nil
+                artists.nsPredicate = NSPredicate(format: "albums.@count != 0")
                 return
             }
             
@@ -45,11 +45,13 @@ struct ArtistsListView: View {
                 searches.append(searchBar.search.replacingOccurrences(of: "and", with: "&").trimmingCharacters(in: .whitespaces))
             }
             
-            let predicates = searches.map { search in
+            var predicates = searches.map { search in
                 NSPredicate(format: "%K beginswith[c] %@", #keyPath(Artist.name), search)
             }
-            
-            artists.nsPredicate = searchBar.search.isEmpty ? nil : NSCompoundPredicate(orPredicateWithSubpredicates: predicates)
+			
+			predicates.append(NSPredicate(format: "albums.@count != 0"))
+			
+            artists.nsPredicate = searchBar.search.isEmpty ? nil : NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
         }
         .listStyle(PlainListStyle())
     }

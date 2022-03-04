@@ -32,6 +32,13 @@ struct AlbumRow: View {
                             .opacity(0.6)
                     }
                 }
+				
+				Spacer()
+				
+				if album.favorite {
+					Image(systemName: "heart.fill")
+						.foregroundColor(.accentColor)
+				}
             }
             .contentShape(Rectangle())
         }

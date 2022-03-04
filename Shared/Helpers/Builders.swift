@@ -51,7 +51,7 @@ class Builders {
             // Else if we have more than 2, line them up, album artist first, and
             // join them with an Oxford Comma (Vampire Weekend)
             else {
-                return artists.filter { $0.name != nil }.map { $0.name! }.sorted(by: { $0 == song!.album!.albumArtistName || $0 > $1 }).joined(separator: ", ")
+                return artists.filter { $0.name != nil }.map { $0.name! }.sorted(by: { $0 == song!.album?.albumArtistName ?? "" || $0 > $1 }).joined(separator: ", ")
             }
         }
         

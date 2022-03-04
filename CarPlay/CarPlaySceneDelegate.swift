@@ -33,11 +33,11 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             }
         })
         
-        artists.forEach({ artist in
-            if artist.thumbnail == nil {
-                self.networkingManager.loadArtistImage(artist: artist)
-            }
-        })
+//        artists.forEach({ artist in
+//            if artist.thumbnail == nil {
+//                self.networkingManager.loadArtistImage(artist: artist)
+//            }
+//        })
         
         let artistListItems = artists.map({ artist -> CPListItem in
             
@@ -77,10 +77,12 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
                             
                             let albumSongIds = self.networkingManager.retrieveSongsFromCore(albumId: albumListItem.userInfo as! String)
                             
-                            let albumSongs = albumSongIds.map { id in
+                            let albumSongs = (albumSongIds.map { id in
                                 self.networkingManager.context.object(with: id)
                                 
-                            } as! [Song]
+							} as! [Song]).sorted(by: {
+								$0.indexNumber < $1.indexNumber
+							})
 
                                                                      
                             albumSongItems = albumSongs.map({ (song: Song) -> CPListItem in
@@ -138,11 +140,11 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
             $0.sortName! < $1.sortName!
         })
         
-        playlists.forEach({ playlist in
-            if playlist.thumbnail == nil {
-                self.networkingManager.loadPlaylistImage(playlist: playlist)
-            }
-        })
+//        playlists.forEach({ playlist in
+//            if playlist.thumbnail == nil {
+//                self.networkingManager.loadPlaylistImage(playlist: playlist)
+//            }
+//        })
         
         let playlistButtons = playlists.map({ playlist -> CPListItem in
                         
@@ -150,7 +152,6 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
                 
                 let playlistSong = self.networkingManager.privateContext.object(with: objectId) as! PlaylistSong
                 
-                self.networkingManager.loadAlbumArtwork(album: playlistSong.song!.album!)
             })
             
             let listItem = CPListItem(text: playlist.name!, detailText: "", image: playlist.thumbnail != nil ? UIImage(data: playlist.thumbnail!) : nil)
@@ -177,6 +178,8 @@ class CarPlaySceneDelegate: UIResponder, CPTemplateApplicationSceneDelegate {
                         let playlistSongItem = CPListItem(text: song.name, detailText: Builders.artistName(song: song), image: song.album?.thumbnail != nil ? UIImage(data: (song.album?.thumbnail)!) : nil, accessoryImage: song.downloaded ? UIImage(systemName: "arrow.down.circle.fill") : UIImage(systemName: "icloud"), accessoryType: song.downloaded ? .none : .cloud)
                         
                         playlistSongItem.handler = {item, completion in
+							
+							self.networkingManager.loadAlbumArtwork(album: song.album!)
                             
                             self.player.loadSongs(songs.map { $0.song! }, songId: song.jellyfinId!)
                             

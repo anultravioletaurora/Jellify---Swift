@@ -27,7 +27,11 @@ struct ArtistsView: View {
                 
         self.fetchRequest = FetchRequest(
             entity: Artist.entity(),
-            sortDescriptors: [NSSortDescriptor(key: #keyPath(Artist.favorite), ascending: false), NSSortDescriptor(key: #keyPath(Artist.sortName), ascending: true, selector: #selector(NSString.caseInsensitiveCompare))]
+            sortDescriptors: [
+				NSSortDescriptor(key: #keyPath(Artist.favorite), ascending: false),
+				NSSortDescriptor(key: #keyPath(Artist.sortName), ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
+			],
+			predicate: NSPredicate(format: "albums.@count != 0")
         )
     }
     
