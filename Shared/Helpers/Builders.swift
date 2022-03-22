@@ -64,6 +64,20 @@ class Builders {
             return song!.album!.albumArtistName!
         }
     }
+	
+	static func artistName(album: Album) -> String {
+		guard album.albumArtists != nil || album.albumArtistName != nil else {
+			return "Unknown Artist"
+		}
+		
+		if album.albumArtistName != nil {
+			return album.albumArtistName!
+		}
+		
+		else {
+			return (album.albumArtists!.allObjects as! [Artist]).map({ $0.name! }).joined(separator: ", ")
+		}
+	}
     
     static func streamUrl(song: Song) -> URL {
         let container = "opus,mp3,aac,m4a,flac,webma,webm,wav,ogg,mpa,wma"

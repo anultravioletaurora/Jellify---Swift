@@ -89,7 +89,7 @@ struct AlbumsGalleryView: View {
 struct AlbumGalleryItem: View {
     @ObservedObject
     var album : FetchedResults<Album>.Element
-    
+	    
     var body: some View {
         NavigationLink(destination: LazyNavigationView(AlbumDetailView(album: album)), label: {
             VStack {

@@ -17,13 +17,6 @@ struct AlbumImage: View {
     var height = UIScreen.main.bounds.height / 4
 
     var body: some View {
-        ItemThumbnail(thumbnail: album.artwork, itemId: album.jellyfinId!, frame: height, cornerRadius: 2)
-            .onAppear(perform: {
-                networkingManager.imageQueue.async {
-                    if (album.artwork == nil) {
-                        networkingManager.loadAlbumArtwork(album: album)
-                    }
-                }
-            })
+        ItemThumbnail(itemId: album.jellyfinId!, frame: height, cornerRadius: 2)
     }
 }

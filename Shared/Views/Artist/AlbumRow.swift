@@ -13,7 +13,7 @@ struct AlbumRow: View {
     var album : FetchedResults<Album>.Element
     
     let artist : FetchedResults<Artist>.Element
-    
+	    
     var body: some View {
         NavigationLink(destination: AlbumDetailView(album: album)) {
                 
@@ -21,16 +21,13 @@ struct AlbumRow: View {
                 // Album Image
                 AlbumThumbnail(album: album)
 
-                VStack(alignment: .leading) {
+				VStack(alignment: .leading, spacing: 10) {
 
                     Text(album.name ?? "Unknown Album")
-                        .font(.body)
 
-                    HStack {                        
-                        Text(String(album.productionYear))
-                            .font(.subheadline)
-                            .opacity(0.6)
-                    }
+					Text(String(album.productionYear))
+						.font(.subheadline)
+						.opacity(Globals.componentOpacity)
                 }
 				
 				Spacer()

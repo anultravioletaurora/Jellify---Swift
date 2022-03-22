@@ -29,12 +29,44 @@ struct JellifyApp: App {
     var body: some Scene {
         WindowGroup {
                 ContentView()
-                .environment(\.managedObjectContext, networkingManager.context)
+				.environment(\.managedObjectContext, persistenceController.container.viewContext)
                 .environmentObject(Settings())
                 .environmentObject(Player.shared)
+				.environmentObject(ViewControls())
         }
         .onChange(of: scenePhase) { _ in
             persistenceController.save()
         }
     }
+}
+
+class ViewControls : ObservableObject, Equatable {
+	static func == (lhs: ViewControls, rhs: ViewControls) -> Bool {
+		return lhs.showArtistView == rhs.showArtistView
+	}
+	
+	@Published
+	var showArtistView = false {
+		didSet {
+			print("Show artist view changed: \(showArtistView)")
+		}
+	}
+	
+	@Published
+	var currentView : CurrentView? {
+		didSet {
+			print("Current view changed: \(currentView!)")
+		}
+	}
+}
+
+enum CurrentView {
+	case Playlist
+	case PlaylistDetail
+	case Artist
+	case ArtistDetail
+	case NowPlayingArtistDetail
+	case Album
+	case AlbumDetail
+	case Home
 }

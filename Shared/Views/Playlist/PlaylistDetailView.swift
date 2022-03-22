@@ -29,11 +29,23 @@ struct PlaylistDetailView: View {
     
     @State
     var confirmDeleteDownload : Bool = false
+	
+	@EnvironmentObject
+	var viewControls : ViewControls
 
-    @EnvironmentObject
-    var player : Player
+    @StateObject
+	var player : Player = Player.shared
+		
+	@State
+	var isDisplayed : Bool = false
+	
+	@State
+	var navigateAway : Bool = false
+	
+	@State
+	var artistToView : Artist?
 
-    init(playlist: Playlist) {
+	init(playlist: Playlist) {
         self.playlist = playlist
         
         self.fetchRequest = FetchRequest(
@@ -164,5 +176,25 @@ struct PlaylistDetailView: View {
         .sheet(isPresented: $showPlaylistSheet, content: {
             PlaylistSelectionSheet(song: $selectedSong, showPlaylistSheet: $showPlaylistSheet)
         })
+		.onAppear {
+			self.viewControls.currentView = .PlaylistDetail
+			self.viewControls.showArtistView = false
+			self.navigateAway = false
+		}
+		.onChange(of: self.viewControls.showArtistView, perform: { newValue in
+			if newValue && viewControls.currentView == .PlaylistDetail{
+				if let artist = player.currentArtist {
+					
+					self.artistToView = artist
+					
+					self.navigateAway = true
+				}
+			}
+		})
+		
+		if self.artistToView != nil {
+			NavigationLink(destination: NowPlayingArtistDetailView(artist: self.artistToView!), isActive: $navigateAway, label: {})
+				.isDetailLink(false)
+		}
     }
 }

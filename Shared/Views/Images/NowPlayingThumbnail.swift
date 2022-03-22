@@ -16,7 +16,7 @@ struct NowPlayingThumbnail: View {
         if player.currentSong != nil {
             AlbumThumbnail(album: player.currentSong!.song.album!)
         } else {
-            ItemThumbnail(thumbnail: nil, itemId: "", frame: 60, cornerRadius: 2)
+            ItemThumbnail(itemId: "", frame: 60, cornerRadius: 2)
         }
     }
 }

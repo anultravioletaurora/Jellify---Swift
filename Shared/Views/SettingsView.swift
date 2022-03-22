@@ -66,5 +66,6 @@ struct SettingsView: View {
 //            .overlay(PlayerView())
             .navigationTitle("Settings")
         }
+		.navigationViewStyle(.stack) 
     }
 }

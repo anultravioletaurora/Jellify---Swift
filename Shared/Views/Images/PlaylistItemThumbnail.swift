@@ -13,6 +13,6 @@ struct PlaylistItemThumbnail: View {
     var playlistSong: FetchedResults<PlaylistSong>.Element
     
     var body: some View {
-        ItemThumbnail(thumbnail: playlistSong.song!.album!.thumbnail, itemId: playlistSong.song!.album!.jellyfinId!, frame: 60, cornerRadius: 2)
+        ItemThumbnail(itemId: playlistSong.song!.album!.jellyfinId!, frame: 60, cornerRadius: 2)
     }
 }

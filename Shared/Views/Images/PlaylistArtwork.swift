@@ -16,7 +16,7 @@ struct PlaylistArtwork: View {
         HStack {
             Spacer()
             
-            ItemThumbnail(thumbnail: playlist.thumbnail, itemId: playlist.jellyfinId!, frame: Globals.ARTWORK_FRAME, cornerRadius: 2)
+            ItemThumbnail(itemId: playlist.jellyfinId!, frame: Globals.ARTWORK_FRAME, cornerRadius: 2)
             
             Spacer()
         }

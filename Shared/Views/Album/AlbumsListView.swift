@@ -18,12 +18,27 @@ struct AlbumsListView: View {
     
     @StateObject
     var searchBar = SearchBarViewModel()
+	
+	@EnvironmentObject
+	var viewControls : ViewControls
+	
+	@EnvironmentObject
+	var player : Player
     
     @Binding
     var limit: Int
         
     @State
     var listId = UUID()
+	
+	@State
+	var artist : Artist?
+	
+	@State
+	var artistToView : Artist?
+	
+	@State
+	var navigateAway : Bool = false
 
     init(limit: Binding<Int>) {
         
@@ -52,11 +67,12 @@ struct AlbumsListView: View {
                 HStack {
                     AlbumThumbnail(album: album)
                     
-					VStack(alignment: .leading) {
+					VStack(alignment: .leading, spacing: 10) {
 						Text(album.name ?? "Unknown Album")
 						
 						Text(album.albumArtistName ?? "Unknown Artist")
 							.opacity(Globals.componentOpacity)
+							.font(.subheadline)
 					}
 					
 					Spacer()
@@ -91,9 +107,27 @@ struct AlbumsListView: View {
                 albums.nsPredicate = nil
                 return
             }
-            albums.nsPredicate = searchBar.search.isEmpty ? nil : NSPredicate(format: "%K beginswith[c] %@", #keyPath(Album.name), searchBar.search.trimmingCharacters(in: .whitespaces))
+            albums.nsPredicate = searchBar.search.isEmpty ? nil : NSPredicate(format: "%K contains[c] %@", #keyPath(Album.name), searchBar.search.trimmingCharacters(in: .whitespaces))
         }
 
         .listStyle(PlainListStyle())
+		.onAppear {
+			self.viewControls.currentView = .Album
+		}
+		.onChange(of: self.viewControls.showArtistView, perform: { newValue in
+			if newValue && self.viewControls.currentView == .Album {
+				if let artist = player.currentArtist {
+					
+					self.artistToView = artist
+					
+					self.navigateAway = true
+				}
+			}
+		})
+		
+		if self.artistToView != nil {
+			NavigationLink(destination: NowPlayingArtistDetailView(artist: self.artistToView!), isActive: $navigateAway, label: {})
+				.isDetailLink(false)
+		}
     }
 }

@@ -86,6 +86,7 @@ class Player: ObservableObject {
 
     static let shared = Player()
     let session = AVAudioSession.sharedInstance()
+	let imageManager : ImageManager = ImageManager.shared
     
     let queue = DispatchQueue(label: "playerQueue", qos: .userInteractive, attributes: .concurrent)
         
@@ -168,6 +169,9 @@ class Player: ObservableObject {
         }
     }
     
+	@Published
+	public var currentArtist: Artist?
+	
     @Published
     public var currentSong: AVPlayerItemId?
     {
@@ -188,6 +192,10 @@ class Player: ObservableObject {
 
             duration =  currentSong?.song.runTime ?? "0:00"
             timeElasped = "0:00"
+			
+			if let currentSong = currentSong {
+				currentArtist = NetworkingManager.shared.retrieveArtistByName(name: currentSong.song.album!.albumArtistName!, context: NetworkingManager.shared.context)
+			}
         }
     }
     public var songIndex: Int = 0
@@ -344,7 +352,7 @@ class Player: ObservableObject {
             }
                     
         default: ()
-            self.isPlaying = true
+            self.isPlaying = false
         }
     }
 
@@ -387,6 +395,7 @@ class Player: ObservableObject {
                 }
             }
         default: ()
+			isPlaying = false
         }
     }
     
@@ -634,7 +643,14 @@ class Player: ObservableObject {
                 MPMediaItemPropertyAlbumTitle: currentItem.song.album?.name ?? "Unknown Album",
                 MPMediaItemPropertyTitle: currentItem.song.name ?? "Unknown Track",
                 MPMediaItemPropertyArtwork: MPMediaItemArtwork(boundsSize: CGSize(width: 500, height: 500), requestHandler: { (size: CGSize) -> UIImage in
-                    return self.getAlbumUiImage(data: self.currentSong?.song.album?.artwork) ?? self.placeholderImage
+					
+					if let album = self.currentSong?.song.album {
+						if let image = self.getAlbumImage(album: album) {
+							return UIImage(data: image)!
+						}
+					}
+					
+					return self.placeholderImage
                 })
             ]
             MPNowPlayingInfoCenter.default().playbackState = self.isPlaying ? MPNowPlayingPlaybackState.playing : .paused
@@ -647,14 +663,18 @@ class Player: ObservableObject {
     }
     }
     
-    private func getAlbumUiImage(data: Data?) -> UIImage? {
-        var image: UIImage?
-
-        if data != nil {
-            image = UIImage(data: data!)
-        }
-
-        return image
+	private func getAlbumImage(album : Album) -> Data? {
+		
+		if let image = imageManager.imageFor(itemId: album.jellyfinId!) {
+			return image
+		} else {
+			imageManager.download(itemId: album.jellyfinId!, complete: { image in
+				
+				return image
+			})
+		}
+		
+		return nil
     }
     
     private func setupPlayTimer() {

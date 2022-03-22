@@ -30,5 +30,6 @@ struct SongsView: View {
                 })
             })
         }
+		.navigationViewStyle(.stack) 
     }
 }

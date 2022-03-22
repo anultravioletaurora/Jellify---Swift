@@ -9,19 +9,20 @@ import SwiftUI
 import LNPopupUI
 
 struct TabBarView: View {
-                    
-    @State
-    var selectedTab : Int = 1
-                    
+                           	
     var body: some View {
         
         print(Self._printChanges())
 
-        return TabView(selection: $selectedTab) {
+        return TabView {
             
+			HomeView()
+				.tabItem {
+					Label("Home", systemImage: "music.note.house.fill")
+				}
+			
             // Artists Tab
             ArtistsView()
-                    .tag(1)
                     .tabItem {
                         Label("Artists", systemImage: "music.mic")
                     }
@@ -29,28 +30,24 @@ struct TabBarView: View {
             
             // Albums Tab
             AlbumsView()
-                .tag(2)
                 .tabItem {
                     Label("Albums", systemImage: "square.stack.fill")
                 }
+			
+			// Playlists Tab
+			PlaylistsView()
+				.tabItem {
+					Label("Playlists", systemImage: "music.note.list")
+				}
             
             // Songs Tab
             SongsView()
-                .tag(3)
                 .tabItem {
                     Label("Songs", systemImage: "music.note")
-                }
-            
-            // Playlists Tab
-            PlaylistsView()
-                .tag(4)
-                .tabItem {
-                    Label("Playlists", systemImage: "music.note.list")
                 }
 
             // Settings View
             SettingsView()
-                .tag(5)
                 .tabItem {
                     Label("Settings", systemImage: "gear")
                 }

@@ -17,15 +17,19 @@ class NetworkingManager : ObservableObject {
     
     var cancellables = Set<AnyCancellable>()
     
-    let processingQueue = DispatchQueue(label: "JellifyProcessingQueue", attributes: .concurrent)
+	let processingQueue = DispatchQueue(label: "JellifyProcessingQueue", qos: .userInitiated, attributes: .concurrent)
     
-    let imageQueue = DispatchQueue(label: "JellifyImageQueue")
+	let imageQueue = DispatchQueue(label: "JellifyImageQueue", qos: .background)
+	
+	let persistenceController = PersistenceController.shared
         
     let context : NSManagedObjectContext = PersistenceController.shared.container.viewContext
         
     let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
 	    
     let sessionId : UUID = UUID()
+	
+	var songDispatchGroup = DispatchGroup()
     
     @Published
     var loadingPhase : LoadingPhase? = nil {
@@ -42,44 +46,68 @@ class NetworkingManager : ObservableObject {
                 })
                     
             case .songs:
-                loadSongs(complete: {
+				loadSongs(complete: {
                     self.loadPlaylists(complete: {
-                        let playlists = self.retrieveAllPlaylistsFromCore()
+												
+						// Specify we need to be on a background context
+						let backgroundContext = PersistenceController.shared.container.newBackgroundContext()
+						
+						let playlists = self.retrieveAllPlaylistsFromCore(context: backgroundContext)
+						
+						let songs = self.retrieveAllSongsFromCore(context: backgroundContext, ids: nil)
+						
+						backgroundContext.performAndWait {
 
-                        playlists.forEach({ playlist in
+							var completedPlaylistAdditions : [Bool] = []
 
-                            let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+							playlists.forEach({ playlist in
 
-                            privateContext.parent = self.context
+								
+								self.loadPlaylistItems(playlist: playlist, context: backgroundContext, songs: songs, complete: {
+									
+									completedPlaylistAdditions.append(true)
+									
+									if completedPlaylistAdditions.count == playlists.count {
+										do {
+											try backgroundContext.save()
+											
+											// Retrieve current sync
+											let sync = self.retrieveCurrentSync()
+											sync?.timeFinished = Date.now
+											sync?.wasSuccess = true
 
-                            let privatePlaylist = privateContext.object(with: self.retrievePlaylistFromCore(playlistId: playlist.jellyfinId!)!) as! Playlist
+											self.saveContext()
+											
+											print("Loading complete!")
+											
+											DispatchQueue.main.async {
+												self.loadingPhase = nil
+												self.libraryIsPopulated = true
+											}
+											self.processDownloadQueue()
+											
+										} catch {
+											
+											// Retrieve current sync
+											let sync = self.retrieveCurrentSync()
+											sync?.timeFinished = Date.now
+											sync?.wasSuccess = false
+											
+											self.saveContext()
+											
+											print("Loading complete!")
+											
+											DispatchQueue.main.async {
+												self.loadingPhase = nil
+												self.libraryIsPopulated = true
+											}
+											self.processDownloadQueue()
+										}
 
-                            self.loadPlaylistItems(playlist: privatePlaylist, context: privateContext, complete: {
-                                
-                                do {
-                                    try privateContext.save()
-
-                                    if playlist == playlists.last! {
-                                            self.saveContext()
-                                            print("Loading complete!")
-                                        
-                                        DispatchQueue.main.async {
-                                            self.loadingPhase = nil
-                                            self.libraryIsPopulated = true
-                                        }
-										self.processDownloadQueue()
-                                    }
-                                } catch {
-									self.saveContext()
-									print("Loading complete!")
-                                    DispatchQueue.main.async {
-                                        self.loadingPhase = nil
-                                        self.libraryIsPopulated = true
-                                    }
-									self.processDownloadQueue()
-                                }
-                            })
-                        })
+									}
+								})
+							})
+						}
                     })
                 }, startIndex: 0, retrievedSongIds: [])
                     
@@ -220,7 +248,7 @@ class NetworkingManager : ObservableObject {
     }
     
     public func libraryIsPopulatedWithAtLeastSomething() -> Bool {
-        self.retrieveAllSongsFromCore().count > 0
+		self.retrieveAllSongsFromCore(context: nil, ids: nil).count > 0
     }
     
     public func addToPlaylist(playlist: Playlist, song: Song, complete: @escaping () -> Void) -> Void {
@@ -248,7 +276,9 @@ class NetworkingManager : ObservableObject {
 
                 }
 				
-                self.loadPlaylistItems(playlist: privatePlaylist, context: privateContext, complete: {
+				let songs = self.retrieveAllSongsFromCore(context: privateContext, ids: nil)
+				
+				self.loadPlaylistItems(playlist: privatePlaylist, context: privateContext, songs: songs, complete: {
                     print("Playlist addition and refresh")
 
 					if privatePlaylist.downloaded && !song.downloaded {
@@ -278,25 +308,69 @@ class NetworkingManager : ObservableObject {
             .sink(receiveCompletion: { completion in
                 print("Creating playlist receive completion: \(completion)")
             }, receiveValue: { response in
-                
-                let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-                
-                privateContext.parent = self.context
-                
-                let newPlaylist = Playlist(context: privateContext)
-                
-                newPlaylist.jellyfinId = response.id
-                newPlaylist.name = name
-                                
-                self.loadPlaylistItems(playlist: newPlaylist, context: privateContext, complete: {
-                    
-                    try! privateContext.save()
-                    
-                    self.saveContext()
-                    
-                    complete()
-                })
-            })
+				
+				self.loadPlaylists(complete: {
+						// Specify we need to be on a background context
+						let backgroundContext = PersistenceController.shared.container.newBackgroundContext()
+						
+						let playlists = self.retrieveAllPlaylistsFromCore(context: backgroundContext)
+						
+						let songs = self.retrieveAllSongsFromCore(context: backgroundContext, ids: nil)
+						
+						backgroundContext.performAndWait {
+
+							var completedPlaylistAdditions : [Bool] = []
+
+							playlists.forEach({ playlist in
+
+								
+								self.loadPlaylistItems(playlist: playlist, context: backgroundContext, songs: songs, complete: {
+									
+									completedPlaylistAdditions.append(true)
+									
+									if completedPlaylistAdditions.count == playlists.count {
+										do {
+											try backgroundContext.save()
+											
+											// Retrieve current sync
+											let sync = self.retrieveCurrentSync()
+											sync?.timeFinished = Date.now
+											sync?.wasSuccess = true
+
+											self.saveContext()
+											
+											print("Loading complete!")
+											
+											DispatchQueue.main.async {
+												self.loadingPhase = nil
+												self.libraryIsPopulated = true
+											}
+											self.processDownloadQueue()
+											
+										} catch {
+											
+											// Retrieve current sync
+											let sync = self.retrieveCurrentSync()
+											sync?.timeFinished = Date.now
+											sync?.wasSuccess = false
+											
+											self.saveContext()
+											
+											print("Loading complete!")
+											
+											DispatchQueue.main.async {
+												self.loadingPhase = nil
+												self.libraryIsPopulated = true
+											}
+											self.processDownloadQueue()
+										}
+
+									}
+								})
+							})
+						}
+					})
+			})
             .store(in: &self.cancellables)
     }
     
@@ -324,7 +398,7 @@ class NetworkingManager : ObservableObject {
     public func deleteFromPlaylist(playlist: Playlist, indexSet: IndexSet) -> Void {
         
 		// For some reason pulling the index out of the index set is always off by one
-		let indexToRemove = playlist.songs?.count == indexSet.last! + 1 ? indexSet.last! : indexSet.last! + 1
+		let indexToRemove = playlist.songs?.count == indexSet.last! + 1 ? indexSet.last! : indexSet.last!
         
         if var playlistSongs = playlist.songs?.allObjects as? [PlaylistSong]{
             let remainingPlaylistSongIds = playlistSongs.filter { indexToRemove != $0.indexNumber }.map { $0.jellyfinId! }
@@ -332,16 +406,37 @@ class NetworkingManager : ObservableObject {
                                 
             let playlistSongIdsToRemove = (playlist.songs!.allObjects as! [PlaylistSong]).map { $0.jellyfinId! }.filter { !remainingPlaylistSongIds.contains($0)}
 			
+			var deletedSongs : [PlaylistSong] = []
+			
+			playlistSongIdsToRemove.forEach({ playlistSongId in
+								
+				let playlistSong : PlaylistSong = self.context.object(with: self.retrievePlaylistSongFromCore(playlistSongId: playlistSongId)!) as! PlaylistSong
+				
+				deletedSongs.append(playlistSong)
+				self.deletePlaylistSongByJellyfinId(playlistSongId: playlistSongId, context: self.context)
+			})
+			
 			print("Removing songs \((playlist.songs!.allObjects as! [PlaylistSong]).filter({ playlistSongIdsToRemove.contains($0.jellyfinId!)}).map({ $0.song!.name!}).joined(separator: ", "))")
                     
             PlaylistsAPI.removeFromPlaylist(playlistId: playlist.jellyfinId!, entryIds: playlistSongIdsToRemove, apiResponseQueue: JellyfinAPI.apiResponseQueue)
                 .sink(receiveCompletion: { completion in
+					
+					switch completion {
+					case .failure:
+						deletedSongs.forEach({ playlistSong in
+							playlist.addToSongs(playlistSong)
+						})
+						
+					default:
+						return
+					}
                     print("Call to remove song from playlist complete: \(completion)")
                 }, receiveValue: { response in
-
-					playlistSongIdsToRemove.forEach({ playlistSongId in
-						self.deletePlaylistSongByJellyfinId(playlistSongId: playlistSongId, context: self.context)
-					})
+					
+					// We've deleted the playlist item(s) pre-emptively, so no need to delete here
+//					playlistSongIdsToRemove.forEach({ playlistSongId in
+//						self.deletePlaylistSongByJellyfinId(playlistSongId: playlistSongId, context: self.context)
+//					})
 					
 					for case let playlistSong as PlaylistSong in playlist.songs! {
 						if playlistSong.indexNumber > indexToRemove {
@@ -418,8 +513,6 @@ class NetworkingManager : ObservableObject {
                             songToShift.indexNumber -= 1
                         }
                     }
-                    
-                    try! privateContext.save()
                 } else {
                     playlistSong?.indexNumber = Int16(updatedIndex)
                 }
@@ -428,12 +521,16 @@ class NetworkingManager : ObservableObject {
         
         PlaylistsAPI.moveItem(playlistId: playlist.jellyfinId!, itemId: playlistSong!.jellyfinId!, newIndex: updatedIndex)
             .sink(receiveCompletion: { completion in
+				print(completion)
                 switch completion {
                 case .finished:
                     print("Playlist item moved")
+					try! privateContext.save()
                     self.saveContext()
                 case .failure:
                     print("Playlist item move failed")
+					privateContext.rollback()
+					self.saveContext()
                 }
             }, receiveValue: { response in
 //                if playlist.songs != nil {
@@ -455,16 +552,17 @@ class NetworkingManager : ObservableObject {
 //
 //                    self.saveContext()
 //                })
+				print(response)
             })
             .store(in: &self.cancellables)
     }
     
-    public func retrieveArtistByJellyfinId(jellyfinId: String) -> Artist? {
-        return self.context.object(with: self.retrieveArtistFromCoreById(jellyfinId: jellyfinId)!) as? Artist
-    }
+//    public func retrieveArtistByJellyfinId(jellyfinId: String) -> Artist? {
+//        return self.context.object(with: self.retrieveArtistFromCoreById(jellyfinId: jellyfinId)!) as? Artist
+//    }
     
 	public func retrieveArtistByName(name: String, context: NSManagedObjectContext) -> Artist? {
-        return context.object(with: self.retrieveArtistFromCore(artistName: name)!) as? Artist
+		return self.retrieveArtistFromCore(artistName: name, context: context)
     }
 
     public func loadAlbumArtwork(album: Album) -> Void {
@@ -630,6 +728,11 @@ class NetworkingManager : ObservableObject {
     public func syncLibrary() -> Void {
                 
         print("Starting Sync")
+		
+		let sync = Sync(context: self.context)
+		sync.timeStarted = Date.now
+		
+		self.saveContext()
         
         // By setting the loading phase to artists, this will cascade a sync of all items
         self.loadingPhase = .artists
@@ -679,15 +782,19 @@ class NetworkingManager : ObservableObject {
             .sink(receiveCompletion: { error in
                 switch error {
                 case .finished :
-                    
+                    			
+					print("Finished loading artists")
 					self.saveContext()
-					
                     DispatchQueue.main.sync {
                         self.loadingPhase = .albums
                     }
                 case .failure:
                     print("Error retrieving artists: \(error)")
                     
+					let sync = self.retrieveCurrentSync()
+					sync?.timeFinished = Date.now
+					sync?.wasSuccess = false
+					
                     DispatchQueue.main.sync {
                         self.loadingPhase = nil
                     }
@@ -695,36 +802,85 @@ class NetworkingManager : ObservableObject {
                 
             }, receiveValue: { response in
 
-                if response.items != nil {
-                    
-                    // Check if there are any artists we should remove
-                    self.privateContext.perform {
-                        
-                        let retrievedArtistIds = response.items!.map({ $0.id! })
-                        
-                        self.deleteMissingArtists(retrievedArtistIds: retrievedArtistIds)
-                        
-                        response.items!.forEach({ artistResult in
-                            
-                            var artist : Artist? = nil
-                            
-                            if (self.retrieveArtistFromCore(artistName: artistResult.name!) != nil) {
-                                artist = self.privateContext.object(with: self.retrieveArtistFromCore(artistName: artistResult.name!)!) as! Artist?
-                            }
-                                // Check if artist already exists in store
-                            if artist == nil {
-                                artist = Artist(context: self.privateContext)
-                                
-                                artist!.jellyfinId = artistResult.id!
-                            }
-                            
-                            artist!.name = artistResult.name ?? "Unknown Artist"
-                            artist!.dateCreated = artistResult.dateCreated?.formatted() ?? ""
-                            artist!.overview = artistResult.overview
-                            artist!.sortName = artistResult.sortName ?? artistResult.name!
-                            artist!.favorite = artistResult.userData?.isFavorite ?? artist?.favorite ?? false
-                        })
-                    }
+				// Check that we have a response and there are items, complete if else
+				guard response.items != nil else {
+					return
+				}
+				
+				// Specify we need to be on a background context
+				let backgroundContext = PersistenceController.shared.container.newBackgroundContext()
+								
+				backgroundContext.performAndWait {
+
+					let existingArtists = self.retrieveAllArtistsFromCore(context: backgroundContext)
+					
+					let existingArtistIds = Set(existingArtists.map({ $0.jellyfinId! }))
+					
+					let artistResponseIds = response.items!.map({ $0.id! })
+					
+					// Delete missing albums
+					self.deleteMissingArtists(retrievedArtistIds: artistResponseIds, context: backgroundContext)
+					
+					// Determine new albums
+					let newArtistIds = Set(artistResponseIds).subtracting(existingArtistIds)
+					
+					let newArtists = response.items!.filter({ newArtistIds.contains($0.id!) })
+					
+					let existingArtistsResponse = response.items!.filter({ !newArtistIds.contains($0.id! ) })
+					
+					
+					
+				// Create new artists concurrently
+					for artistResult in newArtists {
+							
+						print("Creating artist \(newArtists.firstIndex(of: artistResult)!) of \(newArtistIds.count)")
+							
+//							let artistResult = newArtists[index]
+							
+							let newArtist = Artist(context: backgroundContext)
+							
+							newArtist.jellyfinId = artistResult.id
+							newArtist.name = artistResult.name
+							newArtist.sortName = artistResult.sortName
+							newArtist.favorite = artistResult.userData?.isFavorite ?? false
+							
+							backgroundContext.insert(newArtist)
+					}
+					
+					var artistResponseComparables = Set(existingArtistsResponse.map({ ArtistComparable(artistResult: $0)}))
+					
+					var existingArtistComparables = Set(existingArtists.map({ ArtistComparable(artist: $0 )}))
+					
+					let updatedArtists = Array(existingArtistComparables.subtracting(artistResponseComparables))
+				
+					// Check the rest of the artists for updates
+					DispatchQueue.concurrentPerform(iterations: updatedArtists.count, execute: { index in
+						
+						print("Checking artist \(index) of \(updatedArtists.count) for updates")
+						
+						let existingArtist = existingArtists.first(where: { $0.jellyfinId! == updatedArtists[index].jellyfinId })!
+						
+						let artistResult = response.items!.first(where: { $0.id! == existingArtist.jellyfinId })!
+						
+						if self.artistContainsDifference(artist: existingArtist, artistResult: artistResult) {
+							
+							print("Updating artist \(index) of \(existingArtists.count)")
+
+							existingArtist.name = artistResult.name!
+							existingArtist.sortName = artistResult.sortName!
+							existingArtist.favorite = artistResult.userData?.isFavorite ?? false
+						}
+					})
+					
+
+					do {
+						try backgroundContext.save()
+					} catch {
+						print("Error saving artists' private context: \(error)")
+					}
+					
+					// Finally, save off the changes
+					self.saveContext()
                 }
             })
             .store(in: &cancellables)
@@ -744,262 +900,386 @@ class NetworkingManager : ObservableObject {
                 case .failure:
                     print("Error retrieving artists: \(completion)")
                     
+					let sync = self.retrieveCurrentSync()
+					sync?.timeFinished = Date.now
+					sync?.wasSuccess = false
+					
                     DispatchQueue.main.sync {
                         self.loadingPhase = nil
                     }
                 }
             }, receiveValue: { response in
-                if response.items != nil {
-                    
-                    let albumIds = response.items!.map { $0.id! }
-                    
-                    self.deleteMissingAlbums(retrievedAlbumIds: albumIds)
+				
+				// Check that we have a response and there are items, complete if else
+				guard response.items != nil else {
+					return
+				}
+				
+				// Specify we need to be on a background context
+				let backgroundContext = PersistenceController.shared.container.newBackgroundContext()
+				
+				let artists = self.retrieveAllArtistsFromCore(context: backgroundContext)
+				
+				backgroundContext.performAndWait {
 					
-					self.saveContext()
-                    
-                    let existingAlbumIds = Set(self.retrieveAllAlbumsFromCore()).map({ $0.jellyfinId! })
-                                        
-                    var albumIdsSet = Set(response.items!.map { $0.id! })
-                                                
-                    albumIdsSet.subtract(existingAlbumIds)
-                    
-                    let newAlbums = response.items!.filter { albumIdsSet.contains($0.id! )}
-                    
-					DispatchQueue.concurrentPerform(iterations: response.items!.count) { index in
+					let existingAlbums = self.retrieveAllAlbumsFromCore(context: backgroundContext)
+					
+					let existingAlbumIds = Set(existingAlbums.map({ $0.jellyfinId! }))
+					
+					let albumResponseIds = response.items!.map({ $0.id! })
+					
+					// Delete missing albums
+					self.deleteMissingAlbums(retrievedAlbumIds: albumResponseIds, context: backgroundContext)
+					
+					// Determine new albums
+					let newAlbumIds = Set(albumResponseIds).subtracting(existingAlbumIds)
+					
+					let newAlbums = response.items!.filter({ newAlbumIds.contains($0.id!) })
+					
+					let existingAlbumsResponse = response.items!.filter({ !newAlbumIds.contains($0.id!) })
+					
+					var insertIndex = 0
+					let total = newAlbums.count
+					
+					let batchInsert = NSBatchInsertRequest(entity: Album.entity()) { (managedObject: NSManagedObject) -> Bool in
+						guard insertIndex < total else { return true }
+						
+						if let newAlbum = managedObject as? Album {
+							
+							let albumResult = newAlbums[insertIndex]
+							
+							newAlbum.jellyfinId = albumResult.id
+							newAlbum.name = albumResult.name
+							newAlbum.sortName = albumResult.sortName
+							newAlbum.albumArtistName = albumResult.albumArtist
+							newAlbum.favorite = albumResult.userData?.isFavorite ?? false
+							newAlbum.productionYear = Int16(albumResult.productionYear ?? 0)
+							
+							self.refreshAlbumArtists(album: newAlbum, albumResult: albumResult, artists: artists)
 
-                        let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-                        
-                        privateContext.parent = self.privateContext
+						}
+						
+						insertIndex += 1
+						return false
+					}
+					
+					try! backgroundContext.execute(batchInsert)
+					
+					// Create new albums concurrently
+//					for albumResult in newAlbums {
+//						
+//						print("Creating album \(newAlbums.firstIndex(of: albumResult)) of \(newAlbumIds.count)")
+//													
+//						let newAlbum = Album(context: backgroundContext)
+//						
+//						newAlbum.jellyfinId = albumResult.id
+//						newAlbum.name = albumResult.name
+//						newAlbum.sortName = albumResult.sortName
+//						newAlbum.albumArtistName = albumResult.albumArtist
+//						newAlbum.favorite = albumResult.userData?.isFavorite ?? false
+//						newAlbum.productionYear = Int16(albumResult.productionYear ?? 0)
+//						
+//						self.refreshAlbumArtists(album: newAlbum, albumResult: albumResult, artists: artists)
+//					}
+					
+					var albumResponseComparables = Set(existingAlbumsResponse.map({ AlbumComparable(albumResult: $0 )}))
+									
+					var existingAlbumComparables = Set(existingAlbums.map({ AlbumComparable(album: $0 )}))
+					
+					let updatedAlbums = Array(existingAlbumComparables.subtracting(albumResponseComparables))
+										
+					// Check the rest of the albums for updates
+					DispatchQueue.concurrentPerform(iterations: updatedAlbums.count, execute: { index in
+						
+						print("Checking album \(index) of \(updatedAlbums.count) for updates")
+						
+						let existingAlbum = existingAlbums.first(where: { $0.jellyfinId! == updatedAlbums[index].jellyfinId })!
+						
+						let albumResult = response.items!.first(where: { $0.id! == existingAlbum.jellyfinId })
+						
+						if self.albumContainsDifference(album: existingAlbum, albumResult: albumResult) {
+							
+							print("Updating album \(index) of \(existingAlbums.count)")
 
-						let albumResult = response.items![index]
-                        
-                        print("Album \(index) of \(response.items!.count)")
-                        
-                        var album : Album?
-                        
-                        if (self.retrieveAlbumFromCore(albumId: albumResult.id!) == nil) {
-                            
-                            album = Album(context: privateContext)
-                            
-                            album!.jellyfinId = albumResult.id!
-                        } else {
-                            album = privateContext.object(with: self.retrieveAlbumFromCore(albumId: albumResult.id!)!) as? Album
-                        }
-                        
-                        album!.name = albumResult.name!
-                        album!.sortName = albumResult.sortName ?? albumResult.name!
-                        album!.productionYear = Int16(albumResult.productionYear ?? 0)
-                        album!.favorite = albumResult.userData?.isFavorite ?? album?.favorite ?? false
-                        
-                        // Run Time?
-                        
-                        var artist : Artist? = nil
-                        
-                        if (albumResult.albumArtist != nil) {
-                            
-                            if (self.retrieveArtistFromCore(artistName: albumResult.albumArtist!) != nil) {
-                                artist = privateContext.object(with: self.retrieveArtistFromCore(artistName: albumResult.albumArtist!)!) as! Artist?
-                            }
-                        }
-                        
-                        if (artist != nil) {
-							album!.albumArtistName = albumResult.albumArtist!
-                            
-                            self.retrieveArtistsFromCoreByJellyfinIds(jellyfinIds: albumResult.albumArtists!.map { $0.id! }).forEach({ artistObjectId in
-                                album!.addToAlbumArtists(privateContext.object(with: artistObjectId) as! Artist)
-                            })
-                        }
-                        
-                        try! privateContext.save()
-                    }
-                    
-                    self.saveContext()
-                    complete()
-                } else {
-                    complete()
-                }
+							existingAlbum.name = albumResult!.name
+							existingAlbum.sortName = albumResult!.sortName
+							existingAlbum.albumArtistName = albumResult!.albumArtist
+							existingAlbum.favorite = albumResult!.userData?.isFavorite ?? false
+							existingAlbum.productionYear = Int16(albumResult!.productionYear ?? 0)
+							
+							self.refreshAlbumArtists(album: existingAlbum, albumResult: albumResult!, artists: artists)
+						}
+					})
+								
+					do {
+						try backgroundContext.save()
+					} catch {
+						print("Unable to save albums' background context: \(error)")
+					}
+				}
             })
             .store(in: &self.cancellables)
         }
         
-    private func loadSongs(complete: @escaping () -> Void, startIndex: Int?, retrievedSongIds: [String]?) -> Void {
-        ItemsAPI.getItemsByUserId(userId: self.userId, maxOfficialRating: nil, hasThemeSong: nil, hasThemeVideo: nil, hasSubtitles: nil, hasSpecialFeature: nil, hasTrailer: nil, adjacentTo: nil, parentIndexNumber: nil, hasParentalRating: nil, isHd: nil, is4K: nil, locationTypes: nil, excludeLocationTypes: nil, isMissing: nil, isUnaired: nil, minCommunityRating: nil, minCriticRating: nil, minPremiereDate: nil, minDateLastSaved: nil, minDateLastSavedForUser: nil, maxPremiereDate: nil, hasOverview: nil, hasImdbId: nil, hasTmdbId: nil, hasTvdbId: nil, excludeItemIds: nil, startIndex: startIndex, limit: Globals.API_FETCH_PAGE_SIZE, recursive: true, searchTerm: nil, sortOrder: nil, parentId: nil, fields: [ItemFields.sortName, ItemFields.mediaSources], excludeItemTypes: nil, includeItemTypes: ["Audio"], filters: nil, isFavorite: nil, mediaTypes: nil, imageTypes: nil, sortBy: nil, isPlayed: nil, genres: nil, officialRatings: nil, tags: nil, years: nil, enableUserData: true, imageTypeLimit: nil, enableImageTypes: nil, person: nil, personIds: nil, personTypes: nil, studios: nil, artists: nil, excludeArtistIds: nil, artistIds: nil, albumArtistIds: nil, contributingArtistIds: nil, albums: nil, albumIds: nil, ids: nil, videoTypes: nil, minOfficialRating: nil, isLocked: nil, isPlaceHolder: nil, hasOfficialRating: nil, collapseBoxSetItems: nil, minWidth: nil, minHeight: nil, maxWidth: nil, maxHeight: nil, is3D: nil, seriesStatus: nil, nameStartsWithOrGreater: nil, nameStartsWith: nil, nameLessThan: nil, studioIds: nil, genreIds: nil, enableTotalRecordCount: nil, enableImages: false, apiResponseQueue: processingQueue)
+	private func loadSongs(complete: @escaping () -> Void, startIndex: Int?, retrievedSongIds: [String]?) -> Void {
+				
+		ItemsAPI.getItemsByUserId(userId: self.userId, maxOfficialRating: nil, hasThemeSong: nil, hasThemeVideo: nil, hasSubtitles: nil, hasSpecialFeature: nil, hasTrailer: nil, adjacentTo: nil, parentIndexNumber: nil, hasParentalRating: nil, isHd: nil, is4K: nil, locationTypes: nil, excludeLocationTypes: nil, isMissing: nil, isUnaired: nil, minCommunityRating: nil, minCriticRating: nil, minPremiereDate: nil, minDateLastSaved: nil, minDateLastSavedForUser: nil, maxPremiereDate: nil, hasOverview: nil, hasImdbId: nil, hasTmdbId: nil, hasTvdbId: nil, excludeItemIds: nil, startIndex: startIndex, limit: Globals.API_FETCH_PAGE_SIZE, recursive: true, searchTerm: nil, sortOrder: nil, parentId: nil, fields: [ItemFields.sortName, ItemFields.mediaSources], excludeItemTypes: nil, includeItemTypes: ["Audio"], filters: nil, isFavorite: nil, mediaTypes: nil, imageTypes: nil, sortBy: nil, isPlayed: nil, genres: nil, officialRatings: nil, tags: nil, years: nil, enableUserData: true, imageTypeLimit: nil, enableImageTypes: nil, person: nil, personIds: nil, personTypes: nil, studios: nil, artists: nil, excludeArtistIds: nil, artistIds: nil, albumArtistIds: nil, contributingArtistIds: nil, albums: nil, albumIds: nil, ids: nil, videoTypes: nil, minOfficialRating: nil, isLocked: nil, isPlaceHolder: nil, hasOfficialRating: nil, collapseBoxSetItems: nil, minWidth: nil, minHeight: nil, maxWidth: nil, maxHeight: nil, is3D: nil, seriesStatus: nil, nameStartsWithOrGreater: nil, nameStartsWith: nil, nameLessThan: nil, studioIds: nil, genreIds: nil, enableTotalRecordCount: nil, enableImages: false, apiResponseQueue: processingQueue)
                 .sink(receiveCompletion: { completion in
                     switch completion {
                     case .finished :
                         print("Finished song retrieval at \(startIndex ?? 0)")
-//                        self.saveContext()
+                        self.saveContext()
                     case .failure:
-                        print("Error retrieving artists: \(completion)")
+                        print("Error retrieving songs: \(completion)")
                         
+						let sync = self.retrieveCurrentSync()
+						sync?.timeFinished = Date.now
+						sync?.wasSuccess = false
+						
                         DispatchQueue.main.sync {
                             self.loadingPhase = nil
                         }
                     }
                     
-                }, receiveValue: { response in
-
+				}, receiveValue: { response in
                     
-                    if response.items != nil {
-                        
-                        var songIds = Set(response.items!.map { $0.id})
-                        
-                        songIds.subtract(Set(self.retrieveAllSongsFromCore().map { $0.jellyfinId}))
-                                                    
-                        let newSongs = response.items!.filter { songIds.contains($0.id)}
-                        
-                        if true {
+					guard response.items != nil && !response.items!.isEmpty else {
+						
+						self.deleteMissingSongs(retrievedSongIds: retrievedSongIds ?? [])
 
-							DispatchQueue.concurrentPerform(iterations: response.items!.count) { index in
-                                                                
-								let songResult = response.items![index]
-                                
-                                print("Song \(index) of \(newSongs.count)")
-                                        
-                                // TODO: Perform a more thorough comparison so that we update metadata if it's changed
-                                if (self.retrieveSongFromCore(songId: songResult.id!) == nil) {
-                                    
-									let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+						complete()
+						
+						return
+					}
+					// Specify we need to be on a background context
+					let backgroundContext = PersistenceController.shared.container.newBackgroundContext()
+																				
+					backgroundContext.performAndWait {
+												
+						let existingArtists = self.retrieveAllArtistsFromCore(context: backgroundContext)
+						
+						let existingAlbums = self.retrieveAllAlbumsFromCore(context: backgroundContext)
+						
+						let existingSongs = self.retrieveAllSongsFromCore(context: backgroundContext, ids: response.items!.map({ $0.id! }))
+						
+						// Determine new songs
+						let newSongIds = Set(response.items!.map({ $0.id })).subtracting(existingSongs.map({ $0.jellyfinId }))
+						
+						let newResponseSongs = response.items!.filter({ newSongIds.contains($0.id!) })
+						
+						let existingSongIds = existingSongs.map({ $0.jellyfinId! })
+												
+						let existingResponseSongs = response.items!.filter({ !newSongIds.contains($0.id!) })
+						
+						var insertIndex = 0
+						let total = newResponseSongs.count
+						
+						let result = try! backgroundContext.execute(NSBatchInsertRequest(entity: Song.entity()) { (managedObject: NSManagedObject) -> Bool in
+							guard insertIndex < total else { return true }
+														
+							if let song = managedObject as? Song {
+								
+								let songResult = newResponseSongs[insertIndex]
+								
+								song.jellyfinId = songResult.id!
+								song.name = songResult.name!
+								song.sortName = songResult.sortName ?? songResult.name!
+								song.container = songResult.mediaSources![0].container
+								song.favorite = songResult.userData?.isFavorite ?? false
 
-									privateContext.parent = self.privateContext
-									
-									let song = Song(context: privateContext)
-									
-									song.jellyfinId = songResult.id!
-									song.name = songResult.name!
-									song.sortName = songResult.sortName ?? songResult.name!
-									song.container = songResult.mediaSources![0].container
-									song.favorite = songResult.userData?.isFavorite ?? false
-									
-									// Run Time?
-									song.runTimeTicks = songResult.runTimeTicks!
-									
-									// Check that index number exists so we can unwrap it's value safely
-									if songResult.indexNumber != nil {
-										song.indexNumber = Int16(songResult.indexNumber!)
-									}
-									
-									// Check that the disk number exists so we can unwrap it's value safely
-									if songResult.parentIndexNumber != nil {
-										song.diskNumber = Int16(songResult.parentIndexNumber!)
-									}
-									
-									if let albumId = songResult.albumId {
-										song.album = privateContext.object(with: self.retrieveAlbumFromCore(albumId: albumId)!) as! Album
-									}
-									
-									if let artistIds = songResult.artistItems?.map({ $0.name }) {
-										artistIds.forEach({ artistName in
-											song.addToArtists(self.retrieveArtistByName(name: artistName!, context: privateContext)!)
-										})
-									}
-									
-									try! privateContext.save()
-                                } else {
-                                    let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+								// Run Time?
+								song.runTimeTicks = songResult.runTimeTicks!
 
-                                    privateContext.parent = self.privateContext
+								// Check that index number exists so we can unwrap it's value safely
+								if songResult.indexNumber != nil {
+									song.indexNumber = Int16(songResult.indexNumber!)
+								}
 
-                                    let song = privateContext.object(with: self.retrieveSongFromCore(songId: songResult.id!)!) as! Song
-                                    
-                                    song.name = songResult.name!
-                                    song.sortName = songResult.sortName ?? songResult.name!
-                                    song.container = songResult.mediaSources![0].container
-                                    song.favorite = songResult.userData?.isFavorite ?? false
-									
-									if let albumId = songResult.albumId {
-										song.album = privateContext.object(with: self.retrieveAlbumFromCore(albumId: albumId)!) as! Album
-									}
-									
-									if let artistIds = songResult.artistItems?.map({ $0.name }) {
-										artistIds.forEach({ artistName in
-											song.addToArtists(self.retrieveArtistByName(name: artistName!, context: privateContext)!)
-										})
-									}
-                                    
-                                    try! privateContext.save()
-                                }
-                                
-                                // Check if we've gone through everything the server has to offer
-								if (songResult == response.items!.last!) {
-                                    
-                                    // If this response is less than the configured fetch amount, it means the server doesn't
-                                    // have more to give and we should complete
-                                    if (response.items!.count < Globals.API_FETCH_PAGE_SIZE) {
-                                        
-                                        self.saveContext()
+								// Check that the disk number exists so we can unwrap it's value safely
+								if songResult.parentIndexNumber != nil {
+									song.diskNumber = Int16(songResult.parentIndexNumber!)
+								}
 
-                                        // Since we've got everything, remove songs that are no longer on the server
-                                        self.deleteMissingSongs(retrievedSongIds: retrievedSongIds! + response.items!.map({ $0.id! }))
+								if let artistIds = songResult.artistItems?.map({ $0.id! }) {
 
-                                        self.saveContext()
-                                        complete()
-                                    }
-                                    
-                                    // Else it means there may be more songs on the server, let's go again!
-                                    else {
-                                        
-                                        var index = Globals.API_FETCH_PAGE_SIZE
-                                        
-                                        if startIndex != nil {
-                                            index += startIndex!
-                                        }
-                                        
-                                        self.saveContext()
-                                        
-                                        self.loadSongs(complete: {
-                                            self.saveContext()
-                                            complete()
-                                        }, startIndex: index, retrievedSongIds: retrievedSongIds == nil ? response.items!.map({ $0.id! }) : retrievedSongIds! + response.items!.map({ $0.id! }))
-                                    }
-                                }
-                            }
-                        } else {
+									artistIds.forEach({ artistId in
+										if let artist = existingArtists.first(where: {$0.jellyfinId == artistId}) {
+											song.addToArtists(artist)
+										}
+									})
+								}
+							}
 							
-							DispatchQueue.concurrentPerform(iterations: response.items!.count, execute: { index in
-								let responseItem = response.items![index]
+							insertIndex += 1
+							return false
+						})
+									
+						let songsToAddAlbumsTo = self.retrieveSongsMissingAlbums(context: backgroundContext, songIds: Array(response.items!.map({ $0.id! })))
+						
+						print("Adding albums to \(songsToAddAlbumsTo.count) songs")
+						
+						for song in songsToAddAlbumsTo {
+													
+							let songResult = response.items!.first(where: { $0.id == song.jellyfinId })!
+							
+							if let albumId = songResult.albumId {
+								if let album = existingAlbums.first(where: { $0.jellyfinId == albumId}) {
+									song.album = album
+								} else {
+									// fatalError("Unable to associate song with album: \(song.name!)")
+								}
+							} else if let albumName = songResult.album {
+								if let album = existingAlbums.first(where: { $0.name == albumName }) {
+									song.album = album
+								} else {
+									// fatalError("Unable to associate song \(song.name!) with album: \(albumName)")
+								}
 								
-								let song = self.privateContext.object(with: self.retrieveSongFromCore(songId: responseItem.id!)!) as! Song
-								
-								song.name = responseItem.name!
-								song.favorite = responseItem.userData?.isFavorite ?? song.favorite
-								song.container = responseItem.mediaSources?[0].container ?? song.container
-							})
-                                
-                            // If this response is less than the configured fetch amount, it means the server doesn't
-                            // have more to give and we should complete
-                            if (response.items!.count < Globals.API_FETCH_PAGE_SIZE) {
-                                
-                                self.saveContext()
-                                
-                                // Since we've got everything, remove songs that are no longer on the server
-                                self.deleteMissingSongs(retrievedSongIds: retrievedSongIds! + response.items!.map({ $0.id! }))
-                                                                
-                                self.saveContext()
-                                complete()
-                            }
-                            
-                            // Else it means there may be more songs on the server, let's go again!
-                            else {
-                                
-                                var index = Globals.API_FETCH_PAGE_SIZE
-                                
-                                if startIndex != nil {
-                                    index += startIndex!
-                                }
-                                                                
-                                self.loadSongs(complete: {
-                                    complete()
-                                }, startIndex: index, retrievedSongIds: retrievedSongIds == nil ? response.items!.map({ $0.id! }) : retrievedSongIds! + response.items!.map({ $0.id! }))
-                            }
-                        }
-                        
-//                        complete()
+							}else {
+								 fatalError("Unable to associate song with album: \(song.name!)")
+							}
 
-                    } else {
-                        complete()
-                    }
-                })
+						}
+						
+						try! backgroundContext.save()
+						
+						var songResponseComparables = Set(existingResponseSongs.map({ SongComparable(songResult: $0 )}))
+						
+						var existingSongComparables = Set(existingSongs.map({ SongComparable(song: $0 )}))
+						
+						let updatedSongs = Array(existingSongComparables.subtracting(songResponseComparables))
+												
+						print("Updating \(updatedSongs.count) songs")
+
+						
+						for updatedSong in updatedSongs {
+
+							let existingSong = existingSongs.first(where: { $0.jellyfinId == updatedSong.jellyfinId })!
+							
+							guard response.items!.first(where: { $0.id! == existingSong.jellyfinId }) != nil else {
+								return
+							}
+							
+							let songResult = response.items!.first(where: { $0.id! == existingSong.jellyfinId })!
+							
+							print("Song \(existingSongs.firstIndex(of: existingSong)! + (startIndex ?? 0)) of \(updatedSongs.count + (startIndex ?? 0))")
+
+							existingSong.jellyfinId = songResult.id!
+							existingSong.name = songResult.name!
+							existingSong.sortName = songResult.sortName ?? songResult.name!
+							existingSong.container = songResult.mediaSources![0].container
+							existingSong.favorite = songResult.userData?.isFavorite ?? false
+
+							// Run Time?
+							existingSong.runTimeTicks = songResult.runTimeTicks!
+
+							// Check that index number exists so we can unwrap it's value safely
+							if songResult.indexNumber != nil {
+								existingSong.indexNumber = Int16(songResult.indexNumber!)
+							}
+
+							// Check that the disk number exists so we can unwrap it's value safely
+							if songResult.parentIndexNumber != nil {
+								existingSong.diskNumber = Int16(songResult.parentIndexNumber!)
+							}
+							if let albumId = songResult.albumId {
+
+								existingSong.album = existingAlbums.first(where: { $0.jellyfinId == albumId})
+							}
+
+							let songResultArtistIds = Set(songResult.artistItems!.map({ $0.id! }))
+							let existingSongArtistIds = Set((existingSong.artists?.allObjects as! [Artist]).map({ $0.jellyfinId! }))
+							
+							let artistIds = songResultArtistIds.subtracting(existingSongArtistIds)
+
+							artistIds.forEach({ artistId in
+								if let artist = existingArtists.first(where: {$0.jellyfinId == artistId}) {
+									existingSong.addToArtists(artist)
+								}
+							})
+						}
+						
+						
+						do {
+							try backgroundContext.save()
+						} catch {
+							print("Unable to save songs' background context: \(error)")
+						}
+					}
+					
+                        
+//                        var songIds = Set(response.items!.map { $0.id})
+//
+//                        songIds.subtract(Set(self.retrieveAllSongsFromCore().map { $0.jellyfinId}))
+//
+//                        let newSongs = response.items!.filter { songIds.contains($0.id)}
+																				
+//						songQueue.async {
+//							DispatchQueue.concurrentPerform(iterations: response.items!.count, execute: { index in
+//
+//								let privateContext : NSManagedObjectContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+//
+//								privateContext.parent = self.context
+//
+//								let songResult = response.items![index]
+//
+//								print("Song \(response.items!.firstIndex(of: songResult)! + (startIndex ?? 0)) of \(response.items!.count + (startIndex ?? 0))")
+//
+//								let song : Song?
+//
+//									// If we don't currently have the song we're iterating through...
+//								if self.retrieveSongFromCore(songId: songResult.id!) == nil {
+//
+//									// We'll get it created
+//									song = Song(context: privateContext)
+//								} else {
+//									song = privateContext.object(with: self.retrieveSongFromCore(songId: songResult.id!)!) as? Song
+//								}
+//
+//
+//								song!.jellyfinId = songResult.id!
+//								song!.name = songResult.name!
+//								song!.sortName = songResult.sortName ?? songResult.name!
+//								song!.container = songResult.mediaSources![0].container
+//								song!.favorite = songResult.userData?.isFavorite ?? false
+//
+//								// Run Time?
+//								song!.runTimeTicks = songResult.runTimeTicks!
+//
+//								// Check that index number exists so we can unwrap it's value safely
+//								if songResult.indexNumber != nil {
+//									song!.indexNumber = Int16(songResult.indexNumber!)
+//								}
+//
+//								// Check that the disk number exists so we can unwrap it's value safely
+//								if songResult.parentIndexNumber != nil {
+//									song!.diskNumber = Int16(songResult.parentIndexNumber!)
+//								}
+//								if let albumId = songResult.albumId {
+//
+//									song!.album = privateContext.object(with: self.retrieveAlbumFromCore(albumId: albumId)!) as? Album
+//								}
+//
+//								if let artistIds = songResult.artistItems?.map({ $0.id! }) {
+//
+//									artistIds.forEach({ artistId in
+//										if let artistObjectId = self.retrieveArtistFromCoreById(jellyfinId: artistId) {
+//											song!.addToArtists(privateContext.object(with: artistObjectId) as! Artist)
+//										}
+//									})
+//								}
+//
+//								if song!.hasChanges {
+//									try! privateContext.save()
+//								}
+//							})
+//						}
+						let index = Globals.API_FETCH_PAGE_SIZE + (startIndex != nil ? startIndex! : 0)
+
+					self.loadSongs(complete: {
+							complete()
+						}, startIndex: index, retrievedSongIds: (retrievedSongIds ?? []) + response.items!.map({ $0.id! }))
+					})
                 .store(in: &self.cancellables)
     }
     
@@ -1015,7 +1295,7 @@ class NetworkingManager : ObservableObject {
                     // Remove old items that don't exist on the server anymore
                     let jellyfinPlaylistIds = response.items!.map { $0.id! }
                     
-                    let playlistsToDelete = self.retrieveAllPlaylistsFromCore().filter { !jellyfinPlaylistIds.contains($0.jellyfinId!) }
+					let playlistsToDelete = self.retrieveAllPlaylistsFromCore(context: self.privateContext).filter { !jellyfinPlaylistIds.contains($0.jellyfinId!) }
                     
                     self.deletePlaylists(playlistsToDelete: playlistsToDelete)
                     
@@ -1069,7 +1349,7 @@ class NetworkingManager : ObservableObject {
     /**
      Loads a playlist's tracks from the API and associates them with the playlist, adding new tracks, removing old tracks, and updating index numbers
      */
-    private func loadPlaylistItems(playlist: Playlist, context: NSManagedObjectContext, complete: @escaping () -> Void) -> Void {
+	private func loadPlaylistItems(playlist: Playlist, context: NSManagedObjectContext, songs: [Song], complete: @escaping () -> Void) -> Void {
         PlaylistsAPI.getPlaylistItems(playlistId: playlist.jellyfinId!, userId: self.userId, apiResponseQueue: self.processingQueue)
         .sink(receiveCompletion: { complete in
             print("Playlist song retrieval for playlist \(playlist.name): \(complete)")
@@ -1082,31 +1362,33 @@ class NetworkingManager : ObservableObject {
                 
                                 
                 var index = 0
-                
+				                
                 // Clear out all songs to repopulate with new data
                 if playlist.songs != nil {
                     
                     self.deleteAllPlaylistSongsFromPlaylist(playlist: playlist, context: context)
                 }
                 
+				// Go through each of the response items and turn them into playlist songs
                 playlistItems.items!.forEach({ playlistItem in
                     
-                    let playlistSong = PlaylistSong(context: context)
-                    
-                    playlistSong.jellyfinId = playlistItem.playlistItemId
-                    
-                    playlistSong.playlist = playlist
-                    playlistSong.indexNumber = Int16(index)
-                    
-                    let song: Song = context.object(with: self.retrieveSongFromCore(songId: playlistItem.id!)!) as! Song
-                    playlistSong.song = song
-                    
-                    playlist.addToSongs(playlistSong)
+					// We can only add a song to the playlist if we have the song stored
+					if let song = songs.first(where: { $0.jellyfinId == playlistItem.id }) {
+						let playlistSong = PlaylistSong(context: context)
+						
+						playlistSong.jellyfinId = playlistItem.playlistItemId
+						
+						playlistSong.playlist = playlist
+						playlistSong.indexNumber = Int16(index)
+						
+						playlistSong.song = song
+						
+						playlist.addToSongs(playlistSong)
+					}
                     
                     index += 1
                 })
                       
-                try! context.save()
                 complete()
             } else {
                 complete()
@@ -1119,8 +1401,78 @@ class NetworkingManager : ObservableObject {
     private func loadImages() -> Void {
         
     }
+	
+	private func artistContainsDifference(artist: Artist?, artistResult: BaseItemDto) -> Bool {
+		
+		// If we didn't even have this artist before, then you bet your bottom dollar there's a difference
+		guard artist != nil else {
+			return true
+		}
+		
+		return artist!.name != artistResult.name || artist!.favorite != artistResult.userData?.isFavorite || artist!.sortName != artistResult.sortName
+	}
+	
+	private func refreshAlbumArtists(album: Album, albumResult: BaseItemDto, artists: [Artist]) -> Void {
+				
+		// Check counts first, if one exists on the result but not on what we have, then you best believe they're different
+		guard album.albumArtists != nil && albumResult.albumArtists != nil else {
+			return
+		}
+		
+		album.albumArtistName = albumResult.albumArtist
+		
+		let existingAlbumArtists : [Artist] = album.albumArtists!.allObjects as! [Artist]
+		
+		let existingAlbumArtistIds : [String] = existingAlbumArtists.map({ $0.jellyfinId! })
+		
+		let newAlbumArtistIds : [String] = albumResult.artistItems!.map({ $0.id! })
+				
+		// Check that everything we got is still there, remove as necessary
+		for albumArtistId in existingAlbumArtistIds {
+			
+			if !newAlbumArtistIds.contains(where: { $0 == albumArtistId}) {
+				
+				// The list from the server has been retrieved and this artist has been voted off the island
+				album.removeFromAlbumArtists(existingAlbumArtists.first(where: { $0.jellyfinId == albumArtistId })!)
+			}
+		}
+		
+		// Check if there are any of them we're missing, add as necessary
+		for albumArtistId in newAlbumArtistIds {
+			
+			if !existingAlbumArtistIds.contains(where: { $0 == albumArtistId }) {
+								
+				let albumResultArtist = albumResult.artistItems!.first(where: { $0.id! == albumArtistId })!
+				
+				if let byId = artists.first(where: { $0.jellyfinId == albumArtistId }) {
+					album.addToAlbumArtists(byId)
+				}
+		
+				// Else we found a case where the artist IDs don't line up, so we'll do a fuzzy search on name to see if we can get alignment
+				else if let byName = artists.first(where: { $0.name!.lowercased().contains(albumResultArtist.name!.lowercased())}) {
+					album.addToAlbumArtists(byName)
+				}
+				
+				else {
+					fatalError("Unable to associate album with artist")
+				}
+			}
+		}
+	}
+	
+	private func albumContainsDifference(album: Album?, albumResult: BaseItemDto?) -> Bool {
+		
+		// If we didn't even have this album before or it doesn't exist in the response, then we'll return false
+		guard album != nil && albumResult != nil else {
+			return false
+		}
+		
+		return album!.name != albumResult!.name! || album!.sortName != albumResult!.sortName ?? albumResult!.name! || album!.productionYear != Int16(albumResult!.productionYear ?? 0) ||
+		album!.favorite != albumResult!.userData?.isFavorite ?? album?.favorite ?? false
+
+	}
     
-    private func deleteMissingAlbums(retrievedAlbumIds: [String]) -> Void {
+	private func deleteMissingAlbums(retrievedAlbumIds: [String], context: NSManagedObjectContext) -> Void {
         
         guard !retrievedAlbumIds.isEmpty else {
             return
@@ -1133,11 +1485,16 @@ class NetworkingManager : ObservableObject {
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         
         do {
-            let albumsToDelete = try self.privateContext.fetch(fetchRequest) as! [Album]
+			
+            let albumsToDelete = try context.fetch(fetchRequest) as! [Album]
             
-            self.deleteMissingSongs(albums: albumsToDelete)
+			self.deleteMissingSongs(albums: albumsToDelete, context: context)
                         
-            try self.privateContext.execute(deleteRequest)
+            try context.execute(deleteRequest)
+			
+			try context.save()
+			
+			self.saveContext()
         } catch {
             print("Error deleting old albums: \(error)")
         }
@@ -1160,17 +1517,20 @@ class NetworkingManager : ObservableObject {
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         
         do {
-            let albumsToDelete = try self.privateContext.fetch(fetchRequest) as! [Album]
+			let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+			privateContext.parent = self.context
+
+            let albumsToDelete = try privateContext.fetch(fetchRequest) as! [Album]
             
-            self.deleteMissingSongs(albums: albumsToDelete)
+			self.deleteMissingSongs(albums: albumsToDelete, context: privateContext)
                         
-            try self.privateContext.execute(deleteRequest)
+            try privateContext.execute(deleteRequest)
         } catch {
             print("Error deleting old albums: \(error)")
         }
     }
     
-    private func deleteMissingArtists(retrievedArtistIds: [String]) -> Void {
+	private func deleteMissingArtists(retrievedArtistIds: [String], context: NSManagedObjectContext) -> Void {
         
         guard !retrievedArtistIds.isEmpty else {
             return
@@ -1183,13 +1543,13 @@ class NetworkingManager : ObservableObject {
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         
         do {
-            let artistsToDelete = try self.privateContext.fetch(fetchRequest) as! [Artist]
+            let artistsToDelete = try context.fetch(fetchRequest) as! [Artist]
             
 //            self.deleteMissingAlbums(artists: artistsToDelete)
 //            
 //            self.deleteMissingSongs(artists: artistsToDelete)
                         
-            try self.privateContext.execute(deleteRequest)
+            try context.execute(deleteRequest)
         } catch {
             print("Error deleting old artists: \(error)")
         }
@@ -1212,21 +1572,24 @@ class NetworkingManager : ObservableObject {
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         
         do {
-            let songsToDelete = try self.privateContext.fetch(fetchRequest) as! [Song]
+			let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+			privateContext.parent = self.context
+
+            let songsToDelete = try privateContext.fetch(fetchRequest) as! [Song]
 			
 			songsToDelete.filter({ $0.downloaded }).forEach({ song in
 				DownloadManager.shared.delete(song: song)
 			})
             
-            self.deleteMissingPlaylistSongs(songs: songsToDelete)
+			self.deleteMissingPlaylistSongs(songs: songsToDelete, context: privateContext)
             
-            try self.privateContext.execute(deleteRequest)
+            try privateContext.execute(deleteRequest)
         } catch {
             print("Error deleting old songs: \(error)")
         }
     }
     
-    private func deleteMissingSongs(albums: [Album]) -> Void {
+	private func deleteMissingSongs(albums: [Album], context: NSManagedObjectContext) -> Void {
         
         guard !albums.isEmpty else {
             return
@@ -1239,13 +1602,13 @@ class NetworkingManager : ObservableObject {
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         
         do {
-            let songsToDelete = try self.privateContext.fetch(fetchRequest) as! [Song]
+            let songsToDelete = try context.fetch(fetchRequest) as! [Song]
 			
 			songsToDelete.filter({ $0.downloaded }).forEach({ song in
 				DownloadManager.shared.delete(song: song)
 			})
             
-            self.deleteMissingPlaylistSongs(songs: songsToDelete)
+			self.deleteMissingPlaylistSongs(songs: songsToDelete, context: context)
             
             try self.privateContext.execute(deleteRequest)
         } catch {
@@ -1266,15 +1629,18 @@ class NetworkingManager : ObservableObject {
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         
         do {
-            let songsToDelete = try self.privateContext.fetch(fetchRequest) as! [Song]
+			let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
+			privateContext.parent = self.context
+
+            let songsToDelete = try privateContext.fetch(fetchRequest) as! [Song]
 			
 			songsToDelete.filter({ $0.downloaded }).forEach({ song in
 				DownloadManager.shared.delete(song: song)
 			})
             
-            self.deleteMissingPlaylistSongs(songs: songsToDelete)
+			self.deleteMissingPlaylistSongs(songs: songsToDelete, context: privateContext)
                         
-            try self.privateContext.execute(deleteRequest)
+            try privateContext.execute(deleteRequest)
         } catch {
             print("Error deleting old songs: \(error)")
         }
@@ -1286,7 +1652,7 @@ class NetworkingManager : ObservableObject {
         })
     }
     
-    private func deleteMissingPlaylistSongs(songs: [Song]) -> Void {
+	private func deleteMissingPlaylistSongs(songs: [Song], context: NSManagedObjectContext) -> Void {
         let fetchRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "PlaylistSong")
         
         fetchRequest.predicate = NSPredicate(format: "song in %@", songs)
@@ -1294,9 +1660,9 @@ class NetworkingManager : ObservableObject {
         let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
         
         do {
-            let songsToDelete = try self.privateContext.fetch(fetchRequest) as! [PlaylistSong]
+            let songsToDelete = try context.fetch(fetchRequest) as! [PlaylistSong]
             
-            try self.privateContext.execute(deleteRequest)
+            try context.execute(deleteRequest)
         } catch {
             print("Error deleting old playlist songs: \(error)")
         }
@@ -1314,14 +1680,14 @@ class NetworkingManager : ObservableObject {
         }
     }
     
-    private func retrieveArtistFromCore(artistName: String) -> NSManagedObjectID? {
+	private func retrieveArtistFromCore(artistName: String, context: NSManagedObjectContext?) -> Artist? {
         let fetchRequest = Artist.fetchRequest()
 
         // TODO: Fix this since it isn't retrieving the artist
         fetchRequest.predicate = NSPredicate(format: "name ==[c] %@", artistName)
                 
         do {
-            return try self.context.fetch(fetchRequest).first?.objectID
+			return context != nil ? try context!.fetch(fetchRequest).first : try self.privateContext.fetch(fetchRequest).first
         } catch {
             // TODO: handle the error
              print(error)
@@ -1330,13 +1696,13 @@ class NetworkingManager : ObservableObject {
         }
     }
     
-    private func retrieveArtistFromCoreById(jellyfinId: String) -> NSManagedObjectID? {
+	private func retrieveArtistFromCoreById(jellyfinId: String, context: NSManagedObjectContext) -> NSManagedObjectID? {
         let fetchRequest = Artist.fetchRequest()
         
         fetchRequest.predicate = NSPredicate(format: "jellyfinId == %@", jellyfinId)
         
         do {
-            return try self.context.fetch(fetchRequest).first?.objectID
+            return try context.fetch(fetchRequest).first?.objectID
         } catch {
             print("Error retrieving artist from CoreData: \(error)")
             
@@ -1344,11 +1710,11 @@ class NetworkingManager : ObservableObject {
         }
     }
     
-    public func retrieveAllArtistsFromCore() -> [Artist] {
+	public func retrieveAllArtistsFromCore(context: NSManagedObjectContext) -> [Artist] {
         let fetchRequest = Artist.fetchRequest()
         
         do {
-            return try self.privateContext.fetch(fetchRequest)
+			return try context.fetch(fetchRequest)
         } catch {
             print("Error retrieving all artists from CoreData: \(error)")
             
@@ -1398,16 +1764,13 @@ class NetworkingManager : ObservableObject {
         }
     }
  
-    private func retrieveAlbumFromCore(albumId: String) -> NSManagedObjectID? {
+	private func retrieveAlbumFromCore(albumId: String, context: NSManagedObjectContext) -> NSManagedObjectID? {
         let fetchRequest = Album.fetchRequest()
         
         fetchRequest.predicate = NSPredicate(format: "jellyfinId == %@", albumId)
-        
-        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        privateContext.parent = self.context
-        
+                
         do {
-            return try privateContext.fetch(fetchRequest).first?.objectID
+            return try context.fetch(fetchRequest).first?.objectID
         } catch {
             print("Error retrieving album from CoreData: \(error)")
             
@@ -1447,21 +1810,39 @@ class NetworkingManager : ObservableObject {
 		}
 	}
     
-    private func retrieveAllAlbumsFromCore() -> [Album] {
+	public func retrieveAllAlbumsFromCore(context: NSManagedObjectContext) -> [Album] {
         let fetchRequest = Album.fetchRequest()
-        
-        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        
-        privateContext.parent = self.context
-        
+                        
         do {
-            return try privateContext.fetch(fetchRequest)
+			return try context.fetch(fetchRequest)
         } catch let error as NSError {
             print("Error retrieving all albums from CoreData: \(error)")
             
             return []
         }
     }
+	
+	/**
+	 Retrieves songs associated with a given album sorted by disk number, then index number
+	 */
+	public func retrieveAlbumSongsFromCore(albumId: String) -> [NSManagedObjectID]? {
+		let fetchRequest = Song.fetchRequest()
+		
+		fetchRequest.predicate = NSPredicate(format: "album.jellyfinId == %@", albumId)
+		
+		fetchRequest.sortDescriptors = [
+			NSSortDescriptor(key: #keyPath(Song.diskNumber), ascending: true),
+			NSSortDescriptor(key: #keyPath(Song.indexNumber), ascending: true)
+		]
+		
+		do {
+			return try self.context.fetch(fetchRequest).map({ $0.objectID })
+		} catch let error as NSError {
+			print("Error retrieving songs from album \(albumId): \(error)")
+			
+			return nil
+		}
+	}
     
     private func retrieveSongFromCore(songId: String) -> NSManagedObjectID? {
         let fetchRequest = Song.fetchRequest()
@@ -1499,21 +1880,40 @@ class NetworkingManager : ObservableObject {
         }
     }
     
-    private func retrieveAllSongsFromCore() -> [Song] {
+	private func retrieveAllSongsFromCore(context: NSManagedObjectContext?, ids: [String]?) -> [Song] {
         let fetchRequest = Song.fetchRequest()
-                
-        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        
-        privateContext.parent = self.context
-        
+		
+		if ids != nil {
+			fetchRequest.predicate = NSPredicate(format: "jellyfinId IN %@", ids!)
+		}
+                        
         do {
-            return try privateContext.fetch(fetchRequest)
+			return context != nil ? try context!.fetch(fetchRequest) : try self.privateContext.fetch(fetchRequest)
         } catch let error as NSError {
             print("Error retrieving all songs from CoreData: \(error)")
             
             return []
         }
     }
+	
+	private func retrieveSongsMissingAlbums(context: NSManagedObjectContext, songIds: [String?]) -> [Song] {
+		let fetchRequest = Song.fetchRequest()
+		
+		let predicates = [
+			NSPredicate(format: "album == nil"),
+			NSPredicate(format: "jellyfinId IN %@", songIds)
+		]
+		
+		fetchRequest.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
+		
+		do {
+			return try context.fetch(fetchRequest)
+		} catch let error as NSError {
+			print("Error retrieving songs with missing albums: \(error)")
+			
+			return []
+		}
+	}
     
 //    private func retrieveAllSongsIdsFromCore() -> [String] {
 //        let fetchRequest = Song.fetchRequest()
@@ -1562,17 +1962,13 @@ class NetworkingManager : ObservableObject {
         }
     }
     
-    public func retrieveAllPlaylistsFromCore() -> [Playlist] {
+	public func retrieveAllPlaylistsFromCore(context: NSManagedObjectContext) -> [Playlist] {
         let fetchRequest = Playlist.fetchRequest()
         
         fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Playlist.sortName), ascending: true)]
-        
-        let privateContext = NSManagedObjectContext(concurrencyType: .privateQueueConcurrencyType)
-        
-        privateContext.parent = self.context
-        
+                
         do {
-            return try privateContext.fetch(fetchRequest)
+            return try context.fetch(fetchRequest)
         } catch let error as NSError {
             print("Error retrieving all playlists from CoreData: \(error)")
             
@@ -1640,23 +2036,53 @@ class NetworkingManager : ObservableObject {
             return nil
         }
     }
+	
+	private func retrieveCurrentSync() -> Sync? {
+		let fetchRequest = Sync.fetchRequest()
+		
+		fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Sync.timeStarted), ascending: false)]
+		fetchRequest.predicate = NSPredicate(format: "timeFinished == nil")
+		
+		do {
+			return try self.context.fetch(fetchRequest).first
+		} catch let error as NSError {
+			print("Error retrieving sync from coredata: \(error)")
+			
+			return nil
+		}
+	}
+	
+	private func retrieveLastSync() -> Sync? {
+		let fetchRequest = Sync.fetchRequest()
+		
+		fetchRequest.sortDescriptors = [NSSortDescriptor(key: #keyPath(Sync.timeFinished), ascending: false)]
+		fetchRequest.predicate = NSPredicate(format: "wasSuccess == true")
+		
+		do {
+			return try self.context.fetch(fetchRequest).first
+		} catch let error as NSError {
+			print("Error retrieving sync from coredata: \(error)")
+			
+			return nil
+		}
+	}
     
     public func saveContext() {
         
-		self.privateContext.perform {
-            do {
+		self.privateContext.performAndWait {
+			do {
 				try self.privateContext.save()
-                self.context.performAndWait {
-                    do {
-                        try self.context.save()
-                    } catch {
-                        fatalError("Failure to save main context: \(error)")
-                    }
-                }
-            } catch {
-                fatalError("Error saving private context: \(error)")
-            }
-        }
+				self.context.performAndWait {
+					do {
+						try self.context.save()
+					} catch {
+						fatalError("Failure to save main context: \(error)")
+					}
+				}
+			} catch {
+				fatalError("Error saving private context: \(error)")
+			}
+		}
     }
             
     private func setAuthHeaders() -> Void {
@@ -1705,4 +2131,132 @@ enum LoadingPhase {
     case songs
     case playlists
     case artwork
+}
+
+struct ArtistComparable : Hashable {
+	
+	var jellyfinId : String
+	var favorite : Bool
+	var name : String
+	var sortName : String
+	
+	init(artist: Artist) {
+		jellyfinId = artist.jellyfinId!
+		name = artist.name!
+		sortName = artist.sortName!
+		favorite = artist.favorite
+	}
+	
+	init(artistResult: BaseItemDto) {
+		jellyfinId = artistResult.id!
+		name = artistResult.name!
+		sortName = artistResult.sortName!
+		favorite = artistResult.userData?.isFavorite ?? false
+	}
+	
+	static func == (a: ArtistComparable, b: ArtistComparable) -> Bool {
+		return a.favorite == b.favorite && a.sortName == b.sortName && a.name == b.name && a.jellyfinId == b.jellyfinId
+	}
+	
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(jellyfinId)
+		hasher.combine(favorite)
+		hasher.combine(name)
+		hasher.combine(sortName)
+	}
+}
+
+struct AlbumComparable : Hashable {
+	
+	var jellyfinId : String
+	var favorite : Bool
+	var name : String
+	var sortName : String
+	var productionYear : Int16
+	
+	var albumArtists : [String?]
+	
+	init(album: Album) {
+		
+		jellyfinId = album.jellyfinId!
+		favorite = album.favorite
+		name = album.name!
+		sortName = album.sortName!
+		productionYear = album.productionYear
+		
+		albumArtists = [album.albumArtistName]
+	}
+	
+	init(albumResult: BaseItemDto) {
+		
+		jellyfinId = albumResult.id!
+		name = albumResult.name!
+		sortName = albumResult.sortName ?? albumResult.name!
+		favorite = albumResult.userData?.isFavorite ?? false
+		productionYear = Int16(albumResult.productionYear ?? 0)
+
+		albumArtists = [albumResult.albumArtist]
+	}
+	
+	static func == (a: AlbumComparable, b: AlbumComparable) -> Bool {
+		return a.jellyfinId == b.jellyfinId && a.favorite == b.favorite && a.albumArtists.elementsEqual(b.albumArtists) && a.productionYear == b.productionYear && a.sortName == b.sortName && a.name == b.name
+	}
+	
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(jellyfinId)
+		hasher.combine(favorite)
+		hasher.combine(name)
+		hasher.combine(sortName)
+		hasher.combine(productionYear)
+		hasher.combine(albumArtists)
+	}
+}
+
+struct SongComparable : Hashable {
+	
+	var jellyfinId : String
+	var favorite : Bool
+	var name : String
+	var sortName : String
+	var indexNumber : Int16?
+	var diskNumber : Int16?
+	
+	var artists : [String]
+	
+	init(song: Song) {
+		
+		jellyfinId = song.jellyfinId!
+		favorite = song.favorite
+		name = song.name!
+		sortName = song.sortName!
+		indexNumber = song.indexNumber
+		diskNumber = song.diskNumber
+		
+		artists = (song.artists?.allObjects as [Artist]).map({ $0.jellyfinId! })
+	}
+	
+	init(songResult: BaseItemDto) {
+		
+		jellyfinId = songResult.id!
+		name = songResult.name!
+		sortName = songResult.sortName ?? songResult.name!
+		favorite = songResult.userData?.isFavorite ?? false
+		indexNumber = songResult.indexNumber != nil ? Int16(songResult.indexNumber!) : nil
+		diskNumber = songResult.parentIndexNumber != nil ? Int16(songResult.parentIndexNumber!) : nil
+
+		artists = songResult.artistItems!.map({ $0.id! })
+	}
+	
+	static func == (a: SongComparable, b: SongComparable) -> Bool {
+		return a.jellyfinId == b.jellyfinId && a.favorite == b.favorite && a.name == b.name && a.indexNumber == b.indexNumber && a.diskNumber == b.diskNumber
+	}
+	
+	func hash(into hasher: inout Hasher) {
+		hasher.combine(jellyfinId)
+		hasher.combine(favorite)
+		hasher.combine(name)
+		hasher.combine(indexNumber)
+		hasher.combine(diskNumber)
+	}
+
 }

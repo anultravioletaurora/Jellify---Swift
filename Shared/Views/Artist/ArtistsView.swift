@@ -30,8 +30,8 @@ struct ArtistsView: View {
             sortDescriptors: [
 				NSSortDescriptor(key: #keyPath(Artist.favorite), ascending: false),
 				NSSortDescriptor(key: #keyPath(Artist.sortName), ascending: true, selector: #selector(NSString.caseInsensitiveCompare))
-			],
-			predicate: NSPredicate(format: "albums.@count != 0")
+			]
+//			predicate: NSPredicate(format: "albums.@count != 0")
         )
     }
     
@@ -73,6 +73,7 @@ struct ArtistsView: View {
                 }
             }
         }
+		.navigationViewStyle(.stack) 
     }
 }
 

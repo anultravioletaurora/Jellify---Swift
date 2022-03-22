@@ -15,6 +15,6 @@ struct AlbumPlayingImage: View {
     var height = UIScreen.main.bounds.height / 2.5
 
     var body: some View {
-        ItemThumbnail(thumbnail: album.artwork, itemId: album.jellyfinId!, frame: height, cornerRadius: 10)
+        ItemThumbnail(itemId: album.jellyfinId!, frame: height, cornerRadius: 10)
     }
 }

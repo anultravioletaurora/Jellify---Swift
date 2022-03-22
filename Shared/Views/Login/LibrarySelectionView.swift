@@ -44,6 +44,7 @@ struct LibrarySelectionView: View {
             }
 
         }
+		.navigationViewStyle(.stack) 
         .onAppear(perform: {
             librarySelectionService.retrieveLibraries(complete: { libraries in
                 self.libraries = libraries.items

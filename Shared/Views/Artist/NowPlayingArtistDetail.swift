@@ -7,11 +7,8 @@
 
 import SwiftUI
 
-struct ArtistDetailView: View {
-    
-    @Environment(\.managedObjectContext)
-    var managedObjectContext
-        
+struct NowPlayingArtistDetailView: View {
+            
     var fetchRequest: FetchRequest<Album>
     
     var albums: FetchedResults<Album>{
@@ -26,31 +23,27 @@ struct ArtistDetailView: View {
     
     @State
     var loading : Bool = true
-	
-	@Environment(\.presentationMode)
-	var mode: Binding<PresentationMode>
-	
-	@EnvironmentObject
-	var player : Player
+			
+	@StateObject
+	var player : Player = Player.shared
 	
 	@EnvironmentObject
 	var viewControls : ViewControls
-
-	@State
-    var artist : Artist
-	    
-    @ObservedObject
-    var networkingManager : NetworkingManager = NetworkingManager.shared
-	
-	@State
-	var artistToView : Artist?
 	
 	@State
 	var navigateAway : Bool = false
-	                
-	init(_ artist: Artist) {
-
-		self._artist = State(wrappedValue: artist)
+		    
+    @ObservedObject
+    var networkingManager : NetworkingManager = NetworkingManager.shared
+	
+	var artist : Artist
+	
+	@State
+	var newArtist : Artist?
+                
+	init(artist: Artist) {
+				
+		self.artist = artist
 		
         self.fetchRequest = FetchRequest(
             entity: Album.entity(),
@@ -58,7 +51,7 @@ struct ArtistDetailView: View {
 				NSSortDescriptor(key: #keyPath(Album.favorite), ascending: false),
 				NSSortDescriptor(key: #keyPath(Album.productionYear), ascending: false)
 			],
-            predicate: NSPredicate(format: "albumArtistName == %@", artist.name!)
+			predicate: NSPredicate(format: "albumArtistName == %@", self.artist.name!)
         )		
     }
     
@@ -110,32 +103,31 @@ struct ArtistDetailView: View {
                 }
             }
             .listStyle(PlainListStyle())
-            
-//        .searchable(text: $search, prompt: "Search \(artist.name ?? "Unknown Artist") albums")
-//        .onChange(of: search, perform: { newSearch in
-//            albums.nsPredicate = newSearch.isEmpty ? nil : NSPredicate(format: "%K contains[c] %@", #keyPath(Album.name), newSearch)
-//
-//        })
+			.onAppear {
+				self.viewControls.showArtistView = false
+				self.viewControls.currentView = .NowPlayingArtistDetail
+				self.navigateAway = false
+				self.newArtist = nil
+			}
+			.onChange(of: self.viewControls.showArtistView, perform: { newValue in
+				if newValue && viewControls.currentView == .NowPlayingArtistDetail{
+					
+					if newArtist == nil {
+						if let currentArtist = player.currentArtist {
+							
+							self.newArtist = currentArtist
+															
+							self.navigateAway = true
+						}
+					}
+				}
+			})
+			
+			if self.newArtist != nil {
+				NavigationLink(destination: NowPlayingArtistDetailView(artist: newArtist!), isActive: $navigateAway, label: {})
+					.isDetailLink(false)
+			}
         }
         .navigationTitle(artist.name ?? "Unknown Artist")
-		.onAppear {
-			self.viewControls.currentView = .ArtistDetail
-			self.viewControls.showArtistView = false
-		}
-		.onChange(of: self.viewControls.showArtistView, perform: { newValue in
-			if newValue && self.viewControls.currentView == .ArtistDetail {
-				if let artist = player.currentArtist {
-					
-					self.artistToView = artist
-					
-					self.navigateAway = true
-				}
-			}
-		})
-		
-		if self.artistToView != nil {
-			NavigationLink(destination: NowPlayingArtistDetailView(artist: self.artistToView!), isActive: $navigateAway, label: {})
-				.isDetailLink(false)
-		}
     }
 }

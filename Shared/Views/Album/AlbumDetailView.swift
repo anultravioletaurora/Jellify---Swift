@@ -27,25 +27,43 @@ struct AlbumDetailView: View {
         
     @State
     var selectedSong: Song?
-        
-    @State
-    var player : AVPlayer = AVPlayer()
-        
+                
     let networkingManager : NetworkingManager = NetworkingManager.shared
         
     @State
     var confirmDeleteDownload : Bool = false
-    
-    let downloadManager : DownloadManager = DownloadManager.shared
+		
+	@EnvironmentObject
+	var viewControls : ViewControls
+	
+	@EnvironmentObject
+	var player : Player
+	
+	@Environment(\.presentationMode)
+	var mode: Binding<PresentationMode>
 
-    init(album: Album) {
+    let downloadManager : DownloadManager = DownloadManager.shared
+	
+	@State
+	var isDisplayed : Bool = false
+	
+	@State
+	var artist : Artist?
+	
+	@State
+	var navigateAway : Bool = false
+	
+	@State
+	var newArtist : Artist?
+
+	init(album: Album) {
         self.album = album
         
         self.fetchRequest = FetchRequest(
             entity: Song.entity(),
             sortDescriptors: [NSSortDescriptor(key: #keyPath(Song.diskNumber), ascending: true), NSSortDescriptor(key: #keyPath(Song.indexNumber), ascending: true)],
             predicate: NSPredicate(format: "(album == %@)", album)
-        )
+        )		
     }
     
     var body: some View {
@@ -111,7 +129,7 @@ struct AlbumDetailView: View {
                     HStack {
                         Spacer()
                         
-						Text(networkingManager.retrieveArtistByName(name: album.albumArtistName ?? "Unknown Artist", context: networkingManager.privateContext)?.name ?? "Unknown Artist")
+						Text(Builders.artistName(album: album))
                             .foregroundColor(.accentColor)
 
                         Spacer()
@@ -197,9 +215,30 @@ struct AlbumDetailView: View {
                     PlaylistSelectionSheet(song: $selectedSong, showPlaylistSheet: $showPlaylistSheet)
                 })
         }
-
         .listStyle(PlainListStyle())
+			
         }
+		.onAppear {
+			self.viewControls.showArtistView = false
+			self.viewControls.currentView = .AlbumDetail
+			self.navigateAway = false
+			self.newArtist = nil
+		}
+		.onChange(of: self.viewControls.showArtistView, perform: { newValue in
+			if newValue && self.viewControls.currentView == .AlbumDetail {
+				if let currentArtist = player.currentArtist {
+					
+					self.newArtist = currentArtist
+					
+					self.navigateAway = true
+				}
+			}
+		})
+		
+		if self.newArtist != nil {
+			NavigationLink(destination: NowPlayingArtistDetailView(artist: newArtist!), isActive: $navigateAway, label: {})
+				.isDetailLink(false)
+		}
     }
     
     func getRuntime(runTimeTicks: Int) -> String{

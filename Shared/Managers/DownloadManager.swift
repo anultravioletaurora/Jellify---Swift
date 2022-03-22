@@ -79,7 +79,7 @@ public class DownloadManager {
             .store(in: &networkingManager.cancellables)
     }
     
-    public func download(songs: [Song]) -> Void {
+	public func download(songs: [Song]) -> Void {
         
         guard !songs.isEmpty else {
             return

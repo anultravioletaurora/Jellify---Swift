@@ -96,10 +96,73 @@ struct SongRow: View {
                 } else if song.downloading {
                     ProgressView()
                 }
+				
+//				Menu(content: {
+//							Button(action: {
+//								player.appendSongsNext([song])
+//							}, label: {
+//								HStack {
+//									Image(systemName: "text.insert")
+//
+//									Text("Play Next")
+//								}
+//							})
+//							
+//							Button(action: {
+//								player.appendSongsEnd([song])
+//							}, label: {
+//								HStack {
+//									Image(systemName: "text.badge.plus")
+//									
+//									Text("Add to Queue")
+//								}
+//							})
+//							
+//							Button(action: {
+//								
+//								selectedSong = song
+//								
+//								showPlaylistSheet.toggle()
+//							}, label: {
+//								HStack {
+//									Image(systemName: "plus.rectangle.on.rectangle")
+//									
+//									Text("Add to Playlist")
+//								}
+//							})
+//							
+//							Button(action: {
+//								
+//								if song.downloaded {
+//									downloadManager.delete(song: song)
+//								} else {
+//									downloadManager.download(song: song)
+//								}
+//							}, label: {
+//								
+//								if song.downloaded {
+//									HStack {
+//										Image(systemName: "trash.circle")
+//										
+//										Text("Remove Download")
+//									}
+//								} else {
+//									HStack {
+//										Image(systemName: "arrow.down.circle")
+//										
+//										Text("Download")
+//									}
+//								}
+//							})
+//				}, label: {
+//					Image(systemName: "ellipsis")
+//						.font(.title)
+//						.foregroundColor(.primary)
+//				})
             })
         })
-            .id(UUID())
-        .padding(.horizontal, 10)
+		.id(UUID())
+        .padding(.trailing, 10)
         .buttonStyle(PlainButtonStyle())
         .contextMenu {
             Button(action: {

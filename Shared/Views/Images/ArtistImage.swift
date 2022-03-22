@@ -13,6 +13,6 @@ struct ArtistImage: View {
     var artist : FetchedResults<Artist>.Element
         
     var body: some View {
-        ItemThumbnail(thumbnail: artist.thumbnail, itemId: artist.jellyfinId!, frame: 100, cornerRadius: 100)
+        ItemThumbnail(itemId: artist.jellyfinId!, frame: 100, cornerRadius: 100)
     }
 }

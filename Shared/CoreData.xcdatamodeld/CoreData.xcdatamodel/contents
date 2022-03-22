@@ -14,6 +14,9 @@
         <relationship name="albumArtists" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Artist" inverseName="albums" inverseEntity="Artist"/>
         <relationship name="genres" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Genre" inverseName="albums" inverseEntity="Genre"/>
         <relationship name="songs" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Song" inverseName="album" inverseEntity="Song"/>
+        <fetchIndex name="byJellyfinIdIndex">
+            <fetchIndexElement property="jellyfinId" type="Binary" order="ascending"/>
+        </fetchIndex>
     </entity>
     <entity name="Artist" representedClassName="Artist" syncable="YES" codeGenerationType="class">
         <attribute name="dateCreated" optional="YES" attributeType="String"/>
@@ -57,12 +60,18 @@
         <attribute name="indexNumber" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="jellyfinId" optional="YES" attributeType="String"/>
         <attribute name="name" optional="YES" attributeType="String"/>
+        <attribute name="playCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="runTime" optional="YES" attributeType="String"/>
         <attribute name="runTimeTicks" optional="YES" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="sortName" optional="YES" attributeType="String"/>
         <relationship name="album" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Album" inverseName="songs" inverseEntity="Album"/>
         <relationship name="artists" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="Artist" inverseName="songs" inverseEntity="Artist"/>
         <relationship name="playlists" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="PlaylistSong" inverseName="song" inverseEntity="PlaylistSong"/>
+    </entity>
+    <entity name="Sync" representedClassName="Sync" syncable="YES" codeGenerationType="class">
+        <attribute name="timeFinished" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="timeStarted" attributeType="Date" usesScalarValueType="NO"/>
+        <attribute name="wasSuccess" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
     </entity>
     <entity name="User" representedClassName="User" syncable="YES" codeGenerationType="class">
         <attribute name="authToken" optional="YES" attributeType="String"/>
@@ -72,23 +81,16 @@
         <attribute name="serverId" optional="YES" attributeType="String"/>
         <attribute name="userId" optional="YES" attributeType="String"/>
     </entity>
-    <entity name="UserData" representedClassName="UserData" syncable="YES" codeGenerationType="class">
-        <attribute name="isFavorite" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
-        <attribute name="key" optional="YES" attributeType="UUID" usesScalarValueType="NO"/>
-        <attribute name="playCount" optional="YES" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
-        <relationship name="album" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Album"/>
-        <relationship name="artist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Artist"/>
-        <relationship name="playlist" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Playlist"/>
-        <relationship name="song" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="Song"/>
-    </entity>
+    <entity name="UserData" representedClassName="UserData" syncable="YES" codeGenerationType="class"/>
     <elements>
         <element name="Album" positionX="-250.671875" positionY="-102.76171875" width="128" height="224"/>
         <element name="Artist" positionX="-453.94140625" positionY="-31.875" width="128" height="179"/>
-        <element name="Genre" positionX="0" positionY="126" width="128" height="88"/>
+        <element name="Genre" positionX="0" positionY="126" width="128" height="74"/>
         <element name="Playlist" positionX="0" positionY="126" width="128" height="134"/>
         <element name="PlaylistSong" positionX="-252" positionY="27" width="128" height="89"/>
-        <element name="Song" positionX="-437.8984375" positionY="131.203125" width="128" height="254"/>
+        <element name="Song" positionX="-437.8984375" positionY="131.203125" width="128" height="269"/>
+        <element name="Sync" positionX="-252" positionY="27" width="128" height="74"/>
         <element name="User" positionX="-243.81640625" positionY="156.03515625" width="128" height="133"/>
-        <element name="UserData" positionX="-68.51171875" positionY="-130.66796875" width="128" height="134"/>
+        <element name="UserData" positionX="-68.51171875" positionY="-130.66796875" width="128" height="29"/>
     </elements>
 </model>

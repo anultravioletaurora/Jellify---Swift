@@ -17,6 +17,21 @@ struct ArtistsListView: View {
     // ID for the list, this will get regenerated when the user searches so that we generate a new list, this is because there are rerendering issues with searching on large lists where list items overlap with the navigation header
     @State
     var listId = UUID()
+	
+	@EnvironmentObject
+	var viewControls : ViewControls
+	
+	@EnvironmentObject
+	var player : Player
+	
+	@State
+	var artist : Artist?
+	
+	@State
+	var artistToView : Artist?
+	
+	@State
+	var navigateAway : Bool = false
     
     var body: some View {
         // Artists List
@@ -35,7 +50,8 @@ struct ArtistsListView: View {
 			listId = UUID()
 			
             guard !$0.isEmpty else {
-                artists.nsPredicate = NSPredicate(format: "albums.@count != 0")
+//                artists.nsPredicate = NSPredicate(format: "albums.@count != 0")
+				artists.nsPredicate = nil
                 return
             }
             
@@ -46,13 +62,33 @@ struct ArtistsListView: View {
             }
             
             var predicates = searches.map { search in
-                NSPredicate(format: "%K beginswith[c] %@", #keyPath(Artist.name), search)
+                NSPredicate(format: "%K contains[c] %@", #keyPath(Artist.name), search)
             }
 			
-			predicates.append(NSPredicate(format: "albums.@count != 0"))
+//			predicates.append(NSPredicate(format: "albums.@count != 0"))
 			
             artists.nsPredicate = searchBar.search.isEmpty ? nil : NSCompoundPredicate(andPredicateWithSubpredicates: predicates)
         }
         .listStyle(PlainListStyle())
+		
+		.onAppear {
+			self.viewControls.currentView = .Artist
+			self.viewControls.showArtistView = false
+		}
+		.onChange(of: self.viewControls.showArtistView, perform: { newValue in
+			if newValue && self.viewControls.currentView == .Artist {
+				if let artist = player.currentArtist {
+					
+					self.artistToView = artist
+					
+					self.navigateAway = true
+				}
+			}
+		})
+		
+		if self.artistToView != nil {
+			NavigationLink(destination: NowPlayingArtistDetailView(artist: self.artistToView!), isActive: $navigateAway, label: {})
+				.isDetailLink(false)
+		}
     }
 }

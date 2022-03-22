@@ -52,5 +52,6 @@ struct AlbumsView: View {
                 }
             }
         }
+		.navigationViewStyle(.stack) 
     }
 }

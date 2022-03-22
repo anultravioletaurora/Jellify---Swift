@@ -17,6 +17,9 @@ struct ContentView: View {
     
     @ObservedObject
     var networkingManager = NetworkingManager.shared
+	
+	@ObservedObject
+	var player = Player.shared
     
     @EnvironmentObject
     var settings : Settings
@@ -26,8 +29,7 @@ struct ContentView: View {
     
     @State
     var miniplayerExpanded = false
-
-        
+	
     init() {
         
         // Because of reasons I don't know, this is needed so that the tab bar doesn't
@@ -53,28 +55,28 @@ struct ContentView: View {
         // Else have them start listening
         else {
             
-            TabBarView()
+			TabBarView()
 
 
-            .onAppear(perform: {
-                
-                networkingManager.openSession()
-                
-                // Start up any downloads that haven't completed
-                networkingManager.processDownloadQueue()
-                
-                // Sync library on app startup
-                if settings.syncOnStartup {
-                    networkingManager.syncLibrary()
-                }
-            })
-            .transition(.opacity)
-            .popup(isBarPresented: $miniplayerPresented, isPopupOpen: $miniplayerExpanded, popupContent: {
-                NowPlayingView(miniplayerExpanded: $miniplayerExpanded)
-            })
-            .popupBarProgressViewStyle(.top)
-            .popupBarMarqueeScrollEnabled(true)
-            .popupInteractionStyle(.drag)
+			.onAppear(perform: {
+				
+				networkingManager.openSession()
+				
+				// Start up any downloads that haven't completed
+				networkingManager.processDownloadQueue()
+				
+				// Sync library on app startup
+				if settings.syncOnStartup {
+					networkingManager.syncLibrary()
+				}
+			})
+			.transition(.opacity)
+			.popup(isBarPresented: $miniplayerPresented, isPopupOpen: $miniplayerExpanded, popupContent: {
+				NowPlayingView(miniplayerExpanded: $miniplayerExpanded)
+			})
+			.popupBarProgressViewStyle(.top)
+			.popupBarMarqueeScrollEnabled(true)
+			.popupInteractionStyle(.drag)
         }
     }
 }

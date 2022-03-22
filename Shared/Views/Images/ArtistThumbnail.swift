@@ -15,13 +15,13 @@ struct ArtistThumbnail: View {
     let networkingManager : NetworkingManager = NetworkingManager.shared
     
     var body: some View {
-        ItemThumbnail(thumbnail: artist.thumbnail, itemId: artist.jellyfinId!, frame: 60, cornerRadius: 100)
-            .onAppear(perform: {
-                networkingManager.imageQueue.async {
-                    if (artist.thumbnail == nil) {
-                        networkingManager.loadArtistImage(artist: artist)
-                    }
-                }
-            })
+        ItemThumbnail(itemId: artist.jellyfinId!, frame: 60, cornerRadius: 100)
+//            .onAppear(perform: {
+//                networkingManager.imageQueue.async {
+//                    if (artist.thumbnail == nil) {
+//                        networkingManager.loadArtistImage(artist: artist)
+//                    }
+//                }
+//            })
     }
 }

@@ -83,7 +83,7 @@ struct SongsListView: View {
         .id(listId)
         .searchable(text: $searchBar.search, prompt: "Search songs")
         .disableAutocorrection(true)
-        .onReceive(searchBar.$search.debounce(for: .seconds(Globals.debounceDuration), scheduler: RunLoop.main))
+        .onReceive(searchBar.$search.debounce(for: .seconds(Globals.debounceDuration), scheduler: DispatchQueue.main))
         {
             listId = UUID()
             
@@ -99,7 +99,7 @@ struct SongsListView: View {
             }
             
             let predicates = searches.map { search in
-                NSPredicate(format: "%K beginswith[c] %@", #keyPath(Song.name), search)
+                NSPredicate(format: "%K contains[c] %@", #keyPath(Song.name), search)
             }
                     
             songs.nsPredicate = searchBar.search.isEmpty ? nil : NSCompoundPredicate(orPredicateWithSubpredicates: predicates)

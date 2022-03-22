@@ -13,13 +13,15 @@ struct NowPlayingView: View {
         
     @EnvironmentObject
     var player : Player
+	
+	let imageManager = ImageManager.shared
 
     @State
     private var airPlayView = AirPlayView()
         
     @Binding
     var miniplayerExpanded : Bool
-    
+	    
     @State
     private var viewingQueue = false
     
@@ -37,11 +39,11 @@ struct NowPlayingView: View {
             
             if horizontalSizeClass == .compact {
                 VStack {
-                    PlayerViewBody(viewingQueue: $viewingQueue, miniplayerExpanded: $miniplayerExpanded)
+					PlayerViewBody(viewingQueue: $viewingQueue, miniplayerExpanded: $miniplayerExpanded)
                 }
             } else {
                 HStack {
-                    PlayerViewBody(viewingQueue: $viewingQueue, miniplayerExpanded: $miniplayerExpanded)
+					PlayerViewBody(viewingQueue: $viewingQueue, miniplayerExpanded: $miniplayerExpanded)
                 }
                 .padding(.horizontal, 30)
             }
@@ -52,12 +54,12 @@ struct NowPlayingView: View {
             // Blurred album artwork background
             .background(content: {
                 
-				if player.currentSong?.song.album != nil && player.currentSong?.song.album!.artwork != nil {
+				if player.currentSong?.song.album != nil {
                     AlbumBackdropImage(album: player.currentSong!.song.album!)
                 }
             })
             .popupTitle(player.currentSong?.song.name ?? "Nothing Playing", subtitle: Builders.artistName(song: player.currentSong?.song) )
-			.popupImage(player.currentSong != nil && player.currentSong!.song.album != nil ? Image(data: player.currentSong!.song.album!.artwork).resizable() :  Image("placeholder").resizable())
+			.popupImage(player.currentSong != nil && player.currentSong!.song.album != nil ? Image(data: imageManager.imageFor(itemId: player.currentSong!.song.album!.jellyfinId!)).resizable() :  Image("placeholder").resizable())
             .popupBarItems({
                 HStack {
                     // Play / Pause music
@@ -120,7 +122,10 @@ struct PlayerViewBody : View {
     
     @Binding
     var miniplayerExpanded : Bool
-        
+	
+	@EnvironmentObject
+	var viewControls : ViewControls
+	
     var height = UIScreen.main.bounds.height / 2.5
 
     @Environment(\.colorScheme)
@@ -164,6 +169,13 @@ struct PlayerViewBody : View {
                                 .font(.title2)
 
                             Text(Builders.artistName(song: player.currentSong?.song ?? nil))
+								.onTapGesture {
+									miniplayerExpanded.toggle()
+														
+									if let artist = NetworkingManager.shared.retrieveArtistByName(name: player.currentSong!.song.album!.albumArtistName!, context: NetworkingManager.shared.context) {
+										viewControls.showArtistView = true
+									}
+								}
 
                             // Album name text
                             Text(player.currentSong?.song.album?.name ?? "")
